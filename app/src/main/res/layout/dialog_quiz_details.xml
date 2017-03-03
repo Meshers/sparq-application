@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Date"
+        android:textColor="@color/secondaryText"
+        android:textSize="@dimen/list_sub_heading" />
+
+    <TextView
+        android:id="@+id/dialog_quiz_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Some Description"
+        android:textColor="@color/primaryText"
+        android:textSize="@dimen/list_heading" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="Description"
+        android:textColor="@color/secondaryText"
+        android:textSize="@dimen/list_sub_heading" />
+
+    <TextView
+        android:id="@+id/dialog_quiz_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Some Description"
+        android:textColor="@color/primaryText"
+        android:textSize="@dimen/list_heading" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="Total Number of Questions"
+        android:textColor="@color/secondaryText"
+        android:textSize="@dimen/list_sub_heading" />
+
+    <TextView
+        android:id="@+id/dialog_quiz_no_questions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Some Description"
+        android:textColor="@color/primaryText"
+        android:textSize="@dimen/list_heading" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="Duration"
+        android:textColor="@color/secondaryText"
+        android:textSize="@dimen/list_sub_heading" />
+
+    <TextView
+        android:id="@+id/dialog_quiz_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Some Description"
+        android:textColor="@color/primaryText"
+        android:textSize="@dimen/list_heading" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="Max Number of Marks"
+        android:textColor="@color/secondaryText"
+        android:textSize="@dimen/list_sub_heading" />
+
+    <TextView
+        android:id="@+id/dialog_quiz_max_marks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Some Description"
+        android:textColor="@color/primaryText"
+        android:textSize="@dimen/list_heading" />
+
+</LinearLayout>
