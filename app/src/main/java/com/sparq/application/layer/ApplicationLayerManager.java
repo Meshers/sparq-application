@@ -10,6 +10,10 @@ import java.io.UnsupportedEncodingException;
 public class ApplicationLayerManager {
     private AlContext mAlContext;
 
+    public ApplicationLayerManager(){
+        this.mAlContext = new AlContext();
+    }
+
     public void sendData(byte[] packet, byte toAddr) {
         mAlContext.sendPdu(toAddr, packet);
     }

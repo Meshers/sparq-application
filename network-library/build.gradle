@@ -1,0 +1,4 @@
+configurations.maybeCreate("default")
+artifacts.add("default", file('network-lib.aar'))
+dependencies {
+}
