@@ -1,5 +1,7 @@
 package com.sparq.application.layer;
 
+import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -30,26 +32,11 @@ public class ApplicationLayerManager {
     private byte mOwnAddr;
     private LinkLayerManager mLinkLayerManager;
 
-    public ApplicationLayerManager(byte ownAddr,
-                                   final LinkLayerManager linkLayerManager,
+    public ApplicationLayerManager(byte ownAddr, MyBluetoothAdapter bluetoothAdapter,
                                    final ApplicationPacketDiscoveryHandler applicationPacketDiscoveryHandler){
 
         this.mApplicationPacketDiscoveryHandler = applicationPacketDiscoveryHandler;
-        this.mLinkLayerManager = linkLayerManager;
         this.mOwnAddr = ownAddr;
-
-
-        AlContext.Callback callback = new AlContext.Callback() {
-            @Override
-            public void transmitPdu(ApplicationLayerPdu pdu) {
-                mLinkLayerManager.sendData(pdu.encode(), mToAddr);
-            }
-
-            @Override
-            public void sendUpperLayer(AlMessage message) {
-                applicationPacketDiscoveryHandler.handleDiscovery(message);
-            }
-        };
 
         DeviceDiscoveryHandler discoveryHandler = new DeviceDiscoveryHandler() {
 
@@ -60,6 +47,27 @@ public class ApplicationLayerManager {
                 mAlContext.receivePdu(pdu);
             }
         };
+
+        this.mLinkLayerManager = new LinkLayerManager(
+                mOwnAddr,
+                bluetoothAdapter,
+                discoveryHandler
+        );
+
+
+
+        AlContext.Callback callback = new AlContext.Callback() {
+            @Override
+            public void transmitPdu(ApplicationLayerPdu pdu) {
+                mLinkLayerManager.sendData(pdu.encode(), mToAddr);
+            }
+
+            @Override
+            public void sendUpperLayer(AlMessage message) {
+                mApplicationPacketDiscoveryHandler.handleDiscovery(message);
+            }
+        };
+
     }
 
     public void sendData(ApplicationLayerPdu.TYPE type, byte[] data, byte toAddr , byte... headers) {

@@ -21,7 +21,7 @@ public class QuizItem extends Questionare{
     }
 
     public QuizItem(int quizId, int eventId, String name, String description, Date date, long duration, int state, double totalMarks, UserItem creator){
-        super(quizId, eventId, 0, name, description, date, creator);
+        super(quizId, eventId, 0, name, description, date, creator, 0);
 
         this.state = state;
         this.duration = duration;

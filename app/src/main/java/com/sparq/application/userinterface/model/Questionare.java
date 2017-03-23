@@ -27,7 +27,7 @@ public abstract class Questionare {
         questions = new HashMap<Integer, QuestionItem>();
     }
 
-    public Questionare(int questionareId, int eventId, int type, String name, String description, Date date, UserItem creator){
+    public Questionare(int questionareId, int eventId, int type, String name, String description, Date date, UserItem creator, int numberOfQuestions){
         this.questionareId = questionareId;
         this.type = type;
         this.name = name;
@@ -36,7 +36,11 @@ public abstract class Questionare {
         this.date = date;
         this.creator = creator;
 
-        questions = new HashMap<Integer, QuestionItem>();
+        questions = new HashMap<Integer, QuestionItem>(numberOfQuestions);
+
+        for(int i = 0; i < numberOfQuestions; i++){
+            questions.put(i, null);
+        }
     }
 
     public int getQuestionareId() {
@@ -103,25 +107,12 @@ public abstract class Questionare {
         this.questions = questions;
     }
 
-    public boolean addQuestionToList(int questionId, int questionareId, String question, int format, double totalMarks){
+    public boolean addQuestionToList(int questionId, QuestionItem questionItem){
 
         if(questions.containsKey(questionId)){
             return false;
         }
         else{
-            QuestionItem questionItem = new QuestionItem(questionId, questionareId, question, format, totalMarks);
-            questions.put(questionId, questionItem);
-            return true;
-        }
-    }
-
-    public boolean addQuestionToList(int questionId, int questionareId, String question, int format, double totalMarks, HashMap<Integer, String> options){
-
-        if(questions.containsKey(questionId)){
-            return false;
-        }
-        else{
-            QuestionItem questionItem = new QuestionItem(questionId, questionareId, question, format, totalMarks, options);
             questions.put(questionId, questionItem);
             return true;
         }
@@ -135,7 +126,7 @@ public abstract class Questionare {
         return questions.get(questionId);
     }
 
-    public boolean editQuestion(int questionId, int questionareId, String question, int format, double totalMarks) {
+    public boolean editQuestion(int questionId, int questionareId, String question, QuestionItem.FORMAT format, double totalMarks) {
 
         if(!questions.containsKey(questionId)){
             return false;

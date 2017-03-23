@@ -8,23 +8,23 @@ import java.util.Date;
 
 public class ConversationThread extends Questionare {
 
-    public String getQuestion() {
-        return question;
-    }
-
-    public void setQuestion(String question) {
-        this.question = question;
-    }
-
-    private String question;
-
     public ConversationThread(){
         super();
     }
 
     public ConversationThread(int threadId, int eventId, Date date, UserItem creator, String question){
-        super(threadId, eventId, 2, null, null, date, creator);
-        this.question = question;
+        super(threadId, eventId, 2, null, null, date, creator, 1);
 
+        QuestionItem questionItem = new QuestionItem(1, threadId, question,QuestionItem.FORMAT.SHORT, (double) 0);
+        super.addQuestionToList(1, questionItem);
+
+    }
+
+    public QuestionItem getQuestionItem(int key){
+        return super.getQuestionWithKey(key);
+    }
+
+    public String getQuestionString(int key){
+        return super.getQuestionWithKey(key).getQuestion();
     }
 }

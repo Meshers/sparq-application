@@ -14,6 +14,9 @@ import android.view.View;
 import android.widget.ListView;
 
 import com.sparq.R;
+import com.sparq.application.layer.ApplicationLayerManager;
+import com.sparq.application.layer.ApplicationPacketDiscoveryHandler;
+import com.sparq.application.layer.almessage.AlMessage;
 import com.sparq.application.userinterface.adapter.AnswerListAdapter;
 import com.sparq.application.userinterface.adapter.QuizListAdapter;
 import com.sparq.application.userinterface.adapter.RecyclerItemClickListener;
@@ -26,11 +29,18 @@ import com.sparq.application.userinterface.model.UserItem;
 import java.sql.Date;
 import java.util.ArrayList;
 
+import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
+import test.com.blootoothtester.network.linklayer.LinkLayerManager;
+
 public class ConverstaionThreadActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private ArrayList<AnswerItem> answersArrayList;
     private AnswerListAdapter mAdapter;
+
+    private MyBluetoothAdapter myBluetoothAdapter;
+    private ApplicationLayerManager applicationLayerManager;
+    private ApplicationPacketDiscoveryHandler handler;
 
 
     @Override
@@ -41,6 +51,8 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         recyclerView = (RecyclerView)  findViewById(R.id.answer_recycler_view);
+
+        initializeLowerlayer();
 
         answersArrayList = getData();
 
@@ -67,6 +79,11 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
 
             }
         }));
+    }
+
+    public void initializeLowerlayer(){
+
+
     }
 
     public ArrayList<AnswerItem> getData(){

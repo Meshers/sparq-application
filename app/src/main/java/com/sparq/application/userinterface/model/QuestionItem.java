@@ -18,26 +18,34 @@ public class QuestionItem {
      * 3: One Word Answers
      * 4: Short Answers
      */
-    private int format;
+    enum FORMAT{
+        NONE,
+        MCQ_SINGLE,
+        MCQ_MULTIPLE,
+        ONE_WORD,
+        SHORT
+    }
+
+    private FORMAT format;
     private double totalMarks;
     private HashMap<Integer, String> options;
 
-    public QuestionItem(int questionId, int questionareId, String question, int format, double totalMarks) {
+    public QuestionItem(int questionId, int questionareId, String question, FORMAT format, double totalMarks) {
         this.questionId = questionId;
         this.questionareId = questionareId;
         this.question = question;
         this.format = format;
         this.totalMarks = totalMarks;
 
-        switch(this.format){
-            case 1:
-            case 2:
+        switch(getFormat()){
+            case MCQ_SINGLE:
+            case MCQ_MULTIPLE:
                 options = new HashMap<Integer, String>();
                 break;
         }
     }
 
-    public QuestionItem(int questionId, int questionareId, String question, int format, double totalMarks, HashMap<Integer, String> options) {
+    public QuestionItem(int questionId, int questionareId, String question, FORMAT format, double totalMarks, HashMap<Integer, String> options) {
         this(questionId, questionareId, question, format, totalMarks);
 
         this.options = options;
@@ -67,11 +75,11 @@ public class QuestionItem {
         this.question = question;
     }
 
-    public int getFormat() {
+    public FORMAT getFormat() {
         return format;
     }
 
-    public void setFormat(int format) {
+    public void setFormat(FORMAT format) {
         this.format = format;
     }
 
