@@ -2,6 +2,8 @@ package com.sparq.application.layer.pdu;
 
 import java.nio.charset.Charset;
 
+import test.com.blootoothtester.network.linklayer.LlMessage;
+
 /**
  * Created by sarahcs on 3/20/2017.
  */
@@ -10,8 +12,8 @@ public class ThreadPdu extends ApplicationLayerPdu{
 
     private final static int THREAD_ID_BYTES = 1;
     private final static int THREAD_CREATOR_ID_BYTES = 1;
+    private final static int SUB_THREAD_CREATOR_ID_BYTES = 1;
     private final static int SUB_THREAD_ID_BYTES = 1;
-    private final static int ANSWERER_ID_BYTES = 1;
 
     private final static int PDU_QUESTION_HEADER_BYTES = TYPE_BYTES + THREAD_ID_BYTES;
     private final static int PAYLOAD_QUESTION_MAX_BYTES = TOT_SIZE - PDU_QUESTION_HEADER_BYTES;
@@ -22,7 +24,7 @@ public class ThreadPdu extends ApplicationLayerPdu{
     private final static int PDU_QUESTION_VOTE_HEADER_BYTES = TYPE_BYTES + THREAD_CREATOR_ID_BYTES + THREAD_ID_BYTES;
     private final static int PAYLOAD_QUESTION_VOTE_MAX_BYTES = TOT_SIZE - PDU_QUESTION_VOTE_HEADER_BYTES;
 
-    private final static int PDU_ANSWER_VOTE_HEADER_BYTES = TYPE_BYTES + THREAD_CREATOR_ID_BYTES + THREAD_ID_BYTES + SUB_THREAD_ID_BYTES + ANSWERER_ID_BYTES;
+    private final static int PDU_ANSWER_VOTE_HEADER_BYTES = TYPE_BYTES + THREAD_CREATOR_ID_BYTES + THREAD_ID_BYTES + SUB_THREAD_CREATOR_ID_BYTES + SUB_THREAD_ID_BYTES;
     private final static int PAYLOAD_ANSWER_VOTE_MAX_BYTES = TOT_SIZE - PDU_ANSWER_VOTE_HEADER_BYTES;
 
     private final static int PAYLOAD_MAX_BYTES = Math.max(
@@ -32,21 +34,28 @@ public class ThreadPdu extends ApplicationLayerPdu{
                             PAYLOAD_ANSWER_VOTE_MAX_BYTES))
     );
 
+    public final static int HEADER_MAX_BYTES = Math.max(
+            PDU_QUESTION_HEADER_BYTES,
+            Math.max(PDU_ANSWER_HEADER_BYTES,
+                    Math.max(PDU_QUESTION_VOTE_HEADER_BYTES,
+                            PDU_ANSWER_VOTE_HEADER_BYTES))
+    );
+
     private TYPE mType;
     private byte mCreatorId;
     private byte mThreadId;
-    private byte mSubthreadId;
-    private byte mAnswererId;
+    private byte mSubThreadCreatorId;
+    private byte mSubThreadId;
     private byte[] mData;
 
-    private ThreadPdu(TYPE type, byte creatorId, byte threadId, byte subThreadId, byte answererId, byte[] data) {
+    private ThreadPdu(TYPE type, byte creatorId, byte threadId, byte subThreadCreatorId, byte subThreadId, byte[] data) {
         super(type);
 
         this.mType = type;
         this.mCreatorId = creatorId;
         this.mThreadId = threadId;
-        this.mSubthreadId = subThreadId;
-        this.mAnswererId = answererId;
+        this.mSubThreadCreatorId = subThreadCreatorId;
+        this.mSubThreadId = subThreadId;
 
         if (mData.length > PAYLOAD_MAX_BYTES) {
             throw new IllegalArgumentException("Payload size greater than max (received "
@@ -56,20 +65,20 @@ public class ThreadPdu extends ApplicationLayerPdu{
         this.mData = data;
     }
 
-    public static ThreadPdu getQuestionPdu(byte threadId, byte[] data){
-        return new ThreadPdu(TYPE.QUESTION, (byte) 0, threadId, (byte) 0, (byte) 0, data);
+    public static ThreadPdu getQuestionPdu(byte threadCreatorId, byte threadId, byte[] data){
+        return new ThreadPdu(TYPE.QUESTION, threadCreatorId, threadId, (byte) 0, (byte) 0, data);
     }
 
-    public static ThreadPdu getAnswerPdu(byte creatorId, byte threadId, byte subThreadId, byte[] data){
-        return new ThreadPdu(TYPE.ANSWER, creatorId, threadId, subThreadId, (byte) 0, data);
+    public static ThreadPdu getAnswerPdu(byte threadCreatorId, byte threadId, byte subThreadCreatorId, byte subThreadId, byte[] data){
+        return new ThreadPdu(TYPE.ANSWER, threadCreatorId, threadId, subThreadCreatorId, subThreadId, data);
     }
 
-    public static ThreadPdu getQuestionVotePdu(byte creatorId, byte threadId, byte[] data){
-        return new ThreadPdu(TYPE.QUESTION_VOTE, creatorId, threadId, (byte) 0, (byte) 0, data);
+    public static ThreadPdu getQuestionVotePdu(byte threadCreatorId, byte threadId, byte[] data){
+        return new ThreadPdu(TYPE.QUESTION_VOTE, threadCreatorId, threadId, (byte) 0, (byte) 0, data);
     }
 
-    public static ThreadPdu getAnswerVotePdu(byte creatorId, byte threadId, byte subThreadId, byte answererId, byte[] data){
-        return new ThreadPdu(TYPE.ANSWER_VOTE, creatorId, threadId, subThreadId, answererId, data);
+    public static ThreadPdu getAnswerVotePdu(byte creatorId, byte threadId, byte subThreadCreatorId, byte subThreadId, byte[] data){
+        return new ThreadPdu(TYPE.ANSWER_VOTE, creatorId, threadId, subThreadCreatorId, subThreadId, data);
     }
 
     public static boolean isValidPdu(String encoded) {
@@ -93,12 +102,20 @@ public class ThreadPdu extends ApplicationLayerPdu{
         return this.mThreadId;
     }
 
-    public byte getmSubthreadId(){
-        return this.mSubthreadId;
+    public byte getSubThreadId(){
+        return this.mSubThreadId;
     }
 
-    private byte getAnswererId(){
-        return this.mAnswererId;
+    public byte getSubThreadCreatorId(){
+        return this.mSubThreadCreatorId;
+    }
+
+    public byte[] getData(){
+        return this.mData;
+    }
+
+    public String getContent(){
+        return new String (mData, CHARSET);
     }
 
     public String getAsString() {
@@ -130,6 +147,10 @@ public class ThreadPdu extends ApplicationLayerPdu{
         encoded[nextFieldIndex] = getTypeEncoded(mType);
         nextFieldIndex += TYPE_BYTES;
 
+        //add thread creator Id
+        encoded[nextFieldIndex] = getThreadCreatorId();
+        nextFieldIndex += THREAD_CREATOR_ID_BYTES;
+
         //add thread ID
         encoded[nextFieldIndex] = getThreadId();
         nextFieldIndex += THREAD_ID_BYTES;
@@ -138,28 +159,13 @@ public class ThreadPdu extends ApplicationLayerPdu{
             case QUESTION:
                 break;
             case ANSWER:
-                encoded[nextFieldIndex] = getThreadCreatorId();
-                nextFieldIndex += THREAD_CREATOR_ID_BYTES;
-
-                break;
-            case QUESTION_VOTE:
-                encoded[nextFieldIndex] = getThreadCreatorId();
-                nextFieldIndex += THREAD_CREATOR_ID_BYTES;
-
-                encoded[nextFieldIndex] = getmSubthreadId();
-                nextFieldIndex += SUB_THREAD_ID_BYTES;
-
-                break;
             case ANSWER_VOTE:
-                encoded[nextFieldIndex] = getThreadCreatorId();
-                nextFieldIndex += THREAD_CREATOR_ID_BYTES;
+                encoded[nextFieldIndex] = getSubThreadCreatorId();
+                nextFieldIndex += SUB_THREAD_CREATOR_ID_BYTES;
 
-                encoded[nextFieldIndex] = getmSubthreadId();
+                encoded[nextFieldIndex] = getSubThreadId();
                 nextFieldIndex += SUB_THREAD_ID_BYTES;
 
-                encoded[nextFieldIndex] = getAnswererId();
-                nextFieldIndex += ANSWERER_ID_BYTES;
-                break;
         }
 
         // add the actual data to send
@@ -167,46 +173,35 @@ public class ThreadPdu extends ApplicationLayerPdu{
         return encoded;
     }
 
-    @Override
-    public ThreadPdu decode(byte[] encoded) {
+
+    public static ThreadPdu decode(byte[] encoded) {
 
         int nextFieldIndex = 0;
+        byte creatorID = (byte) 0;
+        byte subThreadId = (byte) 0;
+        byte subThreadCreatorId = (byte) 0;
+
         // get type
         TYPE type = getTypeDecoded(encoded[nextFieldIndex]);
         nextFieldIndex += TYPE_BYTES;
+
+        //get thread creator id
+        creatorID = encoded[nextFieldIndex];
+        nextFieldIndex += THREAD_CREATOR_ID_BYTES;
+
         // get threadID
         byte threadID = encoded[nextFieldIndex];
         nextFieldIndex += THREAD_ID_BYTES;
 
-        byte creatorID = (byte) 0;
-        byte subThreadId = (byte) 0;
-        byte answererId = (byte) 0;
-
         switch(type){
-            case QUESTION:
-                break;
             case ANSWER:
-                creatorID = encoded[nextFieldIndex];
-                nextFieldIndex += THREAD_CREATOR_ID_BYTES;
-
-                break;
-            case QUESTION_VOTE:
-                creatorID = encoded[nextFieldIndex];
-                nextFieldIndex += THREAD_CREATOR_ID_BYTES;
-
-                subThreadId = encoded[nextFieldIndex];
-                nextFieldIndex += SUB_THREAD_ID_BYTES;
-
-                break;
             case ANSWER_VOTE:
-                creatorID = encoded[nextFieldIndex];
-                nextFieldIndex += THREAD_CREATOR_ID_BYTES;
+
+                subThreadCreatorId = encoded[nextFieldIndex];
+                nextFieldIndex += SUB_THREAD_CREATOR_ID_BYTES;
 
                 subThreadId = encoded[nextFieldIndex];
                 nextFieldIndex += SUB_THREAD_ID_BYTES;
-
-                answererId = encoded[nextFieldIndex];
-                nextFieldIndex += ANSWERER_ID_BYTES;
                 break;
         }
 
@@ -214,7 +209,13 @@ public class ThreadPdu extends ApplicationLayerPdu{
         byte[] data = new byte[encoded.length - nextFieldIndex];
         System.arraycopy(encoded, nextFieldIndex, data, 0, data.length);
 
-        return new ThreadPdu(type, creatorID, threadID, subThreadId, answererId, data);
+        return new ThreadPdu(type, creatorID, threadID, subThreadCreatorId, subThreadId, data);
+    }
+
+
+    public static ApplicationLayerPdu from(LlMessage llmessage) {
+        return decode(llmessage.getData());
+
     }
 }
 

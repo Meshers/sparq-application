@@ -50,7 +50,6 @@ public abstract class ApplicationLayerPdu {
     }
 
     public abstract byte[] encode();
-    public abstract ApplicationLayerPdu decode(byte[] encoded);
 
 
 }
