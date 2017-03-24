@@ -12,11 +12,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sparq.R;
+import com.sparq.application.layer.ApplicationLayerManager;
+import com.sparq.application.layer.ApplicationPacketDiscoveryHandler;
+import com.sparq.application.layer.almessage.AlAnswer;
+import com.sparq.application.layer.almessage.AlMessage;
+import com.sparq.application.layer.almessage.AlQuestion;
+import com.sparq.application.layer.almessage.AlVote;
+import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.userinterface.ConverstaionThreadActivity;
 import com.sparq.application.userinterface.EventActivity;
 import com.sparq.application.userinterface.adapter.QuizListAdapter;
 import com.sparq.application.userinterface.adapter.RecyclerItemClickListener;
 import com.sparq.application.userinterface.adapter.ThreadListAdapter;
+import com.sparq.application.userinterface.model.AnswerItem;
 import com.sparq.application.userinterface.model.ConversationThread;
 import com.sparq.application.userinterface.model.EventItem;
 import com.sparq.application.userinterface.model.QuizItem;
@@ -24,6 +32,8 @@ import com.sparq.application.userinterface.model.UserItem;
 
 import java.sql.Date;
 import java.util.ArrayList;
+
+import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
 
 
 public class ThreadFragment extends Fragment {
@@ -35,6 +45,10 @@ public class ThreadFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private MyBluetoothAdapter myBluetoothAdapter;
+    private ApplicationLayerManager mApplicationLayerManager;
+    private ApplicationPacketDiscoveryHandler handler;
 
     private ArrayList<ConversationThread> threadsArrayList = new ArrayList<>();
     private RecyclerView recyclerView;
@@ -79,6 +93,8 @@ public class ThreadFragment extends Fragment {
 
         initializeView(view);
 
+        initializeLowerLayer();
+
         threadsArrayList = getData();
 
         mAdapter = new ThreadListAdapter(threadsArrayList);
@@ -101,6 +117,110 @@ public class ThreadFragment extends Fragment {
 
 
         return view;
+    }
+
+    public ConversationThread getConversationThread(int questionareId, int creatorId){
+        ead: threadsArrayList){
+
+        for(ConversationThread thr
+            if(thread.getQuestionareId() == questionareId
+                    && thread.getCreator().getUserId() == creatorId){
+                return thread;
+            }
+        }
+        return null;
+
+    }
+
+    public AnswerItem getAnswerForThread(ConversationThread thread, int answerId, int answerCreatorId){
+
+        for(AnswerItem answer: thread.getAnswers()){
+
+            if(answer.getAnswerId() == answerId
+                    && thread.getCreator().getUserId() == answerCreatorId){
+                return answer;
+            }
+        }
+        return null;
+
+    }
+
+    public void initializeLowerLayer(){
+        myBluetoothAdapter = new MyBluetoothAdapter(ConverstaionThreadActivity.this);
+
+        handler = new ApplicationPacketDiscoveryHandler() {
+            @Override
+            public void handleDiscovery(ApplicationLayerPdu.TYPE type, AlMessage alMessage) {
+
+                ConversationThread retreivedThread;
+                AnswerItem retreivedAnswer;
+
+                switch(type){
+                    case QUESTION:
+
+                        AlQuestion alQuestion = (AlQuestion) alMessage;
+                        threadsArrayList.add(
+                                ConversationThread.getConversationThreadFromMessage(alQuestion)
+                        );
+
+                        break;
+                    case ANSWER:
+
+                        AlAnswer alAnswer = (AlAnswer) alMessage;
+                        retreivedThread = getConversationThread(alAnswer.getQuestionId(), alAnswer.getCreatorId());
+                        if(retreivedThread != null){
+                            retreivedThread.addAnswerToList(
+                                    AnswerItem.getAnswerItemFrommessage(alAnswer)
+                            );
+                        }
+
+                        break;
+                    case QUESTION_VOTE:
+
+                        AlVote questionVote = (AlVote) alMessage;
+
+                        retreivedThread = getConversationThread(questionVote.getQuestionId(), questionVote.getCreatorId());
+                        if(retreivedThread != null){
+
+                            switch(questionVote.getVoteValue()){
+                                case UPVOTE:
+                                    retreivedThread.getQuestionItem().addUpVote();
+                                    break;
+                                case DOWNVOTE:
+                                    retreivedThread.getQuestionItem().addDownVote();
+                                    break;
+                            }
+                        }
+
+                        break;
+                    case ANSWER_VOTE:
+
+                        AlVote answerVote = (AlVote) alMessage;
+
+                        retreivedThread = getConversationThread(answerVote.getQuestionId(), answerVote.getCreatorId());
+                        if(retreivedThread != null){
+
+                            retreivedAnswer = getAnswerForThread(retreivedThread, answerVote.getAnswerId(), answerVote.getAnswerCreatorId());
+                            if(retreivedAnswer != null){
+                                switch(answerVote.getVoteValue()){
+                                    case UPVOTE:
+                                        retreivedThread.getQuestionItem().addUpVote();
+                                        break;
+                                    case DOWNVOTE:
+                                        retreivedThread.getQuestionItem().addDownVote();
+                                        break;
+                                }
+                            }
+                        }
+
+                        break;
+
+                }
+            }
+        };
+
+        mApplicationLayerManager = new ApplicationLayerManager(ownAddr, myBluetoothAdapter, handler);
+
     }
 
     public void initializeView(View view){

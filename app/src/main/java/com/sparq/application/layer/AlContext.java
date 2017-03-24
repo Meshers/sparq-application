@@ -37,7 +37,7 @@ public class AlContext {
     public interface Callback {
         void transmitPdu(ApplicationLayerPdu pdu);
 
-        void sendUpperLayer(AlMessage message);
+        void sendUpperLayer(ApplicationLayerPdu.TYPE type, AlMessage message);
     }
 
     private final byte mSessionId;
@@ -279,7 +279,7 @@ public class AlContext {
                 throw new IllegalArgumentException("No such type of Thread packet exists");
         }
 
-        mCallback.sendUpperLayer(alMessage);
+        mCallback.sendUpperLayer(pdu.getType(), alMessage);
     }
 
     public void receivePdu(ApplicationLayerPdu pdu){

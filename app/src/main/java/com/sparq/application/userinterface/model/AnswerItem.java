@@ -1,5 +1,8 @@
 package com.sparq.application.userinterface.model;
 
+import com.sparq.application.layer.almessage.AlAnswer;
+import com.sparq.util.Constants;
+
 import java.io.Serializable;
 
 /**
@@ -12,18 +15,22 @@ public class AnswerItem implements Serializable{
     private int questionItemId;
     private String answer;
     private int length;
-    private UserItem user;
+    private int votes;
+    private UserItem threadCreator;
+    private UserItem answerCreator;
 
 
     public AnswerItem() {
     }
 
-    public AnswerItem(int answerId, int questionItemId, String answer, UserItem user) {
+    public AnswerItem(int answerId, UserItem answerCreator, int questionItemId, UserItem threadCreator, String answer, int votes) {
         this.answerId = answerId;
         this.questionItemId = questionItemId;
         this.length = answer.length();
         this.answer = answer;
-        this.user = user;
+        this.answerCreator = answerCreator;
+        this.threadCreator = threadCreator;
+        this.votes = votes;
     }
 
     public int getAnswerId() {
@@ -58,12 +65,30 @@ public class AnswerItem implements Serializable{
         this.length = length;
     }
 
-
-    public UserItem getUser() {
-        return user;
+    public void addUpvote(){
+        this.votes += 1;
     }
 
-    public void setUser(UserItem user) {
-        this.user = user;
+    public void addDownVote(){
+        this.votes += 1;
+    }
+
+    public UserItem getCreator() {
+        return answerCreator;
+    }
+
+    public void setCreator(UserItem user) {
+        this.answerCreator = user;
+    }
+
+    public static AnswerItem getAnswerItemFrommessage(AlAnswer alAnswer){
+        return new AnswerItem(
+                alAnswer.getAnswerId(),
+                new UserItem(alAnswer.getAnswerCreatorId()),
+                alAnswer.getQuestionId(),
+                new UserItem(alAnswer.getCreatorId()),
+                alAnswer.getAnswerDataAsString(),
+                Constants.INITIAL_VOTE_COUNT
+        );
     }
 }

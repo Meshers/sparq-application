@@ -26,6 +26,10 @@ public class UserItem implements Serializable {
     public UserItem() {
     }
 
+    public UserItem(int userId){
+        this.userId = userId;
+    }
+
     public UserItem(int userId, int userType, String description, String emailId, String lastName, String password, String username, String firstName, Blob userImage) {
         this.userId = userId;
         this.userType = userType;

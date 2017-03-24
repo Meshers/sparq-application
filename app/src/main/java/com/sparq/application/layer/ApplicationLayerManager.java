@@ -63,8 +63,8 @@ public class ApplicationLayerManager {
             }
 
             @Override
-            public void sendUpperLayer(AlMessage message) {
-                mApplicationPacketDiscoveryHandler.handleDiscovery(message);
+            public void sendUpperLayer(ApplicationLayerPdu.TYPE type, AlMessage message) {
+                mApplicationPacketDiscoveryHandler.handleDiscovery(type, message);
             }
         };
 

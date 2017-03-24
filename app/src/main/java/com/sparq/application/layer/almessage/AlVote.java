@@ -18,7 +18,7 @@ public class AlVote extends AlMessage{
 
     private static final int VOTE_DATA_SIZE = 1;
 
-    enum VOTE_TYPE {
+    public enum VOTE_TYPE {
         UPVOTE (1),
         DOWNVOTE (2);
 

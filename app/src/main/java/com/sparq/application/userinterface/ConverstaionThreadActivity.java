@@ -17,6 +17,7 @@ import com.sparq.R;
 import com.sparq.application.layer.ApplicationLayerManager;
 import com.sparq.application.layer.ApplicationPacketDiscoveryHandler;
 import com.sparq.application.layer.almessage.AlMessage;
+import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.userinterface.adapter.AnswerListAdapter;
 import com.sparq.application.userinterface.adapter.QuizListAdapter;
 import com.sparq.application.userinterface.adapter.RecyclerItemClickListener;
@@ -32,16 +33,14 @@ import java.util.ArrayList;
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
 import test.com.blootoothtester.network.linklayer.LinkLayerManager;
 
+import static com.sparq.application.layer.pdu.ApplicationLayerPdu.TYPE.ANSWER;
+import static com.sparq.application.layer.pdu.ApplicationLayerPdu.TYPE.QUESTION;
+
 public class ConverstaionThreadActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private ArrayList<AnswerItem> answersArrayList;
     private AnswerListAdapter mAdapter;
-
-    private MyBluetoothAdapter myBluetoothAdapter;
-    private ApplicationLayerManager applicationLayerManager;
-    private ApplicationPacketDiscoveryHandler handler;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +50,6 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         recyclerView = (RecyclerView)  findViewById(R.id.answer_recycler_view);
-
-        initializeLowerlayer();
 
         answersArrayList = getData();
 
@@ -81,10 +78,7 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
         }));
     }
 
-    public void initializeLowerlayer(){
 
-
-    }
 
     public ArrayList<AnswerItem> getData(){
 
@@ -94,7 +88,7 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
 
         for(int i = 0; i < 10; i++){
 
-            AnswerItem answer = new AnswerItem(i, 2, "In our previous post we had talking about the \"Experiment that decides all\". This post talks about the results of the various tests conducted as part of the experiment. If you wish to read about the experiment in detail please refer to our previous post.", user);
+            AnswerItem answer = new AnswerItem(i,1,1,new UserItem(),"ANSWERRRRRRRRRRRRRRRRRRRRRRR", 0);
 
             answers.add(answer);
         }

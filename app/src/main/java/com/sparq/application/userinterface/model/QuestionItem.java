@@ -1,5 +1,7 @@
 package com.sparq.application.userinterface.model;
 
+import com.sparq.util.Constants;
+
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -28,14 +30,16 @@ public class QuestionItem {
 
     private FORMAT format;
     private double totalMarks;
+    private int votes;
     private HashMap<Integer, String> options;
 
-    public QuestionItem(int questionId, int questionareId, String question, FORMAT format, double totalMarks) {
+    public QuestionItem(int questionId, int questionareId, String question, FORMAT format, double totalMarks, int votes) {
         this.questionId = questionId;
         this.questionareId = questionareId;
         this.question = question;
         this.format = format;
         this.totalMarks = totalMarks;
+        this.votes = votes;
 
         switch(getFormat()){
             case MCQ_SINGLE:
@@ -45,8 +49,9 @@ public class QuestionItem {
         }
     }
 
-    public QuestionItem(int questionId, int questionareId, String question, FORMAT format, double totalMarks, HashMap<Integer, String> options) {
-        this(questionId, questionareId, question, format, totalMarks);
+    public QuestionItem(int questionId, int questionareId, String question, FORMAT format, double totalMarks,
+                        HashMap<Integer, String> options, int votes) {
+        this(questionId, questionareId, question, format, totalMarks, votes);
 
         this.options = options;
     }
@@ -83,6 +88,18 @@ public class QuestionItem {
         this.format = format;
     }
 
+    public int getVotes(){
+        return this.votes;
+    }
+
+    public void addUpVote(){
+        this.votes += 1;
+    }
+
+    public void addDownVote(){
+        this.votes += 1;
+    }
+
     public double getTotalMarks() {
         return totalMarks;
     }
@@ -101,5 +118,21 @@ public class QuestionItem {
 
     public void addOption(int optionId, String option){
         options.put(optionId, option);
+    }
+
+    public static QuestionItem getQuizQuestion(int questionId, int questionareId, String question,
+                                               FORMAT format, double totalMarks,
+                                               HashMap<Integer, String> options){
+        return new QuestionItem(questionId, questionareId, question, format, totalMarks, options, Constants.INITIAL_VOTE_COUNT);
+    }
+
+    public static QuestionItem getPollQuestion(int questionId, int questionareId, String question,
+                                               FORMAT format,
+                                               HashMap<Integer, String> options){
+        return new QuestionItem(questionId, questionareId, question, format, Constants.MIN_QUESTION_MARKS, options, Constants.INITIAL_VOTE_COUNT);
+    }
+
+    public static QuestionItem getThreadQuestion(int questionId, int questionareId, String question){
+        return new QuestionItem(questionId, questionareId, question, FORMAT.SHORT, Constants.MIN_QUESTION_MARKS, null, Constants.INITIAL_VOTE_COUNT);
     }
 }
