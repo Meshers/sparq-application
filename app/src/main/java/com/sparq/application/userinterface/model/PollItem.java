@@ -20,7 +20,7 @@ public class PollItem extends Questionare{
     }
 
     public PollItem(int pollId, int eventId, String name, String description, Date date, int state, UserItem creator){
-        super(pollId, eventId, 1, name, description, date, creator, 0);
+        super(pollId, eventId, QUESTIONARE_TYPE.POLL, name, description, date, creator, 0);
         this.state = state;
     }
 

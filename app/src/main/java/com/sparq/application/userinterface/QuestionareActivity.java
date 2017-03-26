@@ -24,6 +24,7 @@ import com.sparq.application.userinterface.model.QuestionItem;
 import com.sparq.application.userinterface.model.Questionare;
 import com.sparq.application.userinterface.model.QuizItem;
 import com.sparq.application.userinterface.model.UserItem;
+import com.sparq.util.Constants;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,7 +41,7 @@ public class QuestionareActivity extends AppCompatActivity {
     private Questionare questionare;
     private HashMap<Integer, QuestionItem> questions;
     private QuestionareAdapter mAdapter;
-    private int type;
+    private Questionare.QUESTIONARE_TYPE type;
 
 
     @Override
@@ -51,7 +52,7 @@ public class QuestionareActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         Bundle bundle = getIntent().getExtras();
-        type = bundle.getInt("type");
+        type = (Questionare.QUESTIONARE_TYPE) bundle.getSerializable("type");
 
         timer = (TextView) findViewById(R.id.count_down_timer);
         questionText = (TextView) findViewById(R.id.question_text);
@@ -65,9 +66,9 @@ public class QuestionareActivity extends AppCompatActivity {
         // get questions related to a perticular quiz or poll
         questions = questionare.getQuestions();
 
-        mAdapter = new QuestionareAdapter(new ArrayList<String>(
-                questionare.getQuestions().get(0).getOptions().values()),
-                questionare.getType());
+        mAdapter = new QuestionareAdapter(
+                new ArrayList<String>(questionare.getQuestions().get(0).getOptions().values()), questionare.getType()
+        );
 
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
@@ -87,11 +88,11 @@ public class QuestionareActivity extends AppCompatActivity {
         }));
 
         switch(questionare.getType()){
-            case 0:
+            case QUIZ:
                 // QUIZ
                 callTimer();
                 break;
-            case 1:
+            case POLL:
                 // POLL
                 ((LinearLayout)timer.getParent()).removeView(timer);
                 break;
@@ -100,28 +101,30 @@ public class QuestionareActivity extends AppCompatActivity {
 
     }
 
-    public Questionare getData(int type){
+    public Questionare getData(Questionare.QUESTIONARE_TYPE type){
 
 
         UserItem user = new UserItem();
 
         switch (type){
-            case 0:
-                QuizItem quiz = new QuizItem(1,1,"Quiz 0", "blah blah", new Date(11,12,2011), 2, 1, 50, user);
-                HashMap<Integer, String> options1 = new HashMap<Integer, String>();
-                options1.put(0, "YES");
-                options1.put(1, "NO");
-                quiz.addQuestionToList(0, 1, "Do you like the app?", 1, 1, options1);
-
-                return quiz;
-            case 1:
-                PollItem poll = new PollItem(1,1,"Quiz 0", "blah blah", new Date(11,12,2011), 2, user);
-                HashMap<Integer, String> options2 = new HashMap<Integer, String>();
-                options2.put(0, "YES");
-                options2.put(1, "NO");
-                poll.addQuestionToList(0, 1, "Do you like the app?", 1, 1, options2);
-
-                return poll;
+            case QUIZ:
+//                QuizItem quiz = new QuizItem(1,1,"Quiz 0", "blah blah", new Date(11,12,2011), 2, 1, 50, user);
+//                HashMap<Integer, String> options1 = new HashMap<Integer, String>();
+//                options1.put(0, "YES");
+//                options1.put(1, "NO");
+//                quiz.addQuestionToList(
+//                        new QuestionItem(0, 1, "Do you like the app?", 1, , options1, Constants.INITIAL_VOTE_COUNT)
+//                );
+//
+//                return quiz;
+            case POLL:
+//                PollItem poll = new PollItem(1,1,"Quiz 0", "blah blah", new Date(11,12,2011), 2, user);
+//                HashMap<Integer, String> options2 = new HashMap<Integer, String>();
+//                options2.put(0, "YES");
+//                options2.put(1, "NO");
+//                poll.addQuestionToList(0, 1, "Do you like the app?", 1, 1, options2, Constants.INITIAL_VOTE_COUNT);
+//
+//                return poll;
         }
 
         return null;

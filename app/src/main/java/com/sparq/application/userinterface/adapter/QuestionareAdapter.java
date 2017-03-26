@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class QuestionareAdapter extends RecyclerView.Adapter<QuestionareAdapter.MyViewHolder> {
 
     private ArrayList<String> options;
-    private int type;
+    private Questionare.QUESTIONARE_TYPE type;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView optionName;
@@ -33,7 +33,7 @@ public class QuestionareAdapter extends RecyclerView.Adapter<QuestionareAdapter.
     }
 
 
-    public QuestionareAdapter(ArrayList<String> options, int type) {
+    public QuestionareAdapter(ArrayList<String> options, Questionare.QUESTIONARE_TYPE type) {
         this.options = options;
         this.type = type;
     }
@@ -44,16 +44,16 @@ public class QuestionareAdapter extends RecyclerView.Adapter<QuestionareAdapter.
 
         try{
             switch(type){
-                case 1:
-                    itemView = LayoutInflater.from(parent.getContext())
-                            .inflate(R.layout.item_single_choice_answer, parent, false);
-                    break;
-                case 2:
-                    itemView = LayoutInflater.from(parent.getContext())
-                            .inflate(R.layout.item_multiple_choice_answer, parent, false);
-                    break;
-                default:
-                    throw new IllegalArgumentException();
+//                case M:
+//                    itemView = LayoutInflater.from(parent.getContext())
+//                            .inflate(R.layout.item_single_choice_answer, parent, false);
+//                    break;
+//                case 2:
+//                    itemView = LayoutInflater.from(parent.getContext())
+//                            .inflate(R.layout.item_multiple_choice_answer, parent, false);
+//                    break;
+//                default:
+//                    throw new IllegalArgumentException();
             }
         }
         catch (IllegalArgumentException e){

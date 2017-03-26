@@ -52,15 +52,15 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
     @Override
     public void onBindViewHolder(ThreadListAdapter.MyViewHolder holder, int position) {
         ConversationThread thread = threads.get(position);
-        holder.threadName.setText(thread.getQuestion());
+        holder.threadName.setText(thread.getQuestionItem().getQuestion());
     holder.threadDate.setText(thread.getDate().toString());
 
         ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
         // generate color based on a key (same key returns the same color), useful for list/grid views
-        int color = generator.getColor(thread.getQuestion());
+        int color = generator.getColor(thread.getQuestionItem().getQuestion());
 
         TextDrawable drawable = TextDrawable.builder()
-                .buildRound(String.valueOf(thread.getQuestion().charAt(0)), color);
+                .buildRound(String.valueOf(thread.getQuestionItem().getQuestion().charAt(0)), color);
         holder.threadImage.setImageDrawable(drawable);
 
     }

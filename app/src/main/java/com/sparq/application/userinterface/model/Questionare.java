@@ -1,5 +1,7 @@
 package com.sparq.application.userinterface.model;
 
+import com.sparq.util.Constants;
+
 import java.util.Date;
 import java.util.HashMap;
 
@@ -11,12 +13,13 @@ public abstract class Questionare {
 
     int questionareId;
     int eventId;
-    /*
-     * 0: Quiz
-     * 1: Poll
-     * 2: Conversation Thread
-     */
-    int type;
+    public enum QUESTIONARE_TYPE{
+        QUIZ,
+        POLL,
+        CONV_THREAD
+    }
+
+    QUESTIONARE_TYPE type;
     String name;
     String description;
     Date date;
@@ -27,7 +30,7 @@ public abstract class Questionare {
         questions = new HashMap<Integer, QuestionItem>();
     }
 
-    public Questionare(int questionareId, int eventId, int type, String name, String description, Date date, UserItem creator, int numberOfQuestions){
+    public Questionare(int questionareId, int eventId, QUESTIONARE_TYPE type, String name, String description, Date date, UserItem creator, int numberOfQuestions){
         this.questionareId = questionareId;
         this.type = type;
         this.name = name;
@@ -59,11 +62,11 @@ public abstract class Questionare {
         this.eventId = eventId;
     }
 
-    public int getType() {
+    public QUESTIONARE_TYPE getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(QUESTIONARE_TYPE type) {
         this.type = type;
     }
 
@@ -132,7 +135,7 @@ public abstract class Questionare {
             return false;
         }
         else{
-            QuestionItem questionItem = new QuestionItem(questionId, questionareId, question, format, totalMarks);
+            QuestionItem questionItem = new QuestionItem(questionId, questionareId, question, format, totalMarks, Constants.INITIAL_VOTE_COUNT);
             questions.put(questionId, questionItem);
             return true;
         }

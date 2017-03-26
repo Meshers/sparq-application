@@ -20,7 +20,7 @@ public class ConversationThread extends Questionare {
     }
 
     public ConversationThread(int threadId, int eventId, Date date, UserItem creator, String question){
-        super(threadId, eventId, 2, null, null, date, creator, 1);
+        super(threadId, eventId, QUESTIONARE_TYPE.CONV_THREAD, null, null, date, creator, 1);
 
         QuestionItem questionItem = QuestionItem.getThreadQuestion(QUESTION_KEY, threadId, question);
         super.addQuestionToList(1, questionItem);
