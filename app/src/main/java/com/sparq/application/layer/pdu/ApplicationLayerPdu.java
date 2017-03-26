@@ -1,5 +1,7 @@
 package com.sparq.application.layer.pdu;
 
+import android.util.Log;
+
 import java.nio.charset.Charset;
 
 /**
@@ -42,11 +44,16 @@ public abstract class ApplicationLayerPdu {
     }
 
     public static byte getTypeEncoded(TYPE type) {
-        return (byte) (type.ordinal());
+        return (byte) (type.ordinal() + 1);
     }
 
     public static TYPE getTypeDecoded(byte type) {
-        return TYPE.values()[type];
+        try{
+            return TYPE.values()[type - 1];
+        }
+        catch (ArrayIndexOutOfBoundsException e){
+            return null;
+        }
     }
 
     public abstract byte[] encode();

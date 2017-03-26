@@ -35,7 +35,7 @@ public class AlContext {
     private HashMap<AlQuestion, ArrayList<AlAnswer>> mSessionThreads;
 
     public interface Callback {
-        void transmitPdu(ApplicationLayerPdu pdu);
+        void transmitPdu(ApplicationLayerPdu pdu, byte toAddr);
 
         void sendUpperLayer(ApplicationLayerPdu.TYPE type, AlMessage message);
     }
@@ -76,7 +76,7 @@ public class AlContext {
         return null;
     }
 
-    public void sendThreadPdu(ApplicationLayerPdu.TYPE type, byte threadCreatorId, byte threadId, byte subThreadCreatorId, byte subThreadId, byte[] data){
+    public void sendThreadPdu(ApplicationLayerPdu.TYPE type, byte threadCreatorId, byte threadId, byte subThreadCreatorId, byte subThreadId, byte[] data, byte toAddr){
 
         ApplicationLayerPdu pdu = null;
         AlQuestion retrievedQuestion;
@@ -155,15 +155,15 @@ public class AlContext {
             Log.e(TAG,e.getMessage());
         }
 
-        sendPdu(pdu);
+        sendPdu(pdu, toAddr);
     }
 
-    public void sendPdu(ApplicationLayerPdu pdu){
+    public void sendPdu(ApplicationLayerPdu pdu, byte toAddr){
 
         if(pdu != null){
             timeSinceLastMessage = System.currentTimeMillis();
             mBusy = true;
-            sendPduToLowerLayer(pdu);
+            sendPduToLowerLayer(pdu, toAddr);
         }
     }
 
@@ -293,9 +293,9 @@ public class AlContext {
         }
     }
 
-    private void sendPduToLowerLayer(ApplicationLayerPdu pdu) {
+    private void sendPduToLowerLayer(ApplicationLayerPdu pdu, byte toAddr) {
         mCurrentPdu = pdu;
-        mCallback.transmitPdu(pdu);
+        mCallback.transmitPdu(pdu, toAddr);
     }
 
 }

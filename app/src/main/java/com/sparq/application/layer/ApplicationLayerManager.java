@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.sparq.application.layer.almessage.AlMessage;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
@@ -25,26 +26,30 @@ import test.com.blootoothtester.util.Logger;
 
 public class ApplicationLayerManager {
 
+    private byte mSessionId = (byte) 1;
+
     private BroadcastReceiver mBroadcastReceiver;
     private ApplicationPacketDiscoveryHandler mApplicationPacketDiscoveryHandler;
     private AlContext mAlContext;
-    private byte mToAddr;
     private byte mOwnAddr;
     private LinkLayerManager mLinkLayerManager;
 
     public ApplicationLayerManager(byte ownAddr, MyBluetoothAdapter bluetoothAdapter,
-                                   final ApplicationPacketDiscoveryHandler applicationPacketDiscoveryHandler){
+                                   final ApplicationPacketDiscoveryHandler applicationPacketDiscoveryHandler, byte sessionId){
 
         this.mApplicationPacketDiscoveryHandler = applicationPacketDiscoveryHandler;
         this.mOwnAddr = ownAddr;
+        this.mSessionId = sessionId;
 
         DeviceDiscoveryHandler discoveryHandler = new DeviceDiscoveryHandler() {
 
             @Override
             public void handleDiscovery(LlMessage llMessage) {
-
+                Log.i("LLMSSG","Message Received from linklayer: "+ llMessage.getDataAsString());
                 ApplicationLayerPdu pdu = ThreadPdu.from(llMessage);
-                mAlContext.receivePdu(pdu);
+                if(pdu != null){
+                    mAlContext.receivePdu(pdu);
+                }
             }
         };
 
@@ -54,12 +59,10 @@ public class ApplicationLayerManager {
                 discoveryHandler
         );
 
-
-
         AlContext.Callback callback = new AlContext.Callback() {
             @Override
-            public void transmitPdu(ApplicationLayerPdu pdu) {
-                mLinkLayerManager.sendData(pdu.encode(), mToAddr);
+            public void transmitPdu(ApplicationLayerPdu pdu, byte toAddr) {
+                mLinkLayerManager.sendData(pdu.encode(), toAddr);
             }
 
             @Override
@@ -67,6 +70,9 @@ public class ApplicationLayerManager {
                 mApplicationPacketDiscoveryHandler.handleDiscovery(type, message);
             }
         };
+
+        this.mAlContext = new AlContext(mSessionId, callback);
+        mLinkLayerManager.startReceiving();
 
     }
 
@@ -77,8 +83,8 @@ public class ApplicationLayerManager {
             case ANSWER:
             case QUESTION_VOTE:
             case ANSWER_VOTE:
-                if(headers.length != ThreadPdu.HEADER_MAX_BYTES){
-                    sendThreadData(type, headers[0], headers[1], headers[2], headers[3], data);
+                if(headers.length + 1 == ThreadPdu.HEADER_MAX_BYTES){
+                    sendThreadData(type, headers[0], headers[1], headers[2], headers[3], data, toAddr);
                 }
                 else{
                     throw new IllegalArgumentException("Illegal number of header values (Found: " +
@@ -89,10 +95,10 @@ public class ApplicationLayerManager {
     }
 
     public void sendThreadData(ApplicationLayerPdu.TYPE type, byte threadCreatorId,
-                               byte threadId, byte subThreadCreatorId, byte subThreadId, byte[] data){
+                               byte threadId, byte subThreadCreatorId, byte subThreadId, byte[] data, byte toAddr){
 
 
-        mAlContext.sendThreadPdu(type, threadCreatorId, threadId, subThreadCreatorId, subThreadId, data);
+        mAlContext.sendThreadPdu(type, threadCreatorId, threadId, subThreadCreatorId, subThreadId, data, toAddr);
     }
 
     /**

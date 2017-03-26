@@ -84,7 +84,8 @@ public class AlVote extends AlMessage{
 
     public VOTE_TYPE getVoteValue(){
         try{
-            if(mData.length > VOTE_DATA_SIZE || mData.length < VOTE_DATA_SIZE){
+
+            if(mData.length != VOTE_DATA_SIZE){
                 throw new IllegalArgumentException("Vote data size beyond vote packet data limit (received "
                         + mData.length + " allowed " + VOTE_DATA_SIZE + " bytes)");
             }
@@ -95,6 +96,14 @@ public class AlVote extends AlMessage{
             Log.e(TAG, e.getMessage());
         }
         return null;
+    }
+
+    public static byte getVoteEncoded(VOTE_TYPE type){
+        return (byte) (type.ordinal() + 1) ;
+    }
+
+    public static VOTE_TYPE getVoteDecoded(byte type){
+        return VOTE_TYPE.values()[type - 1] ;
     }
 
 }

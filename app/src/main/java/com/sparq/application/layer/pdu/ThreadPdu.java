@@ -1,5 +1,7 @@
 package com.sparq.application.layer.pdu;
 
+import android.util.Log;
+
 import java.nio.charset.Charset;
 
 import test.com.blootoothtester.network.linklayer.LlMessage;
@@ -15,10 +17,10 @@ public class ThreadPdu extends ApplicationLayerPdu{
     private final static int SUB_THREAD_CREATOR_ID_BYTES = 1;
     private final static int SUB_THREAD_ID_BYTES = 1;
 
-    private final static int PDU_QUESTION_HEADER_BYTES = TYPE_BYTES + THREAD_ID_BYTES;
+    private final static int PDU_QUESTION_HEADER_BYTES = TYPE_BYTES + THREAD_CREATOR_ID_BYTES + THREAD_ID_BYTES;
     private final static int PAYLOAD_QUESTION_MAX_BYTES = TOT_SIZE - PDU_QUESTION_HEADER_BYTES;
 
-    private final static int PDU_ANSWER_HEADER_BYTES = TYPE_BYTES + THREAD_CREATOR_ID_BYTES + THREAD_ID_BYTES + SUB_THREAD_ID_BYTES;
+    private final static int PDU_ANSWER_HEADER_BYTES = TYPE_BYTES + THREAD_CREATOR_ID_BYTES + THREAD_ID_BYTES + SUB_THREAD_CREATOR_ID_BYTES+ SUB_THREAD_ID_BYTES;
     private final static int PAYLOAD_ANSWER_MAX_BYTES = TOT_SIZE - PDU_ANSWER_HEADER_BYTES;
 
     private final static int PDU_QUESTION_VOTE_HEADER_BYTES = TYPE_BYTES + THREAD_CREATOR_ID_BYTES + THREAD_ID_BYTES;
@@ -56,6 +58,7 @@ public class ThreadPdu extends ApplicationLayerPdu{
         this.mThreadId = threadId;
         this.mSubThreadCreatorId = subThreadCreatorId;
         this.mSubThreadId = subThreadId;
+        this.mData = data;
 
         if (mData.length > PAYLOAD_MAX_BYTES) {
             throw new IllegalArgumentException("Payload size greater than max (received "
@@ -74,6 +77,7 @@ public class ThreadPdu extends ApplicationLayerPdu{
     }
 
     public static ThreadPdu getQuestionVotePdu(byte threadCreatorId, byte threadId, byte[] data){
+
         return new ThreadPdu(TYPE.QUESTION_VOTE, threadCreatorId, threadId, (byte) 0, (byte) 0, data);
     }
 
@@ -177,39 +181,45 @@ public class ThreadPdu extends ApplicationLayerPdu{
     public static ThreadPdu decode(byte[] encoded) {
 
         int nextFieldIndex = 0;
-        byte creatorID = (byte) 0;
-        byte subThreadId = (byte) 0;
+        byte creatorID = (byte) 1;
+        byte subThreadId = (byte) 1;
         byte subThreadCreatorId = (byte) 0;
 
         // get type
         TYPE type = getTypeDecoded(encoded[nextFieldIndex]);
-        nextFieldIndex += TYPE_BYTES;
 
-        //get thread creator id
-        creatorID = encoded[nextFieldIndex];
-        nextFieldIndex += THREAD_CREATOR_ID_BYTES;
 
-        // get threadID
-        byte threadID = encoded[nextFieldIndex];
-        nextFieldIndex += THREAD_ID_BYTES;
+        if(type != null){
+            nextFieldIndex += TYPE_BYTES;
 
-        switch(type){
-            case ANSWER:
-            case ANSWER_VOTE:
+            //get thread creator id
+            creatorID = encoded[nextFieldIndex];
+            nextFieldIndex += THREAD_CREATOR_ID_BYTES;
 
-                subThreadCreatorId = encoded[nextFieldIndex];
-                nextFieldIndex += SUB_THREAD_CREATOR_ID_BYTES;
+            // get threadID
+            byte threadID = encoded[nextFieldIndex];
+            nextFieldIndex += THREAD_ID_BYTES;
 
-                subThreadId = encoded[nextFieldIndex];
-                nextFieldIndex += SUB_THREAD_ID_BYTES;
-                break;
+            switch(type){
+                case ANSWER:
+                case ANSWER_VOTE:
+
+                    subThreadCreatorId = encoded[nextFieldIndex];
+                    nextFieldIndex += SUB_THREAD_CREATOR_ID_BYTES;
+
+                    subThreadId = encoded[nextFieldIndex];
+                    nextFieldIndex += SUB_THREAD_ID_BYTES;
+                    break;
+            }
+
+            // get the actual data
+            byte[] data = new byte[encoded.length - nextFieldIndex];
+            System.arraycopy(encoded, nextFieldIndex, data, 0, data.length);
+
+            return new ThreadPdu(type, creatorID, threadID, subThreadCreatorId, subThreadId, data);
         }
 
-        // get the actual data
-        byte[] data = new byte[encoded.length - nextFieldIndex];
-        System.arraycopy(encoded, nextFieldIndex, data, 0, data.length);
-
-        return new ThreadPdu(type, creatorID, threadID, subThreadCreatorId, subThreadId, data);
+        return null;
     }
 
 

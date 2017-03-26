@@ -11,7 +11,7 @@
     android:background="@color/colorPrimary"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.sparq.application.LoginActivity"
+    tools:context="com.sparq.application.userinterface.LoginActivity"
     tools:showIn="@layout/activity_login">
 
     <LinearLayout
@@ -42,11 +42,11 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/username_input"
+                    android:id="@+id/event_code_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorPrimaryDark"
-                    android:hint="Username" />
+                    android:hint="Event Code" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -57,11 +57,11 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/password_input"
+                    android:id="@+id/own_addr_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorPrimaryDark"
-                    android:hint="Password" />
+                    android:hint="Own Address" />
 
             </android.support.design.widget.TextInputLayout>
 
