@@ -52,6 +52,8 @@
             android:label="@string/title_activity_main2"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <provider android:name="application.userinterface.database.ApplicationContentProvider"
+            android:authorities="com.sparq.application.userinterface.database.ApplicationContentProvider"/>
     </application>
 
 </manifest>
