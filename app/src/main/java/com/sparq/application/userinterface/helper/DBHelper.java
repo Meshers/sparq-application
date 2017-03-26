@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.sparq.application.userinterface.model.EventItem;
+
 /**
  * Created by sarahcs on 3/23/2017.
  */
@@ -18,7 +20,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
     // Event Table and column names
     private static final String TABLE_EVENT = "event";
-    private static final String EVENT_CODE = "id";
+    private static final String EVENT_ID = "id";
+    private static final String EVENT_CODE = "event_code";
     private static final String EVENT_NAME = "name";
     private static final String EVENT_AGENDA = "agenda";
     private static final String EVENT_VENUE = "venue";
@@ -72,12 +75,13 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db){
 
         String CREATE_EVENT_TABLE = "CREATE TABLE " + TABLE_EVENT + "("
-                + EVENT_CODE + " INTEGER PRIMARY KEY,"
+                + EVENT_ID + " INTEGER PRIMARY KEY,"
+                + EVENT_CODE + " TEXT,"
                 + EVENT_NAME + " TEXT,"
                 + EVENT_AGENDA + " TEXT,"
                 + EVENT_VENUE + " TEXT,"
                 + EVENT_DATE + " DATETIME,"
-                + EVENT_DURATION + " TEXT" + ")";
+                + EVENT_DURATION + " LONG" + ")";
         db.execSQL(CREATE_EVENT_TABLE);
 
         String CREATE_USER_TABLE = "CREATE TABLE " + TABLE_USER + "("
@@ -136,5 +140,9 @@ public class DBHelper extends SQLiteOpenHelper {
         // Create tables again
         onCreate(db);
     }
+
+//    public void addEvent(EventItem event){
+//        db.execSQL("DROP TABLE IF EXISTS ");
+//    }
 
 }

@@ -93,7 +93,7 @@ public class ThreadFragment extends Fragment {
 
         initializeView(view);
 
-        initializeLowerLayer();
+//        initializeLowerLayer();
 
         threadsArrayList = getData();
 
@@ -120,9 +120,9 @@ public class ThreadFragment extends Fragment {
     }
 
     public ConversationThread getConversationThread(int questionareId, int creatorId){
-        ead: threadsArrayList){
 
-        for(ConversationThread thr
+
+        for(ConversationThread thread: threadsArrayList){
             if(thread.getQuestionareId() == questionareId
                     && thread.getCreator().getUserId() == creatorId){
                 return thread;
@@ -145,83 +145,83 @@ public class ThreadFragment extends Fragment {
 
     }
 
-    public void initializeLowerLayer(){
-        myBluetoothAdapter = new MyBluetoothAdapter(ConverstaionThreadActivity.this);
-
-        handler = new ApplicationPacketDiscoveryHandler() {
-            @Override
-            public void handleDiscovery(ApplicationLayerPdu.TYPE type, AlMessage alMessage) {
-
-                ConversationThread retreivedThread;
-                AnswerItem retreivedAnswer;
-
-                switch(type){
-                    case QUESTION:
-
-                        AlQuestion alQuestion = (AlQuestion) alMessage;
-                        threadsArrayList.add(
-                                ConversationThread.getConversationThreadFromMessage(alQuestion)
-                        );
-
-                        break;
-                    case ANSWER:
-
-                        AlAnswer alAnswer = (AlAnswer) alMessage;
-                        retreivedThread = getConversationThread(alAnswer.getQuestionId(), alAnswer.getCreatorId());
-                        if(retreivedThread != null){
-                            retreivedThread.addAnswerToList(
-                                    AnswerItem.getAnswerItemFrommessage(alAnswer)
-                            );
-                        }
-
-                        break;
-                    case QUESTION_VOTE:
-
-                        AlVote questionVote = (AlVote) alMessage;
-
-                        retreivedThread = getConversationThread(questionVote.getQuestionId(), questionVote.getCreatorId());
-                        if(retreivedThread != null){
-
-                            switch(questionVote.getVoteValue()){
-                                case UPVOTE:
-                                    retreivedThread.getQuestionItem().addUpVote();
-                                    break;
-                                case DOWNVOTE:
-                                    retreivedThread.getQuestionItem().addDownVote();
-                                    break;
-                            }
-                        }
-
-                        break;
-                    case ANSWER_VOTE:
-
-                        AlVote answerVote = (AlVote) alMessage;
-
-                        retreivedThread = getConversationThread(answerVote.getQuestionId(), answerVote.getCreatorId());
-                        if(retreivedThread != null){
-
-                            retreivedAnswer = getAnswerForThread(retreivedThread, answerVote.getAnswerId(), answerVote.getAnswerCreatorId());
-                            if(retreivedAnswer != null){
-                                switch(answerVote.getVoteValue()){
-                                    case UPVOTE:
-                                        retreivedThread.getQuestionItem().addUpVote();
-                                        break;
-                                    case DOWNVOTE:
-                                        retreivedThread.getQuestionItem().addDownVote();
-                                        break;
-                                }
-                            }
-                        }
-
-                        break;
-
-                }
-            }
-        };
-
-        mApplicationLayerManager = new ApplicationLayerManager(ownAddr, myBluetoothAdapter, handler);
-
-    }
+//    public void initializeLowerLayer(){
+//        myBluetoothAdapter = new MyBluetoothAdapter(ConverstaionThreadActivity.this);
+//
+//        handler = new ApplicationPacketDiscoveryHandler() {
+//            @Override
+//            public void handleDiscovery(ApplicationLayerPdu.TYPE type, AlMessage alMessage) {
+//
+//                ConversationThread retreivedThread;
+//                AnswerItem retreivedAnswer;
+//
+//                switch(type){
+//                    case QUESTION:
+//
+//                        AlQuestion alQuestion = (AlQuestion) alMessage;
+//                        threadsArrayList.add(
+//                                ConversationThread.getConversationThreadFromMessage(alQuestion)
+//                        );
+//
+//                        break;
+//                    case ANSWER:
+//
+//                        AlAnswer alAnswer = (AlAnswer) alMessage;
+//                        retreivedThread = getConversationThread(alAnswer.getQuestionId(), alAnswer.getCreatorId());
+//                        if(retreivedThread != null){
+//                            retreivedThread.addAnswerToList(
+//                                    AnswerItem.getAnswerItemFrommessage(alAnswer)
+//                            );
+//                        }
+//
+//                        break;
+//                    case QUESTION_VOTE:
+//
+//                        AlVote questionVote = (AlVote) alMessage;
+//
+//                        retreivedThread = getConversationThread(questionVote.getQuestionId(), questionVote.getCreatorId());
+//                        if(retreivedThread != null){
+//
+//                            switch(questionVote.getVoteValue()){
+//                                case UPVOTE:
+//                                    retreivedThread.getQuestionItem().addUpVote();
+//                                    break;
+//                                case DOWNVOTE:
+//                                    retreivedThread.getQuestionItem().addDownVote();
+//                                    break;
+//                            }
+//                        }
+//
+//                        break;
+//                    case ANSWER_VOTE:
+//
+//                        AlVote answerVote = (AlVote) alMessage;
+//
+//                        retreivedThread = getConversationThread(answerVote.getQuestionId(), answerVote.getCreatorId());
+//                        if(retreivedThread != null){
+//
+//                            retreivedAnswer = getAnswerForThread(retreivedThread, answerVote.getAnswerId(), answerVote.getAnswerCreatorId());
+//                            if(retreivedAnswer != null){
+//                                switch(answerVote.getVoteValue()){
+//                                    case UPVOTE:
+//                                        retreivedThread.getQuestionItem().addUpVote();
+//                                        break;
+//                                    case DOWNVOTE:
+//                                        retreivedThread.getQuestionItem().addDownVote();
+//                                        break;
+//                                }
+//                            }
+//                        }
+//
+//                        break;
+//
+//                }
+//            }
+//        };
+//
+//        mApplicationLayerManager = new ApplicationLayerManager(ownAddr, myBluetoothAdapter, handler);
+//
+//    }
 
     public void initializeView(View view){
 

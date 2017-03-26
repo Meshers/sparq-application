@@ -88,7 +88,7 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
 
         for(int i = 0; i < 10; i++){
 
-            AnswerItem answer = new AnswerItem(i,1,1,new UserItem(),"ANSWERRRRRRRRRRRRRRRRRRRRRRR", 0);
+            AnswerItem answer = new AnswerItem(i,new UserItem(),1,new UserItem(),"ANSWERRRRRRRRRRRRRRRRRRRRRRR", 0);
 
             answers.add(answer);
         }
