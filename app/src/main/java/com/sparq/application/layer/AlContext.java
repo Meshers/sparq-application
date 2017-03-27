@@ -8,13 +8,9 @@ import com.sparq.application.layer.almessage.AlQuestion;
 import com.sparq.application.layer.almessage.AlVote;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.layer.pdu.ThreadPdu;
-import com.sparq.application.userinterface.model.ConversationThread;
-import com.sparq.application.userinterface.model.UserItem;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  * Created by sarahcs on 3/19/2017.
@@ -76,6 +72,28 @@ public class AlContext {
         return null;
     }
 
+    public AlQuestion addDummyQuestion(byte threadCreatorId, byte threadId){
+
+        AlQuestion alQuestion = new AlQuestion(threadCreatorId, threadId, null, true);
+
+        this.mSessionThreads.put(alQuestion, new ArrayList<AlAnswer>()
+        );
+
+        return alQuestion;
+    }
+
+    public AlAnswer addDummyAnswer(byte threadCreatorId, byte threadId, byte subThreadCreatorId, byte subThreadId){
+        AlAnswer alAnswer = new AlAnswer(threadCreatorId, threadId, subThreadCreatorId, subThreadId, null, true);
+
+        //get the corresponding answer array
+        AlQuestion retrievedQuestion = getAlQuestion(threadCreatorId, threadId);
+
+        mSessionThreads.get(retrievedQuestion).add(alAnswer);
+
+        return alAnswer;
+
+    }
+
     public void sendThreadPdu(ApplicationLayerPdu.TYPE type, byte threadCreatorId, byte threadId, byte subThreadCreatorId, byte subThreadId, byte[] data, byte toAddr){
 
         ApplicationLayerPdu pdu = null;
@@ -86,14 +104,14 @@ public class AlContext {
             switch(type){
                 case QUESTION:
 
-                    AlQuestion question = new AlQuestion(threadCreatorId, threadId, data);
+                    AlQuestion question = new AlQuestion(threadCreatorId, threadId, data, false);
                     mSessionThreads.put(question, new ArrayList<AlAnswer>());
 
                     pdu = ThreadPdu.getQuestionPdu(threadCreatorId, threadId, data);
                     break;
                 case ANSWER:
 
-                    AlAnswer answer = new AlAnswer(threadCreatorId, threadId, subThreadCreatorId, subThreadId, data);
+                    AlAnswer answer = new AlAnswer(threadCreatorId, threadId, subThreadCreatorId, subThreadId, data, false);
 
                     //get the corresponding answer array
                     retrievedQuestion = getAlQuestion(threadCreatorId, threadId);
@@ -178,10 +196,10 @@ public class AlContext {
 
         switch(pdu.getType()){
             case QUESTION:
-                message = new AlQuestion(threadCreatorId, threadId, data);
+                message = new AlQuestion(threadCreatorId, threadId, data, false);
                 break;
             case ANSWER:
-                message = new AlAnswer(threadCreatorId, threadId, subThreadCreatorId, subThreadId, data);
+                message = new AlAnswer(threadCreatorId, threadId, subThreadCreatorId, subThreadId, data, false);
                 break;
             case QUESTION_VOTE:
                 message = AlVote.getQuestionVote(threadCreatorId, threadId, data);
@@ -206,6 +224,41 @@ public class AlContext {
         return null;
     }
 
+    public void transmitPacketsToUpperLayer(ApplicationLayerPdu.TYPE type, AlMessage alMessage){
+
+        switch(type){
+            case QUESTION:
+                // transmit the question, its answers, and all vote packets to the upper layer
+                mCallback.sendUpperLayer(type, alMessage);
+
+                for(AlAnswer answer: mSessionThreads.get((AlQuestion) alMessage)){
+                    transmitPacketsToUpperLayer(ApplicationLayerPdu.TYPE.ANSWER, answer);
+                }
+
+                for(AlVote vote: ((AlQuestion) alMessage).getVotes()){
+                    transmitPacketsToUpperLayer(ApplicationLayerPdu.TYPE.QUESTION_VOTE, vote);
+                }
+
+                break;
+            case ANSWER:
+                // transmit the answer and all its votes to the upper layer
+                mCallback.sendUpperLayer(type, alMessage);
+
+                for(AlVote vote: ((AlAnswer) alMessage).getVotes()){
+                    transmitPacketsToUpperLayer(ApplicationLayerPdu.TYPE.ANSWER_VOTE, vote);
+                }
+
+                break;
+            case QUESTION_VOTE:
+            case ANSWER_VOTE:
+
+                mCallback.sendUpperLayer(type, alMessage);
+
+                break;
+        }
+    }
+
+
     public void receiveThreadPdu(ThreadPdu pdu){
 
         // convert PDU to appropriate Al Message Type
@@ -213,73 +266,122 @@ public class AlContext {
 
         AlQuestion retrievedQuestion;
         AlAnswer retrievedAnswer;
+        boolean transmitPdu = true;
 
         switch(pdu.getType()){
             case QUESTION:
-                mSessionThreads.put(
-                        (AlQuestion) alMessage,
-                        new ArrayList<AlAnswer>()
-                );
+
+                Log.i(TAG, "QUESTION RECEIVED");
+
+                AlQuestion alQuestion = (AlQuestion) alMessage;
+
+                //check if question exists
+                retrievedQuestion = getAlQuestion(alQuestion.getCreatorId(), alQuestion.getQuestionId());
+                if(retrievedQuestion != null && retrievedQuestion.isDummy()){
+                    // a duplicate question exists
+                    Log.i(TAG, "Duplicate question");
+                    retrievedQuestion.copyData(alQuestion);
+                    alQuestion = retrievedQuestion;
+                }else{
+                    mSessionThreads.put(
+                            alQuestion,
+                            new ArrayList<AlAnswer>(0)
+                    );
+                }
+
+                transmitPacketsToUpperLayer(pdu.getType(),alQuestion);
+
 
                 break;
             case ANSWER:
 
-                AlAnswer alAnswer = (AlAnswer) alMessage;
-                retrievedQuestion = getAlQuestion(
-                        alAnswer.getCreatorId(), alAnswer.getQuestionId()
-                );
+                Log.i(TAG, "ANSWER RECEIVED");
 
-                if(retrievedQuestion != null){
+                AlAnswer alAnswer = (AlAnswer) alMessage;
+               // check if question exists
+                retrievedQuestion = getAlQuestion(alAnswer.getCreatorId(), alAnswer.getQuestionId());
+
+                if(retrievedQuestion == null){
+                    // no such question exists. Add dummy question
+                    Log.i(TAG, "Dummy question");
+                    retrievedQuestion = addDummyQuestion(alAnswer.getCreatorId(), alAnswer.getQuestionId());
+                }
+
+                retrievedAnswer = getAlAnswer(
+                        mSessionThreads.get(retrievedQuestion),
+                        alAnswer.getAnswerCreatorId(), alAnswer.getAnswerId());
+
+                if(retrievedAnswer != null && retrievedAnswer.isDummy()){
+                    // a duplicate answer exists
+                    Log.i(TAG, "duplicate ans");
+                    retrievedAnswer.copyData(alAnswer);
+                    alAnswer = retrievedAnswer;
+                }else{
                     mSessionThreads.get(retrievedQuestion).add(alAnswer);
                 }
-                else{
-                    throw new IllegalArgumentException("No question exists for such an answer");
+
+                if(!retrievedQuestion.isDummy()){
+                    transmitPacketsToUpperLayer(pdu.getType(),alAnswer);
                 }
 
                 break;
             case QUESTION_VOTE:
 
+                Log.i(TAG, "QUESTION VOTE RECEIVED");
+
                 AlVote questionVote = (AlVote) alMessage;
-                retrievedQuestion = getAlQuestion(
-                        questionVote.getCreatorId(), questionVote.getQuestionId()
-                );
-                if(retrievedQuestion != null){
-                    retrievedQuestion.addVote(questionVote);
+
+                retrievedQuestion = getAlQuestion(questionVote.getCreatorId(), questionVote.getQuestionId());
+
+                if(retrievedQuestion == null){
+                    Log.i(TAG, "Dummy question");
+                    // no such question exists. Add dummy question
+                    retrievedQuestion = addDummyQuestion(questionVote.getCreatorId(), questionVote.getQuestionId());
                 }
-                else{
-                    throw new IllegalArgumentException("No question exists for such a vote");
+                retrievedQuestion.addVote(questionVote);
+
+                if(!retrievedQuestion.isDummy()){
+                    transmitPacketsToUpperLayer(pdu.getType(),questionVote);
                 }
+
                 break;
             case ANSWER_VOTE:
 
+                Log.i(TAG, "ANSWER VOTE RECEIVED");
                 AlVote answerVote = (AlVote) alMessage;
-                retrievedQuestion = getAlQuestion(
-                        answerVote.getCreatorId(), answerVote.getQuestionId()
-                );
-                if(retrievedQuestion != null){
-                    retrievedAnswer = getAlAnswer(
-                            mSessionThreads.get(retrievedQuestion),
-                            answerVote.getAnswerCreatorId(),
-                            answerVote.getAnswerId()
+
+                retrievedQuestion = getAlQuestion(answerVote.getCreatorId(), answerVote.getQuestionId());
+                if(retrievedQuestion == null){
+                    Log.i(TAG, "Dummy question");
+                    retrievedQuestion = addDummyQuestion(answerVote.getCreatorId(), answerVote.getQuestionId());
+                }
+
+                retrievedAnswer = getAlAnswer(
+                        mSessionThreads.get(retrievedQuestion),
+                        answerVote.getAnswerCreatorId(), answerVote.getAnswerId());
+
+                if(retrievedAnswer == null){
+                    Log.i(TAG, "Dummy Ans");
+                    retrievedAnswer = addDummyAnswer(
+                            answerVote.getCreatorId(), answerVote.getQuestionId(),
+                            answerVote.getAnswerCreatorId(), answerVote.getAnswerId()
                     );
 
-                    if(retrievedAnswer != null){
-                        retrievedAnswer.addVote(answerVote);
-                    }
-                    else{
-                        throw new IllegalArgumentException("No answer exists for such a vote");
-                    }
+                }
 
+                retrievedAnswer.addVote(answerVote);
+
+                if(!retrievedQuestion.isDummy() && !retrievedAnswer.isDummy()){
+                    transmitPacketsToUpperLayer(pdu.getType(),answerVote);
                 }
-                else{
-                    throw new IllegalArgumentException("No question exists for such a vote");
-                }
+
+
                 break;
             default:
                 throw new IllegalArgumentException("No such type of Thread packet exists");
         }
-
-        mCallback.sendUpperLayer(pdu.getType(), alMessage);
+//
+//        mCallback.sendUpperLayer(pdu.getType(), alMessage);
     }
 
     public void receivePdu(ApplicationLayerPdu pdu){

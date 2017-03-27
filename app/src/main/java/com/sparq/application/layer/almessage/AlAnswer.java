@@ -14,18 +14,20 @@ public class AlAnswer extends AlMessage{
     private byte mQuestionId;
     private byte mAnswerCreatorId;
     private byte mAnswerId;
+    private boolean isDummy;
     private byte[] mAnswerData;
     private ArrayList<AlVote> mVotes;
 
     private final static Charset CHARSET = Charset.forName("UTF-8");
 
-    public AlAnswer(byte creatorId, byte questionId, byte answerCreatorId, byte answerId, byte[] data) {
+    public AlAnswer(byte creatorId, byte questionId, byte answerCreatorId, byte answerId, byte[] data, boolean dummy) {
         super(ApplicationLayerPdu.TYPE.ANSWER);
         mCreatorId = creatorId;
         mQuestionId = questionId;
         mAnswerCreatorId = answerCreatorId;
         mAnswerId = answerId;
         mAnswerData = data;
+        this.isDummy = dummy;
 
         mVotes = new ArrayList<>();
 
@@ -59,8 +61,20 @@ public class AlAnswer extends AlMessage{
         return new String(mAnswerData, CHARSET);
     }
 
+    public boolean isDummy() {
+        return isDummy;
+    }
+
+    public void setDummy(boolean dummy) {
+        isDummy = dummy;
+    }
+
     public ArrayList<AlVote> getVotes(){
         return this.mVotes;
+    }
+
+    public void setVotes(ArrayList<AlVote> votes){
+        this.mVotes = votes;
     }
 
     public AlVote getVoteAtIndex(int index){
@@ -69,5 +83,10 @@ public class AlAnswer extends AlMessage{
 
     public void addVote(AlVote vote){
         this.mVotes.add(vote);
+    }
+
+    public void copyData(AlAnswer answer){
+        this.mAnswerData = answer.getAnswerData();
+        this.isDummy = false;
     }
 }
