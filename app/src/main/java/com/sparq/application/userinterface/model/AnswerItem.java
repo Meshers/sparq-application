@@ -65,7 +65,7 @@ public class AnswerItem implements Serializable{
         this.length = length;
     }
 
-    public void addUpvote(){
+    public void addUpVote(){
         this.votes += 1;
     }
 

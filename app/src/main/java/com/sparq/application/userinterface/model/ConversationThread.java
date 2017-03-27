@@ -48,6 +48,18 @@ public class ConversationThread extends Questionare {
         return this.answers.get(index);
     }
 
+    public AnswerItem getAnswer(int answerId, int answerCreatorId){
+
+        for(AnswerItem answer: getAnswers()){
+            if(answer.getAnswerId() == answerId
+                    && answer.getCreator().getUserId() == answerCreatorId){
+                return answer;
+            }
+        }
+
+        return null;
+    }
+
     public static   ConversationThread getConversationThreadFromMessage(AlQuestion alQuestion){
         return new ConversationThread(
                 alQuestion.getQuestionId(),

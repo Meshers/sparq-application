@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.ListView;
 
 import com.sparq.R;
+import com.sparq.application.SPARQApplication;
 import com.sparq.application.layer.ApplicationLayerManager;
 import com.sparq.application.layer.ApplicationPacketDiscoveryHandler;
 import com.sparq.application.layer.almessage.AlMessage;
@@ -39,8 +40,13 @@ import static com.sparq.application.layer.pdu.ApplicationLayerPdu.TYPE.QUESTION;
 public class ConverstaionThreadActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
+    private int threadId, creatorId;
+    private ConversationThread mThread;
     private ArrayList<AnswerItem> answersArrayList;
     private AnswerListAdapter mAdapter;
+
+    public static final String THREAD_ID ="thread_id";
+    public static final String CREATOR_ID ="creator_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +55,18 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Bundle extras = getIntent().getExtras();
+
+        if(extras != null){
+            threadId = extras.getInt(THREAD_ID);
+            creatorId = extras.getInt(CREATOR_ID);
+        }
+
         recyclerView = (RecyclerView)  findViewById(R.id.answer_recycler_view);
 
-        answersArrayList = getData();
+        mThread = SPARQApplication.getConversationThread(threadId, creatorId);
+
+        answersArrayList = mThread.getAnswers();
 
         mAdapter = new AnswerListAdapter(answersArrayList);
         DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -71,7 +86,11 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(ConverstaionThreadActivity.this, AnswerActivity.class);
 
-                intent.putExtra("Answer", answer);
+                intent.putExtra(AnswerActivity.THREAD_ID, threadId);
+                intent.putExtra(AnswerActivity.CREATOR_ID, creatorId);
+                intent.putExtra(AnswerActivity.ANSWER_ID, answer.getAnswerId());
+                intent.putExtra(AnswerActivity.ANSWER_CREATOR_ID, answer.getCreator());
+
                 startActivity(intent);
 
             }

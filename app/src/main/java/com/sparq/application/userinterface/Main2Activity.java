@@ -7,21 +7,15 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
 
-import com.sparq.application.MyApplication;
+import com.sparq.application.SPARQApplication;
 import com.sparq.application.layer.ApplicationLayerManager;
-import com.sparq.application.layer.ApplicationPacketDiscoveryHandler;
-import com.sparq.application.layer.almessage.AlAnswer;
-import com.sparq.application.layer.almessage.AlMessage;
-import com.sparq.application.layer.almessage.AlQuestion;
 import com.sparq.application.layer.almessage.AlVote;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 
@@ -54,67 +48,13 @@ public class Main2Activity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(test.com.blootoothtester.R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mOwnAddr = MyApplication.getOwnAddress();
+        mOwnAddr = SPARQApplication.getOwnAddress();
         mEventCode = getIntent().getByteExtra(EXTRA_EVENT_CODE, (byte) -1);
 
         initialize();
 
-        mBluetoothAdapter = new MyBluetoothAdapter(Main2Activity.this);
-
-
-        ApplicationPacketDiscoveryHandler mHandler = new ApplicationPacketDiscoveryHandler() {
-            @Override
-            public void handleDiscovery(ApplicationLayerPdu.TYPE type, AlMessage alMessage) {
-
-                switch(type){
-                    case QUESTION:
-
-                        AlQuestion alQuestion = (AlQuestion) alMessage;
-                        Toast.makeText(Main2Activity.this, "RECEIVED MESSAGE: "
-                                + alQuestion.getCreatorId() + ":" +alQuestion.getQuestionId()
-                                ,Toast.LENGTH_SHORT).show();
-
-                        break;
-                    case ANSWER:
-
-                        AlAnswer alAnswer = (AlAnswer) alMessage;
-                        Toast.makeText(Main2Activity.this, "RECEIVED MESSAGE: "
-                                + alAnswer.getCreatorId() + ":"
-                                + alAnswer.getQuestionId()+ ":"
-                                + alAnswer.getAnswerCreatorId()+ ":"
-                                + alAnswer.getAnswerId()+ ":"
-                                ,Toast.LENGTH_SHORT).show();
-
-                        break;
-                    case QUESTION_VOTE:
-
-                        AlVote alQuestionVote = (AlVote) alMessage;
-                        Toast.makeText(Main2Activity.this, "RECEIVED MESSAGE: "
-                                + alQuestionVote.getCreatorId() + ":"
-                                + alQuestionVote.getQuestionId() +":"
-                                + alQuestionVote.getVoteValue()
-                                ,Toast.LENGTH_SHORT).show();
-
-                        break;
-                    case ANSWER_VOTE:
-
-                        AlVote alAnswerVote = (AlVote) alMessage;
-                        Toast.makeText(Main2Activity.this, "RECEIVED MESSAGE: "
-                                        + alAnswerVote.getCreatorId() + ":"
-                                        + alAnswerVote.getQuestionId()+ ":"
-                                        + alAnswerVote.getAnswerCreatorId()+ ":"
-                                        + alAnswerVote.getAnswerId()+ ":"
-                                        + alAnswerVote.getVoteValue()
-                                ,Toast.LENGTH_SHORT).show();
-
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Illegal message type.");
-                }
-            }
-        };
-
-        mApplicationLayerManager = new ApplicationLayerManager(mOwnAddr, mBluetoothAdapter, mHandler, MyApplication.getSessionId());
+        mBluetoothAdapter = SPARQApplication.getBluetoothAdapter();
+        mApplicationLayerManager = SPARQApplication.getApplicationLayerManager();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // this takes care of letting the user add the WRITE_SETTINGS permission
@@ -169,7 +109,7 @@ public class Main2Activity extends AppCompatActivity {
 
 
 
-//        mApplicationLayerManager = MyApplication.getApplicationLayerManager();
+//        mApplicationLayerManager = SPARQApplication.getApplicationLayerManager();
     }
 
 

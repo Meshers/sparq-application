@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sparq.R;
+import com.sparq.application.SPARQApplication;
 import com.sparq.application.layer.ApplicationLayerManager;
 import com.sparq.application.layer.ApplicationPacketDiscoveryHandler;
 import com.sparq.application.layer.almessage.AlAnswer;
@@ -50,7 +51,7 @@ public class ThreadFragment extends Fragment {
     private ApplicationLayerManager mApplicationLayerManager;
     private ApplicationPacketDiscoveryHandler handler;
 
-    private ArrayList<ConversationThread> threadsArrayList = new ArrayList<>();
+    private ArrayList<ConversationThread> threadsArrayList;
     private RecyclerView recyclerView;
     private ThreadListAdapter mAdapter;
 
@@ -95,7 +96,7 @@ public class ThreadFragment extends Fragment {
 
 //        initializeLowerLayer();
 
-        threadsArrayList = getData();
+        threadsArrayList = SPARQApplication.getConversationThreads();
 
         mAdapter = new ThreadListAdapter(threadsArrayList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -109,7 +110,8 @@ public class ThreadFragment extends Fragment {
                 ConversationThread thread =  threadsArrayList.get(position);
 
                 Intent intent = new Intent(getActivity(), ConverstaionThreadActivity.class);
-                intent.putExtra("event_id", thread.getQuestionareId());
+                intent.putExtra(ConverstaionThreadActivity.THREAD_ID, thread.getQuestionareId());
+                intent.putExtra(ConverstaionThreadActivity.CREATOR_ID, thread.getCreator().getUserId());
                 startActivity(intent);
 
             }
@@ -119,130 +121,10 @@ public class ThreadFragment extends Fragment {
         return view;
     }
 
-    public ConversationThread getConversationThread(int questionareId, int creatorId){
-
-
-        for(ConversationThread thread: threadsArrayList){
-            if(thread.getQuestionareId() == questionareId
-                    && thread.getCreator().getUserId() == creatorId){
-                return thread;
-            }
-        }
-        return null;
-
-    }
-
-    public AnswerItem getAnswerForThread(ConversationThread thread, int answerId, int answerCreatorId){
-
-        for(AnswerItem answer: thread.getAnswers()){
-
-            if(answer.getAnswerId() == answerId
-                    && thread.getCreator().getUserId() == answerCreatorId){
-                return answer;
-            }
-        }
-        return null;
-
-    }
-
-//    public void initializeLowerLayer(){
-//        myBluetoothAdapter = new MyBluetoothAdapter(ConverstaionThreadActivity.this);
-//
-//        handler = new ApplicationPacketDiscoveryHandler() {
-//            @Override
-//            public void handleDiscovery(ApplicationLayerPdu.TYPE type, AlMessage alMessage) {
-//
-//                ConversationThread retreivedThread;
-//                AnswerItem retreivedAnswer;
-//
-//                switch(type){
-//                    case QUESTION:
-//
-//                        AlQuestion alQuestion = (AlQuestion) alMessage;
-//                        threadsArrayList.add(
-//                                ConversationThread.getConversationThreadFromMessage(alQuestion)
-//                        );
-//
-//                        break;
-//                    case ANSWER:
-//
-//                        AlAnswer alAnswer = (AlAnswer) alMessage;
-//                        retreivedThread = getConversationThread(alAnswer.getQuestionId(), alAnswer.getCreatorId());
-//                        if(retreivedThread != null){
-//                            retreivedThread.addAnswerToList(
-//                                    AnswerItem.getAnswerItemFrommessage(alAnswer)
-//                            );
-//                        }
-//
-//                        break;
-//                    case QUESTION_VOTE:
-//
-//                        AlVote questionVote = (AlVote) alMessage;
-//
-//                        retreivedThread = getConversationThread(questionVote.getQuestionId(), questionVote.getCreatorId());
-//                        if(retreivedThread != null){
-//
-//                            switch(questionVote.getVoteValue()){
-//                                case UPVOTE:
-//                                    retreivedThread.getQuestionItem().addUpVote();
-//                                    break;
-//                                case DOWNVOTE:
-//                                    retreivedThread.getQuestionItem().addDownVote();
-//                                    break;
-//                            }
-//                        }
-//
-//                        break;
-//                    case ANSWER_VOTE:
-//
-//                        AlVote answerVote = (AlVote) alMessage;
-//
-//                        retreivedThread = getConversationThread(answerVote.getQuestionId(), answerVote.getCreatorId());
-//                        if(retreivedThread != null){
-//
-//                            retreivedAnswer = getAnswerForThread(retreivedThread, answerVote.getAnswerId(), answerVote.getAnswerCreatorId());
-//                            if(retreivedAnswer != null){
-//                                switch(answerVote.getVoteValue()){
-//                                    case UPVOTE:
-//                                        retreivedThread.getQuestionItem().addUpVote();
-//                                        break;
-//                                    case DOWNVOTE:
-//                                        retreivedThread.getQuestionItem().addDownVote();
-//                                        break;
-//                                }
-//                            }
-//                        }
-//
-//                        break;
-//
-//                }
-//            }
-//        };
-//
-//        mApplicationLayerManager = new ApplicationLayerManager(ownAddr, myBluetoothAdapter, handler);
-//
-//    }
 
     public void initializeView(View view){
 
         recyclerView = (RecyclerView) view.findViewById(R.id.thread_recycler_view);
-    }
-
-    public ArrayList<ConversationThread> getData(){
-
-        ArrayList<ConversationThread> threads = new ArrayList<ConversationThread>();
-
-        UserItem user = new UserItem();
-
-        for(int i = 0; i < 10; i++){
-
-            ConversationThread thread = new ConversationThread(0, 1, new Date(2,3,2011), user, "How does this work?");
-
-            threads.add(thread);
-        }
-
-        return threads;
-
     }
 
 

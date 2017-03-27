@@ -239,6 +239,8 @@ public class AlContext {
                     transmitPacketsToUpperLayer(ApplicationLayerPdu.TYPE.QUESTION_VOTE, vote);
                 }
 
+                ((AlQuestion) alMessage).setVotes(new ArrayList<AlVote>());
+
                 break;
             case ANSWER:
                 // transmit the answer and all its votes to the upper layer
@@ -247,6 +249,9 @@ public class AlContext {
                 for(AlVote vote: ((AlAnswer) alMessage).getVotes()){
                     transmitPacketsToUpperLayer(ApplicationLayerPdu.TYPE.ANSWER_VOTE, vote);
                 }
+
+                ((AlAnswer) alMessage).setVotes(new ArrayList<AlVote>());
+
 
                 break;
             case QUESTION_VOTE:

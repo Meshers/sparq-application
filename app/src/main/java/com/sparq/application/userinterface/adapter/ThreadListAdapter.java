@@ -53,7 +53,7 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
     public void onBindViewHolder(ThreadListAdapter.MyViewHolder holder, int position) {
         ConversationThread thread = threads.get(position);
         holder.threadName.setText(thread.getQuestionItem().getQuestion());
-    holder.threadDate.setText(thread.getDate().toString());
+        holder.threadDate.setText(thread.getDate().toString());
 
         ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
         // generate color based on a key (same key returns the same color), useful for list/grid views

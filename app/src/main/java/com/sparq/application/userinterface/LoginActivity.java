@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.sparq.R;
-import com.sparq.application.MyApplication;
+import com.sparq.application.SPARQApplication;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -74,9 +74,11 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        MyApplication.setOwnAddr(Byte.parseByte(addrStr));
-        MyApplication.setSessionId(Byte.parseByte(eventCode));
-        MyApplication.initializeObjects(LoginActivity.this);
+        SPARQApplication.setOwnAddr(Byte.parseByte(addrStr));
+        SPARQApplication.setSessionId(Byte.parseByte(eventCode));
+        SPARQApplication.initializeObjects(LoginActivity.this);
+
+        SPARQApplication.initializeObjects(LoginActivity.this);
 
         intent.putExtra(Main2Activity.EXTRA_EVENT_CODE, Byte.parseByte(addrStr));
 
