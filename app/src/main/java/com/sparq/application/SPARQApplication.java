@@ -68,18 +68,7 @@ public class SPARQApplication extends Application {
 
     public static void initializeObjects(Activity activity){
 
-        mBluetoothAdapter = new MyBluetoothAdapter(activity);
 
-
-        mHandler = new ApplicationPacketDiscoveryHandler() {
-            @Override
-            public void handleDiscovery(ApplicationLayerPdu.TYPE type, AlMessage alMessage) {
-                handlePackets(type, alMessage);
-
-            }
-        };
-
-        mManager = new ApplicationLayerManager(mOwnAddr, mBluetoothAdapter, mHandler, SPARQApplication.getSessionId());
 
     }
 

@@ -232,7 +232,10 @@ public class AlContext {
                 mCallback.sendUpperLayer(type, alMessage);
 
                 for(AlAnswer answer: mSessionThreads.get((AlQuestion) alMessage)){
-                    transmitPacketsToUpperLayer(ApplicationLayerPdu.TYPE.ANSWER, answer);
+                    if(!answer.isDummy()){
+                        transmitPacketsToUpperLayer(ApplicationLayerPdu.TYPE.ANSWER, answer);
+                    }
+
                 }
 
                 for(AlVote vote: ((AlQuestion) alMessage).getVotes()){
