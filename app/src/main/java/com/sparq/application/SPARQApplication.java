@@ -40,6 +40,8 @@ public class SPARQApplication extends Application {
     private static int currentQuestionId = 1;
     private static int currentAnswerId = 1;
 
+    private static boolean isTeacher;
+
     //handlers
     static NotifyUIHandler uihandler;
 
@@ -77,6 +79,14 @@ public class SPARQApplication extends Application {
 
     public static int getCurrentQuestionId() {
         return currentQuestionId;
+    }
+
+    public static boolean isTeacher() {
+        return isTeacher;
+    }
+
+    public static void setIsTeacher(boolean isTeacher) {
+        SPARQApplication.isTeacher = isTeacher;
     }
 
     public static void initializeObjects(Activity activity){
