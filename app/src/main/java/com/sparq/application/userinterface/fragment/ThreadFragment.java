@@ -1,40 +1,22 @@
 package com.sparq.application.userinterface.fragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
-import com.sparq.application.layer.ApplicationLayerManager;
-import com.sparq.application.layer.ApplicationPacketDiscoveryHandler;
-import com.sparq.application.layer.almessage.AlAnswer;
-import com.sparq.application.layer.almessage.AlMessage;
-import com.sparq.application.layer.almessage.AlQuestion;
-import com.sparq.application.layer.almessage.AlVote;
-import com.sparq.application.layer.pdu.ApplicationLayerPdu;
-import com.sparq.application.userinterface.ConverstaionThreadActivity;
-import com.sparq.application.userinterface.EventActivity;
 import com.sparq.application.userinterface.NotifyUIHandler;
-import com.sparq.application.userinterface.adapter.QuizListAdapter;
-import com.sparq.application.userinterface.adapter.RecyclerItemClickListener;
 import com.sparq.application.userinterface.adapter.ThreadListAdapter;
-import com.sparq.application.userinterface.model.AnswerItem;
 import com.sparq.application.userinterface.model.ConversationThread;
-import com.sparq.application.userinterface.model.EventItem;
-import com.sparq.application.userinterface.model.QuizItem;
 import com.sparq.application.userinterface.model.UserItem;
-import com.sparq.util.Constants;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -53,6 +35,7 @@ public class ThreadFragment extends Fragment {
     private ArrayList<ConversationThread> threadsArrayList;
     private RecyclerView recyclerView;
     private ThreadListAdapter mAdapter;
+    private TextView emptyView;
 
     public ThreadFragment() {
         // Required empty public constructor
@@ -89,14 +72,25 @@ public class ThreadFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        //TODO: add message to view incase arraylist is empty
+
         View view = inflater.inflate(R.layout.fragment_thread, container, false);
 
         initializeView(view);
 
         threadsArrayList = SPARQApplication.getConversationThreads();
 
-//        threadsArrayList = getData();
+        //TODO: add message to view incase arraylist is empty
+        /*RecyclerView does not have setEmptyView like
+         conventional lists have had to perform some patch work with the help of another textview in place
+        */
+        if(threadsArrayList.size() == 0){
+            recyclerView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+        }
+        else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        }
 
         mAdapter = new ThreadListAdapter(threadsArrayList, getActivity().getApplicationContext());
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -125,6 +119,7 @@ public class ThreadFragment extends Fragment {
     public void initializeView(View view){
 
         recyclerView = (RecyclerView) view.findViewById(R.id.thread_recycler_view);
+        emptyView = (TextView) view.findViewById(R.id.empty_view);
     }
 
 

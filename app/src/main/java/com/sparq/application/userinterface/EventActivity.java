@@ -1,14 +1,7 @@
 package com.sparq.application.userinterface;
 
 import android.os.Bundle;
-
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.getbase.floatingactionbutton.FloatingActionButton;
-
 import android.support.annotation.NonNull;
-//import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -17,9 +10,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
 import com.sparq.application.layer.ApplicationLayerManager;
@@ -27,10 +23,10 @@ import com.sparq.application.layer.ApplicationPacketDiscoveryHandler;
 import com.sparq.application.layer.almessage.AlMessage;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.userinterface.adapter.EventPagerAdapter;
-import com.sparq.application.userinterface.model.UserItem;
-import com.sparq.util.Constants;
 
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
+
+//import android.support.design.widget.FloatingActionButton;
 
 public class EventActivity extends AppCompatActivity {
 
@@ -137,6 +133,11 @@ public class EventActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
 
                             //TODO: check question length(<160)
+                            //Hope you meant to toast incase the length was greater than 160 characters
+                        }
+                        else if(questionText.getText().toString().length() > 160){
+                            Toast.makeText(EventActivity.this, "Only 160 characters allowed",
+                                    Toast.LENGTH_SHORT).show();
                         }
                         else{
                             //send question

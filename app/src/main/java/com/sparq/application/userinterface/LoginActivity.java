@@ -131,11 +131,26 @@ public class LoginActivity extends AppCompatActivity {
     public void onNextClick() {
         Intent intent = new Intent(this, EventActivity.class);
         String eventCode = mEventCode.getText().toString();
+        String ownAddress = mOwnAddr.getText().toString();
 
 
         //TODO: check if eventCode and addrStr are valid numbers < 127
+        //Fixed for now but we need to decide what exactly goes here for ownAddress
 
-        if (eventCode.equals("")) {
+        if(Integer.valueOf(eventCode) > 127){
+            Toast.makeText(LoginActivity.this, "Invalid Event Code", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // FIXME: 29/3/17 on change of link layer logic
+        // Handles arrayindexoutofbounds exception in case ownAddress more than 40
+        if(Integer.valueOf(ownAddress) > 40){
+            Toast.makeText(LoginActivity.this, "Invalid address", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(eventCode.equals("") || ownAddress.equals("")){
+            Toast.makeText(LoginActivity.this, "Fields cannot be empty", Toast.LENGTH_SHORT).show();
             return;
         }
 

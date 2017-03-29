@@ -2,53 +2,34 @@ package com.sparq.application.userinterface;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
-import com.sparq.application.layer.ApplicationLayerManager;
-import com.sparq.application.layer.ApplicationPacketDiscoveryHandler;
-import com.sparq.application.layer.almessage.AlMessage;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.userinterface.adapter.AnswerListAdapter;
-import com.sparq.application.userinterface.adapter.QuizListAdapter;
 import com.sparq.application.userinterface.adapter.RecyclerItemClickListener;
-import com.sparq.application.userinterface.adapter.ThreadListAdapter;
 import com.sparq.application.userinterface.model.AnswerItem;
 import com.sparq.application.userinterface.model.ConversationThread;
-import com.sparq.application.userinterface.model.QuizItem;
-import com.sparq.application.userinterface.model.UserItem;
-import com.sparq.util.Constants;
 
-import java.sql.Date;
 import java.util.ArrayList;
-
-import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
-import test.com.blootoothtester.network.linklayer.LinkLayerManager;
-
-import static com.sparq.application.layer.pdu.ApplicationLayerPdu.TYPE.ANSWER;
-import static com.sparq.application.layer.pdu.ApplicationLayerPdu.TYPE.QUESTION;
 
 public class ConverstaionThreadActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
-    private Button postAnswer;
     private TextView questionText;
     private EditText answerText;
+    private Button postAnswer;
+    private RecyclerView recyclerView;
 
     private int threadId, creatorId;
     private ConversationThread mThread;
@@ -81,6 +62,7 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
         mAdapter = new AnswerListAdapter(answersArrayList);
 
         //TODO: shift the recyclerview below the edittext
+        //Assuming you meant moving it in the display, it's done, if you had any other interpretation sorry
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int a =  (displaymetrics.heightPixels*45)/100;
