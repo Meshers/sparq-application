@@ -44,6 +44,7 @@
                 <EditText
                     android:id="@+id/event_code_input"
                     android:layout_width="match_parent"
+                    android:inputType="number"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorPrimaryDark"
                     android:hint="Event Code" />
@@ -59,6 +60,7 @@
                 <EditText
                     android:id="@+id/own_addr_input"
                     android:layout_width="match_parent"
+                    android:inputType="number"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorPrimaryDark"
                     android:hint="Own Address" />
