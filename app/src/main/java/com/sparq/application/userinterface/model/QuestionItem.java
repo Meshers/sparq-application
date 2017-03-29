@@ -97,7 +97,7 @@ public class QuestionItem {
     }
 
     public void addDownVote(){
-        this.votes += 1;
+        this.votes -= 1;
     }
 
     public double getTotalMarks() {

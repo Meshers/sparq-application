@@ -94,7 +94,7 @@ public class AlContext {
 
     }
 
-    public void sendThreadPdu(ApplicationLayerPdu.TYPE type, byte threadCreatorId, byte threadId, byte subThreadCreatorId, byte subThreadId, byte[] data, byte toAddr){
+    public boolean sendThreadPdu(ApplicationLayerPdu.TYPE type, byte threadCreatorId, byte threadId, byte subThreadCreatorId, byte subThreadId, byte[] data, byte toAddr){
 
         ApplicationLayerPdu pdu = null;
         AlQuestion retrievedQuestion;
@@ -171,9 +171,11 @@ public class AlContext {
         }
         catch(IllegalArgumentException e){
             Log.e(TAG,e.getMessage());
+            return false;
         }
 
         sendPdu(pdu, toAddr);
+        return true;
     }
 
     public void sendPdu(ApplicationLayerPdu pdu, byte toAddr){

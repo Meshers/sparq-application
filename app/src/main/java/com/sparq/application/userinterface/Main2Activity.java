@@ -126,17 +126,6 @@ public class Main2Activity extends AppCompatActivity {
 
         mApplicationLayerManager = new ApplicationLayerManager(mOwnAddr, mBluetoothAdapter, mHandler, SPARQApplication.getSessionId());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // this takes care of letting the user add the WRITE_SETTINGS permission
-            if (!Settings.System.canWrite(this)) {
-                Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                intent.setData(Uri.parse("package:" + this.getPackageName()));
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-        }
-
-
         if (!mBluetoothAdapter.isSupported()) {
             mQuestionBtn.setEnabled(false);
 

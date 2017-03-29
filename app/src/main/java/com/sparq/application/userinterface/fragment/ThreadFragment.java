@@ -7,9 +7,12 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
@@ -22,6 +25,7 @@ import com.sparq.application.layer.almessage.AlVote;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.userinterface.ConverstaionThreadActivity;
 import com.sparq.application.userinterface.EventActivity;
+import com.sparq.application.userinterface.NotifyUIHandler;
 import com.sparq.application.userinterface.adapter.QuizListAdapter;
 import com.sparq.application.userinterface.adapter.RecyclerItemClickListener;
 import com.sparq.application.userinterface.adapter.ThreadListAdapter;
@@ -30,11 +34,10 @@ import com.sparq.application.userinterface.model.ConversationThread;
 import com.sparq.application.userinterface.model.EventItem;
 import com.sparq.application.userinterface.model.QuizItem;
 import com.sparq.application.userinterface.model.UserItem;
+import com.sparq.util.Constants;
 
 import java.sql.Date;
 import java.util.ArrayList;
-
-import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
 
 
 public class ThreadFragment extends Fragment {
@@ -46,10 +49,6 @@ public class ThreadFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
-    private MyBluetoothAdapter myBluetoothAdapter;
-    private ApplicationLayerManager mApplicationLayerManager;
-    private ApplicationPacketDiscoveryHandler handler;
 
     private ArrayList<ConversationThread> threadsArrayList;
     private RecyclerView recyclerView;
@@ -90,32 +89,33 @@ public class ThreadFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        //TODO: add message to view incase arraylist is empty
         View view = inflater.inflate(R.layout.fragment_thread, container, false);
 
         initializeView(view);
 
-//        initializeLowerLayer();
-
         threadsArrayList = SPARQApplication.getConversationThreads();
 
-        mAdapter = new ThreadListAdapter(threadsArrayList);
+//        threadsArrayList = getData();
+
+        mAdapter = new ThreadListAdapter(threadsArrayList, getActivity().getApplicationContext());
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
-        recyclerView.addOnItemTouchListener( new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
-            @Override public void onItemClick(View view, int position) {
-
-                ConversationThread thread =  threadsArrayList.get(position);
-
-                Intent intent = new Intent(getActivity(), ConverstaionThreadActivity.class);
-                intent.putExtra(ConverstaionThreadActivity.THREAD_ID, thread.getQuestionareId());
-                intent.putExtra(ConverstaionThreadActivity.CREATOR_ID, thread.getCreator().getUserId());
-                startActivity(intent);
-
-            }
-        }));
+//        recyclerView.addOnItemTouchListener( new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
+//            @Override public void onItemClick(View view, int position) {
+//
+//                ConversationThread thread =  threadsArrayList.get(position);
+//
+//                Intent intent = new Intent(getActivity(), ConverstaionThreadActivity.class);
+//                intent.putExtra(ConverstaionThreadActivity.THREAD_ID, thread.getQuestionareId());
+//                intent.putExtra(ConverstaionThreadActivity.CREATOR_ID, thread.getCreator().getUserId());
+//                startActivity(intent);
+//
+//            }
+//        }));
 
 
         return view;
@@ -137,6 +137,52 @@ public class ThreadFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+    }
+
+    @Override
+    public  void onResume(){
+        super.onResume();
+
+        NotifyUIHandler uiHandler = new NotifyUIHandler() {
+            @Override
+            public void handleConversationThreadQuestions() {
+
+                mAdapter = new ThreadListAdapter(threadsArrayList, getActivity().getApplicationContext());
+                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+                recyclerView.setLayoutManager(mLayoutManager);
+                recyclerView.setItemAnimator(new DefaultItemAnimator());
+                recyclerView.setAdapter(mAdapter);
+            }
+
+            @Override
+            public void handleConversationThreadAnswers(){
+                // do nothing
+            }
+        };
+
+        SPARQApplication.setUINotifier(uiHandler);
+    }
+
+    @Override
+    public  void onStop(){
+        super.onStop();
+    }
+
+    public ArrayList<ConversationThread> getData(){
+
+        ArrayList<ConversationThread> threads = new ArrayList<ConversationThread>();
+
+        UserItem user = new UserItem();
+
+        for(int i = 0; i < 10; i++){
+
+            ConversationThread thread = new ConversationThread(0, 1, new Date(2,3,2011), user, "How does this work?");
+
+            threads.add(thread);
+        }
+
+        return threads;
+
     }
 
 }

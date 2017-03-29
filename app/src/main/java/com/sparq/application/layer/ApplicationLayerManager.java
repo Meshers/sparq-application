@@ -76,7 +76,7 @@ public class ApplicationLayerManager {
 
     }
 
-    public void sendData(ApplicationLayerPdu.TYPE type, byte[] data, byte toAddr , byte... headers) {
+    public boolean sendData(ApplicationLayerPdu.TYPE type, byte[] data, byte toAddr , byte... headers) {
 
         switch(type){
             case QUESTION:
@@ -84,21 +84,22 @@ public class ApplicationLayerManager {
             case QUESTION_VOTE:
             case ANSWER_VOTE:
                 if(headers.length + 1 == ThreadPdu.HEADER_MAX_BYTES){
-                    sendThreadData(type, headers[0], headers[1], headers[2], headers[3], data, toAddr);
+                    return sendThreadData(type, headers[0], headers[1], headers[2], headers[3], data, toAddr);
                 }
                 else{
                     throw new IllegalArgumentException("Illegal number of header values (Found: " +
                             headers.length + " but expected " + ThreadPdu.HEADER_MAX_BYTES + ")");
                 }
-                break;
         }
+
+        return false;
     }
 
-    public void sendThreadData(ApplicationLayerPdu.TYPE type, byte threadCreatorId,
+    public boolean sendThreadData(ApplicationLayerPdu.TYPE type, byte threadCreatorId,
                                byte threadId, byte subThreadCreatorId, byte subThreadId, byte[] data, byte toAddr){
 
 
-        mAlContext.sendThreadPdu(type, threadCreatorId, threadId, subThreadCreatorId, subThreadId, data, toAddr);
+        return mAlContext.sendThreadPdu(type, threadCreatorId, threadId, subThreadCreatorId, subThreadId, data, toAddr);
     }
 
     /**
@@ -108,11 +109,12 @@ public class ApplicationLayerManager {
      * @param toAddr address of receiver
      * @param headers set of variables that make up header information
      */
-    public void sendData(ApplicationLayerPdu.TYPE type, String msg, byte toAddr, byte... headers) {
+    public boolean sendData(ApplicationLayerPdu.TYPE type, String msg, byte toAddr, byte... headers) {
         try {
-            sendData(type, msg.getBytes("UTF-8"), toAddr, headers);
+            return sendData(type, msg.getBytes("UTF-8"), toAddr, headers);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            return false;
         }
     }
 

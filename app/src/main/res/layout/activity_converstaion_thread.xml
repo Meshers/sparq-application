@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:background="@color/white"
-    tools:context="com.sparq.application.ConverstaionThreadActivity">
+    tools:context="com.sparq.application.userinterface.ConverstaionThreadActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"

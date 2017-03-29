@@ -11,6 +11,14 @@
     <string name="logout">Log Out</string>
     <string name="other">Other</string>
 
+    <string name="vote_recorded">Your Vote has been Recorded</string>
+    <string name="func_added_soon">Functionality will be added soon</string>
+    <string name="message_send">Message Sent</string>
+    <string name="new_question">Post Question</string>
+    <string name="empty_question_msg">Please enter a valid Question</string>
+    <string name="ans_recorded">Your answer has been recorded</string>
+    <string name="question_recorded">Your question has been recorded</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_event">Event Activity</string>

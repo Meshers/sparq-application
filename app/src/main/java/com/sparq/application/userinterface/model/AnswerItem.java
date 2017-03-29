@@ -65,12 +65,16 @@ public class AnswerItem implements Serializable{
         this.length = length;
     }
 
+    public int getVotes(){
+        return this.votes;
+    }
+
     public void addUpVote(){
         this.votes += 1;
     }
 
     public void addDownVote(){
-        this.votes += 1;
+        this.votes -= 1;
     }
 
     public UserItem getCreator() {

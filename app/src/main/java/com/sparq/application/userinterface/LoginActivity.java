@@ -36,6 +36,8 @@ public class LoginActivity extends AppCompatActivity {
 //            }
 //        });
         initializeViews();
+
+        makePermissionsRequest();
     }
 
     public void makePermissionsRequest() {
@@ -66,9 +68,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onNextClick() {
-        Intent intent = new Intent(this, Main2Activity.class);
+        Intent intent = new Intent(this, EventActivity.class);
         String eventCode = mEventCode.getText().toString();
         String addrStr = mOwnAddr.getText().toString();
+
+        //TODO: check if eventCode and addrStr are valid numbers < 127
 
         if (eventCode.equals("") || addrStr.equals("")) {
             return;
@@ -76,8 +80,6 @@ public class LoginActivity extends AppCompatActivity {
 
         SPARQApplication.setOwnAddr(Byte.parseByte(addrStr));
         SPARQApplication.setSessionId(Byte.parseByte(eventCode));
-        SPARQApplication.initializeObjects(LoginActivity.this);
-
         SPARQApplication.initializeObjects(LoginActivity.this);
 
         intent.putExtra(Main2Activity.EXTRA_EVENT_CODE, Byte.parseByte(addrStr));

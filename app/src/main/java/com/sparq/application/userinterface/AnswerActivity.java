@@ -5,6 +5,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,6 +17,8 @@ import com.sparq.application.layer.ApplicationLayerManager;
 import com.sparq.application.layer.almessage.AlVote;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.userinterface.model.AnswerItem;
+import com.sparq.application.userinterface.model.QuestionItem;
+import com.sparq.util.Constants;
 
 import java.nio.charset.Charset;
 
@@ -23,8 +26,10 @@ public class AnswerActivity extends AppCompatActivity {
 
     private final static Charset CHARSET = Charset.forName("UTF-8");
 
+    private TextView questionText;
     private TextView answerText;
     private TextView usernameText;
+    private TextView answerVotes;
     private ImageView userImage;
     private ImageView like, share, unlike;
 
@@ -32,9 +37,9 @@ public class AnswerActivity extends AppCompatActivity {
     private int answerCreatorId;
     private int threadId;
     private int threadCreatorId;
-    private AnswerItem answer;
 
-    private ApplicationLayerManager mApplicationLayerManager;
+    private QuestionItem question;
+    private AnswerItem answer;
 
     public static final String THREAD_ID ="thread_id";
     public static final String CREATOR_ID ="creator_id";
@@ -55,19 +60,40 @@ public class AnswerActivity extends AppCompatActivity {
             threadCreatorId = extras.getInt(CREATOR_ID);
             answerId = extras.getInt(ANSWER_ID);
             answerCreatorId = extras.getInt(ANSWER_CREATOR_ID);
+
+            Log.i(THREAD_ID, String.valueOf(threadId));
+            Log.i(CREATOR_ID, String.valueOf(threadCreatorId));
+            Log.i(ANSWER_ID, String.valueOf(answerId));
+            Log.i(ANSWER_CREATOR_ID, String.valueOf(answerCreatorId));
         }
 
-        mApplicationLayerManager = SPARQApplication.getApplicationLayerManager();
+        initializeViews();
+
+    }
+
+    public void initializeViews(){
+        question = SPARQApplication.getConversationThread(
+                threadId, threadCreatorId
+        ).getQuestionItem();
 
         answer = SPARQApplication.getConversationThread(
-              threadId, threadCreatorId
+                threadId, threadCreatorId
         ).getAnswer(answerId, answerCreatorId);
+
+        questionText = (TextView) findViewById(R.id.question_text);
+        questionText.setText(question.getQuestion());
 
         answerText = (TextView) findViewById(R.id.answer_text);
         answerText.setText(answer.getAnswer());
+
         usernameText = (TextView) findViewById(R.id.answer_username);
         usernameText.setText("Anonymous");
+
+        answerVotes = (TextView) findViewById(R.id.answer_votes);
+        answerVotes.setText(String.valueOf(answer.getVotes()));
+
         userImage = (ImageView) findViewById(R.id.user_image);
+
         like = (ImageView) findViewById(R.id.like);
         share = (ImageView) findViewById(R.id.share);
         unlike = (ImageView) findViewById(R.id.unlike);
@@ -75,49 +101,45 @@ public class AnswerActivity extends AppCompatActivity {
         like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(AnswerActivity.this, "Your Vote has been recorded.", Toast.LENGTH_SHORT).show();
 
-                mApplicationLayerManager.sendData(
+                SPARQApplication.sendMessage(
                         ApplicationLayerPdu.TYPE.ANSWER_VOTE,
-                        new String(
-                                new byte[]{AlVote.getVoteEncoded(AlVote.VOTE_TYPE.UPVOTE)},
-                                CHARSET
-                        ),
                         SPARQApplication.getBdcastAddress(),
-                        (byte) threadId,
-                        (byte) threadCreatorId, (byte) answerId, (byte) answerCreatorId);
+                        null,
+                        threadCreatorId,
+                        threadId,
+                        answerCreatorId,
+                        answerId,
+                        AlVote.VOTE_TYPE.UPVOTE);
 
-                answer.addUpVote();
+                Toast.makeText(AnswerActivity.this, "Your Vote has been recorded.", Toast.LENGTH_SHORT).show();
             }
         });
 
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(AnswerActivity.this, "Your Vote has been recorded.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AnswerActivity.this, getResources().getString(R.string.vote_recorded), Toast.LENGTH_SHORT).show();
             }
         });
 
         unlike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(AnswerActivity.this, "Your Vote has been recorded.", Toast.LENGTH_SHORT).show();
 
-                mApplicationLayerManager.sendData(
+                SPARQApplication.sendMessage(
                         ApplicationLayerPdu.TYPE.ANSWER_VOTE,
-                        new String(
-                                new byte[]{AlVote.getVoteEncoded(AlVote.VOTE_TYPE.DOWNVOTE)},
-                                CHARSET
-                        ),
                         SPARQApplication.getBdcastAddress(),
-                        (byte) threadId,
-                        (byte) threadCreatorId, (byte) answerId, (byte) answerCreatorId);
+                        null,
+                        threadCreatorId,
+                        threadId,
+                        answerCreatorId,
+                        answerId,
+                        AlVote.VOTE_TYPE.DOWNVOTE);
 
-                answer.addDownVote();
+                Toast.makeText(AnswerActivity.this, getResources().getString(R.string.vote_recorded), Toast.LENGTH_SHORT).show();
             }
         });
-
-
     }
 
 }
