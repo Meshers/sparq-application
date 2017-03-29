@@ -16,5 +16,6 @@ import java.util.ArrayList;
 public interface NotifyUIHandler {
     public void handleConversationThreadQuestions();
     public void handleConversationThreadAnswers();
+    public void handleConversationThreadAnswerVotes();
 
 }

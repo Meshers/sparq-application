@@ -142,4 +142,29 @@ public class AnswerActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        NotifyUIHandler uiHandler = new NotifyUIHandler() {
+            @Override
+            public void handleConversationThreadQuestions() {
+                // do nothing
+            }
+
+            @Override
+            public void handleConversationThreadAnswers(){
+                // do nothing
+            }
+
+            @Override
+            public void handleConversationThreadAnswerVotes(){
+                // do nothing
+                answerVotes.setText(String.valueOf(answer.getVotes()));
+            }
+        };
+
+        SPARQApplication.setUINotifier(uiHandler);
+    }
+
 }

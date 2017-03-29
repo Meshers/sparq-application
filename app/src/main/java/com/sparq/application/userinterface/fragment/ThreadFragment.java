@@ -158,6 +158,11 @@ public class ThreadFragment extends Fragment {
             public void handleConversationThreadAnswers(){
                 // do nothing
             }
+
+            @Override
+            public void handleConversationThreadAnswerVotes(){
+                // do nothing
+            }
         };
 
         SPARQApplication.setUINotifier(uiHandler);

@@ -104,6 +104,7 @@ public class SPARQApplication extends Application {
         if(uihandler != null){
             uihandler.handleConversationThreadQuestions();
             uihandler.handleConversationThreadAnswers();
+            uihandler.handleConversationThreadAnswerVotes();
         }
     }
 

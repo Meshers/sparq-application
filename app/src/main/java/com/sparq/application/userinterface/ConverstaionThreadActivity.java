@@ -173,6 +173,11 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
             public void handleConversationThreadAnswers(){
                 mAdapter.notifyDataSetChanged();
             }
+
+            @Override
+            public void handleConversationThreadAnswerVotes(){
+                // do nothing
+            }
         };
 
         SPARQApplication.setUINotifier(uiHandler);
