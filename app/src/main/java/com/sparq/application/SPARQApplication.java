@@ -45,12 +45,13 @@ public class SPARQApplication extends Application {
     private static int currentAnswerId = 1;
 
     private static boolean isTeacher;
+    private static boolean isTimerElapsed = true;
 
     //handlers
     static NotifyUIHandler uihandler;
 
     //timers
-    CountDownTimer uiTimer;
+    private static CountDownTimer uiTimer;
 
 
     private static ArrayList<ConversationThread> conversationThreads;
@@ -103,6 +104,15 @@ public class SPARQApplication extends Application {
         SPARQApplication.isTeacher = isTeacher;
     }
 
+    public static boolean isTimerElapsed(){
+        return isTimerElapsed;
+    }
+
+    public static void setIsTimerElapsed(boolean isTimerElapsed){
+        SPARQApplication.isTimerElapsed = isTimerElapsed;
+    }
+
+
     public void initializeObjects(final Activity activity){
 
         conversationThreads = new ArrayList<>();
@@ -119,7 +129,8 @@ public class SPARQApplication extends Application {
                 Intent intent = new Intent();
                 intent.setAction(Constants.UI_ENABLE_BROADCAST_INTENT);
                 getApplicationContext().sendBroadcast(intent);
-                Log.i("HERE", "sent");
+                isTimerElapsed = true;
+                Log.i(TAG, "Timer finished");
             }
         };
 
@@ -131,8 +142,9 @@ public class SPARQApplication extends Application {
         intent.setAction(Constants.UI_DISABLE_BROADCAST_INTENT);
         getApplicationContext().sendBroadcast(intent);
 
+        isTimerElapsed = false;
         getInstance().uiTimer.start();
-        Log.i("HERE", "sent");
+        Log.i(TAG, "Timer started");
     }
 
     public static void setUINotifier(NotifyUIHandler handler){

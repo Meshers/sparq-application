@@ -1,8 +1,6 @@
 package com.sparq.application.userinterface;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -13,18 +11,18 @@ import android.widget.Toast;
 
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
-import com.sparq.application.layer.ApplicationLayerManager;
 import com.sparq.application.layer.almessage.AlVote;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.userinterface.model.AnswerItem;
 import com.sparq.application.userinterface.model.QuestionItem;
-import com.sparq.util.Constants;
 
 import java.nio.charset.Charset;
 
 public class AnswerActivity extends AppCompatActivity {
 
     private final static Charset CHARSET = Charset.forName("UTF-8");
+
+    public final static String TAG = "AnswerActivity";
 
     private TextView questionText;
     private TextView answerText;
@@ -48,6 +46,7 @@ public class AnswerActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_answer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -88,6 +87,8 @@ public class AnswerActivity extends AppCompatActivity {
         answerText.setText(answer.getAnswer());
 
         usernameText = (TextView) findViewById(R.id.answer_username);
+
+        // FIXME: 2/4/17
         usernameText.setText("Anonymous");
 
         answerVotes = (TextView) findViewById(R.id.answer_votes);
@@ -113,7 +114,7 @@ public class AnswerActivity extends AppCompatActivity {
                         answerId,
                         AlVote.VOTE_TYPE.UPVOTE);
 
-                Toast.makeText(AnswerActivity.this, "Your Vote has been recorded.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AnswerActivity.this, getResources().getString(R.string.vote_recorded), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -144,12 +145,17 @@ public class AnswerActivity extends AppCompatActivity {
 
         if(answer.hasVoted()){
             // deactivate the vote buttons
-            like.setBackgroundResource(R.drawable.ic_like_disabled);
-            like.setEnabled(false);
-
-            unlike.setBackgroundResource(R.drawable.ic_unlike_disabled);
-            unlike.setEnabled(false);
+            deactivateVote();
         }
+    }
+
+    public void deactivateVote(){
+
+        like.setBackgroundResource(R.drawable.ic_like_disabled);
+        like.setEnabled(false);
+
+        unlike.setBackgroundResource(R.drawable.ic_unlike_disabled);
+        unlike.setEnabled(false);
     }
 
     @Override
@@ -172,11 +178,7 @@ public class AnswerActivity extends AppCompatActivity {
                 answerVotes.setText(String.valueOf(answer.getVotes()));
 
                 // deactivate the vote buttons
-                like.setImageResource(R.drawable.ic_like_disabled);
-                like.setEnabled(false);
-
-                unlike.setImageResource(R.drawable.ic_unlike_disabled);
-                unlike.setEnabled(false);
+                deactivateVote();
             }
         };
 

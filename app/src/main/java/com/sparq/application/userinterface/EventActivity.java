@@ -34,9 +34,13 @@ import com.sparq.util.Constants;
 
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
 
+import static com.sparq.application.SPARQApplication.SPARQInstance;
+
 //import android.support.design.widget.FloatingActionButton;
 
 public class EventActivity extends AppCompatActivity {
+
+    private static final String TAG = "EventActivity";
 
     TabLayout tabLayout;
     public FloatingActionsMenu newEvent;
@@ -47,7 +51,7 @@ public class EventActivity extends AppCompatActivity {
     private ApplicationLayerManager mManager;
 
     //broadcast receiver
-    BroadcastReceiver uiReceiver;
+    BroadcastReceiver timerReceiver;
     boolean isReceiverRegistered;
 
     @Override
@@ -97,12 +101,13 @@ public class EventActivity extends AppCompatActivity {
             }
         });
 
-        uiReceiver = new BroadcastReceiver() {
+        timerReceiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
 
                 String action = intent.getAction();
                 if(action.equalsIgnoreCase(Constants.UI_ENABLE_BROADCAST_INTENT)){
-                    Log.i("HERE", "received");
+                    Log.i(TAG, "received");
+                    SPARQApplication.setIsTimerElapsed(true);
                     newEvent.setEnabled(true);
                 }
                 else if(action.equalsIgnoreCase(Constants.UI_DISABLE_BROADCAST_INTENT)){
@@ -187,6 +192,8 @@ public class EventActivity extends AppCompatActivity {
                             Toast.makeText(EventActivity.this, getResources().getString(R.string.new_question),
                                     Toast.LENGTH_SHORT).show();
 
+                            //Re-start timer to disable buttons
+                            SPARQInstance.startTimer();
                         }
 
                     }
@@ -220,15 +227,22 @@ public class EventActivity extends AppCompatActivity {
     public void onResume(){
         super.onResume();
 
-        Log.i("HERE", "onResume");
         if (!isReceiverRegistered) {
             IntentFilter filter = new IntentFilter();
             filter.addAction(Constants.UI_ENABLE_BROADCAST_INTENT);
             filter.addAction(Constants.UI_DISABLE_BROADCAST_INTENT);
             filter.addCategory(Intent.CATEGORY_DEFAULT);
-            registerReceiver(uiReceiver,filter);
+            registerReceiver(timerReceiver,filter);
             isReceiverRegistered = true;
-            Log.i("HERE", "registered receiver");
+
+            //Checks if the timer has elapsed, if it has the buttons can be active again
+            if(SPARQApplication.isTimerElapsed()){
+                Log.i(TAG, "onResume: " + SPARQApplication.isTimerElapsed());
+                newEvent.setEnabled(true);
+            }
+            else {
+                newEvent.setEnabled(false);
+            }
         }
     }
 
@@ -236,10 +250,10 @@ public class EventActivity extends AppCompatActivity {
     public void onPause(){
         super.onPause();
 
-        Log.i("HERE", "onPause");
+        Log.i(TAG, "onPause");
 
         if (isReceiverRegistered) {
-            unregisterReceiver(uiReceiver);
+            unregisterReceiver(timerReceiver);
             isReceiverRegistered = false;
         }
     }

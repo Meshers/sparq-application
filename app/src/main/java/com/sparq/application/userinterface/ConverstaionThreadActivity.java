@@ -29,8 +29,11 @@ import com.sparq.util.Constants;
 
 import java.util.ArrayList;
 
+import static com.sparq.application.SPARQApplication.SPARQInstance;
+
 public class ConverstaionThreadActivity extends AppCompatActivity {
 
+    private static final String TAG = "CTActivity";
     private TextView questionText;
     private EditText answerText;
     private Button postAnswer;
@@ -108,6 +111,8 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
 
                 String action = intent.getAction();
                 if(action.equalsIgnoreCase(Constants.UI_ENABLE_BROADCAST_INTENT)){
+                    Log.i(TAG, "received");
+                    SPARQApplication.setIsTimerElapsed(true);
                     postAnswer.setEnabled(true);
                 }
                 else if(action.equalsIgnoreCase(Constants.UI_DISABLE_BROADCAST_INTENT)){
@@ -142,6 +147,8 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
                         null
                 );
                 Toast.makeText(ConverstaionThreadActivity.this, getResources().getString(R.string.ans_recorded), Toast.LENGTH_SHORT).show();
+                //Re-start the timer to disable buttons
+                SPARQInstance.startTimer();
             }
         });
     }
@@ -167,7 +174,6 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
     public void onResume(){
         super.onResume();
 
-        Log.i("HERE", "onResume");
         if (!isReceiverRegistered) {
             IntentFilter filter = new IntentFilter();
             filter.addAction(Constants.UI_ENABLE_BROADCAST_INTENT);
@@ -175,7 +181,15 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
             filter.addCategory(Intent.CATEGORY_DEFAULT);
             registerReceiver(uiReceiver,filter);
             isReceiverRegistered = true;
-            Log.i("HERE", "registered receiver");
+
+            //Checks if the timer has elapsed, if it has the buttons can be active again
+            if(SPARQApplication.isTimerElapsed()){
+                Log.i(TAG, "OnResume: " + SPARQApplication.isTimerElapsed());
+                postAnswer.setEnabled(true);
+            }
+            else {
+                postAnswer.setEnabled(false);
+            }
         }
 
         NotifyUIHandler uiHandler = new NotifyUIHandler() {
@@ -203,7 +217,7 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
     public void onPause(){
         super.onPause();
 
-        Log.i("HERE", "onPause");
+        Log.i(TAG, "onPause");
 
         if (isReceiverRegistered) {
             unregisterReceiver(uiReceiver);
