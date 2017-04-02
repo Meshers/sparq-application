@@ -1,6 +1,5 @@
 package com.sparq.application.userinterface;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -169,7 +168,7 @@ public class EventActivity extends AppCompatActivity {
                             //Hope you meant to toast incase the length was greater than 160 characters
                         }
                         else if(questionText.getText().toString().length() > 160){
-                            Toast.makeText(EventActivity.this, "Only 160 characters allowed",
+                            Toast.makeText(EventActivity.this, getResources().getString(R.string.long_question_msg),
                                     Toast.LENGTH_SHORT).show();
                         }
                         else{
@@ -266,6 +265,7 @@ public class EventActivity extends AppCompatActivity {
 
                 if(!outRect.contains((int)event.getRawX(), (int)event.getRawY()))
                     newEvent.collapse();
+
             }
         }
 

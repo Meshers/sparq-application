@@ -16,6 +16,7 @@
     <string name="message_send">Message Sent</string>
     <string name="new_question">Post Question</string>
     <string name="empty_question_msg">Please enter a valid Question</string>
+    <string name="long_question_msg">Only 160 characters allowed</string>
     <string name="ans_recorded">Your answer has been recorded</string>
     <string name="question_recorded">Your question has been recorded</string>
 
