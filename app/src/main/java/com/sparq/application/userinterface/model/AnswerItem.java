@@ -16,6 +16,7 @@ public class AnswerItem implements Serializable{
     private String answer;
     private int length;
     private int votes;
+    private boolean hasVoted;
     private UserItem threadCreator;
     private UserItem answerCreator;
 
@@ -31,6 +32,7 @@ public class AnswerItem implements Serializable{
         this.answerCreator = answerCreator;
         this.threadCreator = threadCreator;
         this.votes = votes;
+        this.hasVoted = false;
     }
 
     public int getAnswerId() {
@@ -83,6 +85,14 @@ public class AnswerItem implements Serializable{
 
     public void setCreator(UserItem user) {
         this.answerCreator = user;
+    }
+
+    public boolean hasVoted() {
+        return hasVoted;
+    }
+
+    public void setHasVoted(boolean hasVoted) {
+        this.hasVoted = hasVoted;
     }
 
     public static AnswerItem getAnswerItemFrommessage(AlAnswer alAnswer){

@@ -2,6 +2,8 @@ package com.sparq.application;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
+import android.os.CountDownTimer;
 import android.util.Log;
 
 import com.sparq.application.layer.ApplicationLayerManager;
@@ -29,6 +31,8 @@ import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
 public class SPARQApplication extends Application {
 
     private static final String TAG = "SPARQApplication";
+    public static SPARQApplication SPARQInstance;
+
     static MyBluetoothAdapter mBluetoothAdapter;
     static ApplicationPacketDiscoveryHandler mHandler;
     static ApplicationLayerManager mManager;
@@ -45,12 +49,22 @@ public class SPARQApplication extends Application {
     //handlers
     static NotifyUIHandler uihandler;
 
+    //timers
+    CountDownTimer uiTimer;
 
-    private static ArrayList<ConversationThread> conversationThreads = new ArrayList<>();
+
+    private static ArrayList<ConversationThread> conversationThreads;
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
+        // Setup singleton instance
+        SPARQInstance = this;
+    }
+
+    // Getter to access Singleton instance
+    public static SPARQApplication getInstance() {
+        return SPARQInstance ;
     }
 
     public static byte getOwnAddress(){
@@ -89,8 +103,36 @@ public class SPARQApplication extends Application {
         SPARQApplication.isTeacher = isTeacher;
     }
 
-    public static void initializeObjects(Activity activity){
+    public void initializeObjects(final Activity activity){
 
+        conversationThreads = new ArrayList<>();
+
+         uiTimer = new CountDownTimer(com.sparq.util.Constants.MAX_TIME_BETWEEN_SEND,
+                com.sparq.util.Constants.MAX_TIME_BETWEEN_SEND) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                // do nothing
+            }
+
+            @Override
+            public void onFinish() {
+                Intent intent = new Intent();
+                intent.setAction(Constants.UI_ENABLE_BROADCAST_INTENT);
+                getApplicationContext().sendBroadcast(intent);
+                Log.i("HERE", "sent");
+            }
+        };
+
+    }
+
+    public void startTimer(){
+
+        Intent intent = new Intent();
+        intent.setAction(Constants.UI_DISABLE_BROADCAST_INTENT);
+        getApplicationContext().sendBroadcast(intent);
+
+        getInstance().uiTimer.start();
+        Log.i("HERE", "sent");
     }
 
     public static void setUINotifier(NotifyUIHandler handler){
@@ -110,7 +152,7 @@ public class SPARQApplication extends Application {
     }
 
     public static void notifyConversationThread(){
-        Log.i("ConverstaionThread", "check null");
+
         if(uihandler != null){
             uihandler.handleConversationThreadQuestions();
             uihandler.handleConversationThreadAnswers();
@@ -230,7 +272,7 @@ public class SPARQApplication extends Application {
                                    int creatorId, int questionId, int answerCreatotId, int answerId,
                                    AlVote.VOTE_TYPE voteType){
 
-        boolean isSent = false;
+        boolean isSent;
 
         switch(type){
             case QUESTION:
@@ -255,6 +297,7 @@ public class SPARQApplication extends Application {
 
                     currentQuestionId ++;
 
+                    getInstance().startTimer();
                     notifyConversationThread();
                 }
 
@@ -308,9 +351,14 @@ public class SPARQApplication extends Application {
                                 thread.getQuestionItem().addDownVote();
                                 break;
                         }
+
+                        // set the voted boolean to true
+                        thread.getQuestionItem().setHasVoted(true);
+                        notifyConversationThread();
                     }
 
-                    notifyConversationThread();
+
+
                 }
 
                 break;
@@ -338,9 +386,12 @@ public class SPARQApplication extends Application {
                                 answer.addDownVote();
                                 break;
                         }
+
+                        answer.setHasVoted(true);
+                        notifyConversationThread();
                     }
 
-                    notifyConversationThread();
+
                 }
 
                 break;

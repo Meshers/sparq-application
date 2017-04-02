@@ -67,11 +67,6 @@ public class AnswerActivity extends AppCompatActivity {
             Log.i(ANSWER_CREATOR_ID, String.valueOf(answerCreatorId));
         }
 
-        initializeViews();
-
-    }
-
-    public void initializeViews(){
         question = SPARQApplication.getConversationThread(
                 threadId, threadCreatorId
         ).getQuestionItem();
@@ -79,6 +74,12 @@ public class AnswerActivity extends AppCompatActivity {
         answer = SPARQApplication.getConversationThread(
                 threadId, threadCreatorId
         ).getAnswer(answerId, answerCreatorId);
+
+        initializeViews();
+
+    }
+
+    public void initializeViews(){
 
         questionText = (TextView) findViewById(R.id.question_text);
         questionText.setText(question.getQuestion());
@@ -119,7 +120,7 @@ public class AnswerActivity extends AppCompatActivity {
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(AnswerActivity.this, getResources().getString(R.string.vote_recorded), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AnswerActivity.this, getResources().getString(R.string.func_added_soon), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -140,6 +141,15 @@ public class AnswerActivity extends AppCompatActivity {
                 Toast.makeText(AnswerActivity.this, getResources().getString(R.string.vote_recorded), Toast.LENGTH_SHORT).show();
             }
         });
+
+        if(answer.hasVoted()){
+            // deactivate the vote buttons
+            like.setBackgroundResource(R.drawable.ic_like_disabled);
+            like.setEnabled(false);
+
+            unlike.setBackgroundResource(R.drawable.ic_unlike_disabled);
+            unlike.setEnabled(false);
+        }
     }
 
     @Override
@@ -159,8 +169,14 @@ public class AnswerActivity extends AppCompatActivity {
 
             @Override
             public void handleConversationThreadAnswerVotes(){
-                // do nothing
                 answerVotes.setText(String.valueOf(answer.getVotes()));
+
+                // deactivate the vote buttons
+                like.setImageResource(R.drawable.ic_like_disabled);
+                like.setEnabled(false);
+
+                unlike.setImageResource(R.drawable.ic_unlike_disabled);
+                unlike.setEnabled(false);
             }
         };
 

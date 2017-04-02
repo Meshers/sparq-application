@@ -22,6 +22,9 @@ import com.alimuzaffar.lib.pin.PinEntryEditText;
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
 
+import static com.sparq.application.SPARQApplication.SPARQInstance;
+import static test.com.blootoothtester.util.Constants.MAX_USERS;
+
 public class LoginActivity extends AppCompatActivity {
 
     private EditText mEventCode;
@@ -133,18 +136,23 @@ public class LoginActivity extends AppCompatActivity {
         String eventCode = mEventCode.getText().toString();
         String ownAddress = mOwnAddr.getText().toString();
 
+        if(eventCode.isEmpty() || ownAddress.isEmpty()){
+            return;
+        }
+
 
         //TODO: check if eventCode and addrStr are valid numbers < 127
         //Fixed for now but we need to decide what exactly goes here for ownAddress
 
-        if(Integer.valueOf(eventCode) > 127){
+        if(Integer.valueOf(eventCode) > 127 || Integer.valueOf(eventCode) < 1){
             Toast.makeText(LoginActivity.this, "Invalid Event Code", Toast.LENGTH_SHORT).show();
             return;
         }
 
         // FIXME: 29/3/17 on change of link layer logic
         // Handles arrayindexoutofbounds exception in case ownAddress more than 40
-        if(Integer.valueOf(ownAddress) > 40){
+        if(Integer.valueOf(ownAddress) > MAX_USERS
+                || Integer.valueOf(eventCode) < 1){
             Toast.makeText(LoginActivity.this, "Invalid address", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -168,7 +176,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
 
-        SPARQApplication.initializeObjects(LoginActivity.this);
+        SPARQApplication.getInstance().initializeObjects(LoginActivity.this);
 
         startActivity(intent);
     }

@@ -60,6 +60,14 @@
         </activity>
         <!--<provider android:name="application.userinterface.database.ApplicationContentProvider"-->
             <!--android:authorities="com.sparq.application.userinterface.database.ApplicationContentProvider"/>-->
+
+        <!--<receiver android:name=".application.userinterface.EventActivity$UIReceiver" android:enabled="true">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="com.sparq.application.UI_ENABLE_INTENT"></action>-->
+                <!--<action android:name="com.sparq.application.UI_DISABLE_INTENT"></action>-->
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
     </application>
 
 </manifest>

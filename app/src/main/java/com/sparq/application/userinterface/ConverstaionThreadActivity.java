@@ -1,6 +1,9 @@
 package com.sparq.application.userinterface;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -8,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,6 +25,7 @@ import com.sparq.application.userinterface.adapter.AnswerListAdapter;
 import com.sparq.application.userinterface.adapter.RecyclerItemClickListener;
 import com.sparq.application.userinterface.model.AnswerItem;
 import com.sparq.application.userinterface.model.ConversationThread;
+import com.sparq.util.Constants;
 
 import java.util.ArrayList;
 
@@ -35,6 +40,9 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
     private ConversationThread mThread;
     private ArrayList<AnswerItem> answersArrayList;
     private AnswerListAdapter mAdapter;
+
+    private BroadcastReceiver uiReceiver;
+    boolean isReceiverRegistered;
 
     public static final String THREAD_ID ="thread_id";
     public static final String CREATOR_ID ="creator_id";
@@ -94,6 +102,20 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
 
             }
         }));
+
+        uiReceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+
+                String action = intent.getAction();
+                if(action.equalsIgnoreCase(Constants.UI_ENABLE_BROADCAST_INTENT)){
+                    postAnswer.setEnabled(true);
+                }
+                else if(action.equalsIgnoreCase(Constants.UI_DISABLE_BROADCAST_INTENT)){
+                    postAnswer.setEnabled(false);
+                }
+
+            }
+        };
     }
 
     public void initializeViews(){
@@ -145,6 +167,17 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
     public void onResume(){
         super.onResume();
 
+        Log.i("HERE", "onResume");
+        if (!isReceiverRegistered) {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(Constants.UI_ENABLE_BROADCAST_INTENT);
+            filter.addAction(Constants.UI_DISABLE_BROADCAST_INTENT);
+            filter.addCategory(Intent.CATEGORY_DEFAULT);
+            registerReceiver(uiReceiver,filter);
+            isReceiverRegistered = true;
+            Log.i("HERE", "registered receiver");
+        }
+
         NotifyUIHandler uiHandler = new NotifyUIHandler() {
             @Override
             public void handleConversationThreadQuestions() {
@@ -163,6 +196,19 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
         };
 
         SPARQApplication.setUINotifier(uiHandler);
+    }
+
+
+    @Override
+    public void onPause(){
+        super.onPause();
+
+        Log.i("HERE", "onPause");
+
+        if (isReceiverRegistered) {
+            unregisterReceiver(uiReceiver);
+            isReceiverRegistered = false;
+        }
     }
 
     @Override

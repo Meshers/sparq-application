@@ -1,13 +1,21 @@
 package com.sparq.application.userinterface;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -23,6 +31,7 @@ import com.sparq.application.layer.ApplicationPacketDiscoveryHandler;
 import com.sparq.application.layer.almessage.AlMessage;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.userinterface.adapter.EventPagerAdapter;
+import com.sparq.util.Constants;
 
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
 
@@ -31,12 +40,16 @@ import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
 public class EventActivity extends AppCompatActivity {
 
     TabLayout tabLayout;
-    FloatingActionsMenu newEvent;
+    public FloatingActionsMenu newEvent;
     FloatingActionButton newConvThread;
 
     private MyBluetoothAdapter mBluetoothAdapter;
     private ApplicationPacketDiscoveryHandler mHandler;
     private ApplicationLayerManager mManager;
+
+    //broadcast receiver
+    BroadcastReceiver uiReceiver;
+    boolean isReceiverRegistered;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,18 +68,7 @@ public class EventActivity extends AppCompatActivity {
 
 //        SPARQApplication.initializeObjects(EventActivity.this);
 
-        mBluetoothAdapter = new MyBluetoothAdapter(EventActivity.this);
-
-        mHandler = new ApplicationPacketDiscoveryHandler() {
-            @Override
-            public void handleDiscovery(ApplicationLayerPdu.TYPE type, AlMessage message) {
-                SPARQApplication.handlePackets(type, message);
-            }
-        };
-
-        mManager = new ApplicationLayerManager(SPARQApplication.getOwnAddress(), mBluetoothAdapter, mHandler,SPARQApplication.getSessionId());
-
-        SPARQApplication.setApplicationLayerManager(mManager);
+        initializeLowerLayer();
 
         tabLayout.addTab(tabLayout.newTab().setText("About"));
         tabLayout.addTab(tabLayout.newTab().setText("Quiz"));
@@ -95,22 +97,53 @@ public class EventActivity extends AppCompatActivity {
 
             }
         });
+
+        uiReceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+
+                String action = intent.getAction();
+                if(action.equalsIgnoreCase(Constants.UI_ENABLE_BROADCAST_INTENT)){
+                    Log.i("HERE", "received");
+                    newEvent.setEnabled(true);
+                }
+                else if(action.equalsIgnoreCase(Constants.UI_DISABLE_BROADCAST_INTENT)){
+                    newEvent.setEnabled(false);
+                }
+
+            }
+        };
     }
 
     public void initializeViews(){
 
-        newEvent = (FloatingActionsMenu) findViewById(R.id.fab_new_event);
+        newEvent = (FloatingActionsMenu) findViewById(R.id.fab);
         newConvThread = (FloatingActionButton) findViewById(R.id.fab_new_thread);
 
         newConvThread.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openDialog();
+                newEvent.collapse();
             }
         });
 
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+    }
+
+    public void initializeLowerLayer(){
+        mBluetoothAdapter = new MyBluetoothAdapter(EventActivity.this);
+
+        mHandler = new ApplicationPacketDiscoveryHandler() {
+            @Override
+            public void handleDiscovery(ApplicationLayerPdu.TYPE type, AlMessage message) {
+                SPARQApplication.handlePackets(type, message);
+            }
+        };
+
+        mManager = new ApplicationLayerManager(SPARQApplication.getOwnAddress(), mBluetoothAdapter, mHandler,SPARQApplication.getSessionId());
+
+        SPARQApplication.setApplicationLayerManager(mManager);
     }
 
     public void openDialog(){
@@ -183,5 +216,61 @@ public class EventActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        Log.i("HERE", "onResume");
+        if (!isReceiverRegistered) {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(Constants.UI_ENABLE_BROADCAST_INTENT);
+            filter.addAction(Constants.UI_DISABLE_BROADCAST_INTENT);
+            filter.addCategory(Intent.CATEGORY_DEFAULT);
+            registerReceiver(uiReceiver,filter);
+            isReceiverRegistered = true;
+            Log.i("HERE", "registered receiver");
+        }
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+
+        Log.i("HERE", "onPause");
+
+        if (isReceiverRegistered) {
+            unregisterReceiver(uiReceiver);
+            isReceiverRegistered = false;
+        }
+    }
+
+//    public class UIReceiver extends BroadcastReceiver
+//    {
+//
+//        @Override
+//        public void onReceive(Context context, Intent intent)
+//        {
+//
+//        }
+//    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event){
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            if (newEvent.isExpanded()) {
+
+                Rect outRect = new Rect();
+                newEvent.getGlobalVisibleRect(outRect);
+
+
+                if(!outRect.contains((int)event.getRawX(), (int)event.getRawY()))
+                    newEvent.collapse();
+            }
+        }
+
+        return super.dispatchTouchEvent(event);
+    }
+
 
 }

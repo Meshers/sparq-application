@@ -150,6 +150,15 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
             }
         });
 
+        if(thread.getQuestionItem().hasVoted()){
+            // deactivate the vote buttons
+            holder.likeBtn.setImageResource(R.drawable.ic_like_disabled);
+            holder.likeBtn.setEnabled(false);
+
+            holder.unlikeBtn.setImageResource(R.drawable.ic_unlike_disabled);
+            holder.unlikeBtn.setEnabled(false);
+        }
+
 
         if(position % 2 == 0){
             holder.threadImage.setBackgroundColor(mContext.getResources().getColor(colors[0]));

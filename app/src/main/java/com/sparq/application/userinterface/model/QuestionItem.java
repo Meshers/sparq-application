@@ -31,6 +31,7 @@ public class QuestionItem {
     private FORMAT format;
     private double totalMarks;
     private int votes;
+    private boolean hasVoted;
     private HashMap<Integer, String> options;
 
     public QuestionItem(int questionId, int questionareId, String question, FORMAT format, double totalMarks, int votes) {
@@ -40,6 +41,7 @@ public class QuestionItem {
         this.format = format;
         this.totalMarks = totalMarks;
         this.votes = votes;
+        this.hasVoted = false;
 
         switch(getFormat()){
             case MCQ_SINGLE:
@@ -106,6 +108,14 @@ public class QuestionItem {
 
     public void setTotalMarks(double totalMarks) {
         this.totalMarks = totalMarks;
+    }
+
+    public boolean hasVoted() {
+        return hasVoted;
+    }
+
+    public void setHasVoted(boolean hasVoted) {
+        this.hasVoted = hasVoted;
     }
 
     public HashMap<Integer, String> getOptions() {
