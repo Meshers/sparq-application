@@ -20,7 +20,7 @@ public class QuestionItem {
      * 3: One Word Answers
      * 4: Short Answers
      */
-    enum FORMAT{
+    public enum FORMAT{
         NONE,
         MCQ_SINGLE,
         MCQ_MULTIPLE,
@@ -43,19 +43,18 @@ public class QuestionItem {
         this.votes = votes;
         this.hasVoted = false;
 
-        switch(getFormat()){
-            case MCQ_SINGLE:
-            case MCQ_MULTIPLE:
-                options = new HashMap<Integer, String>();
-                break;
-        }
     }
 
     public QuestionItem(int questionId, int questionareId, String question, FORMAT format, double totalMarks,
                         HashMap<Integer, String> options, int votes) {
         this(questionId, questionareId, question, format, totalMarks, votes);
 
-        this.options = options;
+        switch(getFormat()){
+            case MCQ_SINGLE:
+            case MCQ_MULTIPLE:
+                this.options = options;
+                break;
+        }
     }
 
     public int getQuestionId() {
@@ -130,19 +129,23 @@ public class QuestionItem {
         options.put(optionId, option);
     }
 
-    public static QuestionItem getQuizQuestion(int questionId, int questionareId, String question,
-                                               FORMAT format, double totalMarks,
-                                               HashMap<Integer, String> options){
-        return new QuestionItem(questionId, questionareId, question, format, totalMarks, options, Constants.INITIAL_VOTE_COUNT);
+    public static QuestionItem getMCQSingleQuestion(int questionId, int questionareId, String question, HashMap<Integer, String> options, float totalMarks){
+
+        return new QuestionItem(questionId, questionareId, question, FORMAT.MCQ_SINGLE, totalMarks, options, Constants.INITIAL_VOTE_COUNT);
     }
 
-    public static QuestionItem getPollQuestion(int questionId, int questionareId, String question,
-                                               FORMAT format,
-                                               HashMap<Integer, String> options){
-        return new QuestionItem(questionId, questionareId, question, format, Constants.MIN_QUESTION_MARKS, options, Constants.INITIAL_VOTE_COUNT);
+    public static QuestionItem getMCQMultipleQuestion(int questionId, int questionareId, String question, HashMap<Integer, String> options, float totalMarks){
+
+        return new QuestionItem(questionId, questionareId, question, FORMAT.MCQ_MULTIPLE, totalMarks, options, Constants.INITIAL_VOTE_COUNT);
     }
 
-    public static QuestionItem getThreadQuestion(int questionId, int questionareId, String question){
-        return new QuestionItem(questionId, questionareId, question, FORMAT.SHORT, Constants.MIN_QUESTION_MARKS, null, Constants.INITIAL_VOTE_COUNT);
+    public static QuestionItem getOneWordQuestion(int questionId, int questionareId, String question, float totalMarks){
+
+        return new QuestionItem(questionId, questionareId, question, FORMAT.ONE_WORD, totalMarks, Constants.INITIAL_VOTE_COUNT);
+    }
+
+
+    public static QuestionItem getShortQuestion(int questionId, int questionareId, String question, float totalMarks){
+        return new QuestionItem(questionId, questionareId, question, FORMAT.SHORT, totalMarks, null, Constants.INITIAL_VOTE_COUNT);
     }
 }

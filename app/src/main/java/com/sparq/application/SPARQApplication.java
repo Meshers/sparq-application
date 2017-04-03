@@ -16,6 +16,7 @@ import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.userinterface.NotifyUIHandler;
 import com.sparq.application.userinterface.model.AnswerItem;
 import com.sparq.application.userinterface.model.ConversationThread;
+import com.sparq.application.userinterface.model.QuestionItem;
 import com.sparq.application.userinterface.model.UserItem;
 import com.sparq.util.Constants;
 
@@ -205,14 +206,7 @@ public class SPARQApplication extends Application {
                         + alAnswer.getAnswerDataAsString()
                 );
 
-                AnswerItem newAnswer = new AnswerItem(
-                        alAnswer.getAnswerId(),
-                        new UserItem(alAnswer.getAnswerCreatorId()),
-                        alAnswer.getQuestionId(),
-                        new UserItem(alAnswer.getCreatorId()),
-                        alAnswer.getAnswerDataAsString(),
-                        Constants.INITIAL_VOTE_COUNT
-                );
+                AnswerItem newAnswer = AnswerItem.getAnswerItemFromMessage(alAnswer);
 
                 getConversationThread(
                         alAnswer.getQuestionId(), alAnswer.getCreatorId()
@@ -323,13 +317,12 @@ public class SPARQApplication extends Application {
                         (byte) creatorId, (byte) questionId, (byte) answerCreatotId, (byte) answerId);
 
                 if(isSent){
-                    AnswerItem newAnswer = new AnswerItem(
+                    AnswerItem newAnswer = AnswerItem.getShortAnswer(
                             answerId,
                             new UserItem(answerCreatotId),
                             questionId,
                             new UserItem(creatorId),
-                            msg,
-                            Constants.INITIAL_VOTE_COUNT
+                            msg
                     );
 
                     getConversationThread(questionId, creatorId).addAnswerToList(newAnswer);

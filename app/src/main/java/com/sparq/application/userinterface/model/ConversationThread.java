@@ -1,6 +1,7 @@
 package com.sparq.application.userinterface.model;
 
 import com.sparq.application.layer.almessage.AlQuestion;
+import com.sparq.util.Constants;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,7 +23,7 @@ public class ConversationThread extends Questionare {
     public ConversationThread(int threadId, int eventId, Date date, UserItem creator, String question){
         super(threadId, eventId, QUESTIONARE_TYPE.CONV_THREAD, null, null, date, creator, 1);
 
-        QuestionItem questionItem = QuestionItem.getThreadQuestion(QUESTION_KEY, threadId, question);
+        QuestionItem questionItem = QuestionItem.getShortQuestion(QUESTION_KEY, threadId, question, Constants.MIN_QUESTION_MARKS);
         super.addQuestionToList(1, questionItem);
 
         answers = new ArrayList<AnswerItem>(0);
