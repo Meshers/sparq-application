@@ -76,8 +76,8 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="5dp"
                 android:text="SUBMIT"
-                android:textColor="@color/colorPrimary"
-                android:background="@color/colorPrimaryDark"/>
+                android:theme="@style/AppButton"
+                style="@style/Widget.AppCompat.Button.Colored"/>
         </LinearLayout>
 
 

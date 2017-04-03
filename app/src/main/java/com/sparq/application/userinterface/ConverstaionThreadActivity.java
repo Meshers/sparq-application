@@ -44,7 +44,7 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
     private ArrayList<AnswerItem> answersArrayList;
     private AnswerListAdapter mAdapter;
 
-    private BroadcastReceiver uiReceiver;
+    private BroadcastReceiver timerReceiver;
     boolean isReceiverRegistered;
 
     public static final String THREAD_ID ="thread_id";
@@ -106,13 +106,12 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
             }
         }));
 
-        uiReceiver = new BroadcastReceiver() {
+        timerReceiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
 
                 String action = intent.getAction();
                 if(action.equalsIgnoreCase(Constants.UI_ENABLE_BROADCAST_INTENT)){
-                    Log.i(TAG, "received");
-                    SPARQApplication.setIsTimerElapsed(true);
+                    Log.i(TAG, "Timer up!");
                     postAnswer.setEnabled(true);
                 }
                 else if(action.equalsIgnoreCase(Constants.UI_DISABLE_BROADCAST_INTENT)){
@@ -179,7 +178,7 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
             filter.addAction(Constants.UI_ENABLE_BROADCAST_INTENT);
             filter.addAction(Constants.UI_DISABLE_BROADCAST_INTENT);
             filter.addCategory(Intent.CATEGORY_DEFAULT);
-            registerReceiver(uiReceiver,filter);
+            registerReceiver(timerReceiver,filter);
             isReceiverRegistered = true;
 
             //Checks if the timer has elapsed, if it has the buttons can be active again
@@ -220,11 +219,12 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
         Log.i(TAG, "onPause");
 
         if (isReceiverRegistered) {
-            unregisterReceiver(uiReceiver);
+            unregisterReceiver(timerReceiver);
             isReceiverRegistered = false;
         }
     }
 
+    // FIXME: 4/3/2017
     @Override
     public void onStop(){
         super.onStop();

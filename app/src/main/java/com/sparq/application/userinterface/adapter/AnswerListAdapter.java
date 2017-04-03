@@ -57,6 +57,7 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.My
         AnswerItem answer = answers.get(position);
         holder.answerText.setText(answer.getAnswer());
 //        holder.userText.setText(answer.getUser().getUsername());
+        // FIXME: 4/3/2017
         holder.userText.setText("Jane Doe");
 
     }

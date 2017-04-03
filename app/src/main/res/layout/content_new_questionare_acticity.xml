@@ -30,6 +30,7 @@
         android:text="SUBMIT"
         android:layout_gravity="end"
         android:textColor="@color/white"
-        android:background="@color/colorAccent"/>
+        android:theme="@style/AppButton"
+        style="@style/Widget.AppCompat.Button.Colored"/>
 
 </LinearLayout>

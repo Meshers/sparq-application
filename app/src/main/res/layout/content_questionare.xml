@@ -87,6 +87,7 @@
         android:layout_alignParentBottom="true"
         android:text="SUBMIT"
         android:textColor="@color/white"
-        android:background="@color/colorAccent"/>
+        android:theme="@style/AppButton"
+        style="@style/Widget.AppCompat.Button.Colored"/>
 
 </RelativeLayout>

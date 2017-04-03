@@ -58,7 +58,8 @@
             android:layout_height="wrap_content"
             android:text="SUBMIT"
             android:textColor="@color/white"
-            android:background="@color/colorAccent"/>
+            android:theme="@style/AppButton"
+            style="@style/Widget.AppCompat.Button.Colored"/>
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView

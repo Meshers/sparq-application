@@ -10,6 +10,7 @@
     <color name="dividerColor">#CDCDCD</color>
     <color name="white">#FFFFFF</color>
     <color name="black_semi_transparent">#B2000000</color>
+    <color name="colorDisabled">#d5dc99</color>
     <color name="warning">#FFC107</color>
     <color name="danger">#FF5722</color>
 </resources>

@@ -1,5 +1,9 @@
 package com.sparq.application.userinterface;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,8 +19,11 @@ import com.sparq.application.layer.almessage.AlVote;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.userinterface.model.AnswerItem;
 import com.sparq.application.userinterface.model.QuestionItem;
+import com.sparq.util.Constants;
 
 import java.nio.charset.Charset;
+
+import static com.sparq.application.SPARQApplication.SPARQInstance;
 
 public class AnswerActivity extends AppCompatActivity {
 
@@ -38,6 +45,9 @@ public class AnswerActivity extends AppCompatActivity {
 
     private QuestionItem question;
     private AnswerItem answer;
+
+    private BroadcastReceiver timerReceiver;
+    boolean isReceiverRegistered;
 
     public static final String THREAD_ID ="thread_id";
     public static final String CREATOR_ID ="creator_id";
@@ -76,6 +86,20 @@ public class AnswerActivity extends AppCompatActivity {
 
         initializeViews();
 
+        timerReceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+
+                String action = intent.getAction();
+                if(action.equalsIgnoreCase(Constants.UI_ENABLE_BROADCAST_INTENT)){
+                    Log.i(TAG, "Timer up!");
+                    activateVote();
+                }
+                else if(action.equalsIgnoreCase(Constants.UI_DISABLE_BROADCAST_INTENT)){
+                    deactivateVote();
+                }
+
+            }
+        };
     }
 
     public void initializeViews(){
@@ -115,6 +139,8 @@ public class AnswerActivity extends AppCompatActivity {
                         AlVote.VOTE_TYPE.UPVOTE);
 
                 Toast.makeText(AnswerActivity.this, getResources().getString(R.string.vote_recorded), Toast.LENGTH_SHORT).show();
+                //Re-start the timer to disable buttons
+                SPARQInstance.startTimer();
             }
         });
 
@@ -140,6 +166,8 @@ public class AnswerActivity extends AppCompatActivity {
                         AlVote.VOTE_TYPE.DOWNVOTE);
 
                 Toast.makeText(AnswerActivity.this, getResources().getString(R.string.vote_recorded), Toast.LENGTH_SHORT).show();
+                //Re-start the timer to disable buttons
+                SPARQInstance.startTimer();
             }
         });
 
@@ -150,17 +178,45 @@ public class AnswerActivity extends AppCompatActivity {
     }
 
     public void deactivateVote(){
+        this.like.setImageResource(R.drawable.ic_like_disabled);
+        this.like.setEnabled(false);
+        Log.i(TAG, "deactivateVote: disabled");
+        this.unlike.setImageResource(R.drawable.ic_unlike_disabled);
+        this.unlike.setEnabled(false);
+    }
 
-        like.setBackgroundResource(R.drawable.ic_like_disabled);
-        like.setEnabled(false);
+    public void activateVote(){
+        if(!answer.hasVoted()) {
+            this.like.setImageResource(R.drawable.ic_like);
+            this.like.setEnabled(true);
 
-        unlike.setBackgroundResource(R.drawable.ic_unlike_disabled);
-        unlike.setEnabled(false);
+            this.unlike.setImageResource(R.drawable.ic_unlike);
+            this.unlike.setEnabled(true);
+        }
     }
 
     @Override
     public void onResume(){
         super.onResume();
+
+        if (!isReceiverRegistered) {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(Constants.UI_ENABLE_BROADCAST_INTENT);
+            filter.addAction(Constants.UI_DISABLE_BROADCAST_INTENT);
+            filter.addCategory(Intent.CATEGORY_DEFAULT);
+            registerReceiver(timerReceiver,filter);
+            isReceiverRegistered = true;
+
+            //Checks if the timer has elapsed, if it has the buttons can be active again
+            if(SPARQApplication.isTimerElapsed()){
+                Log.i(TAG, "OnResume: " + SPARQApplication.isTimerElapsed());
+                activateVote();
+            }
+            else {
+                Log.i(TAG, "OnResume: " + SPARQApplication.isTimerElapsed());
+                deactivateVote();
+            }
+        }
 
         NotifyUIHandler uiHandler = new NotifyUIHandler() {
             @Override
@@ -183,6 +239,18 @@ public class AnswerActivity extends AppCompatActivity {
         };
 
         SPARQApplication.setUINotifier(uiHandler);
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+
+        Log.i(TAG, "onPause");
+
+        if (isReceiverRegistered) {
+            unregisterReceiver(timerReceiver);
+            isReceiverRegistered = false;
+        }
     }
 
 }
