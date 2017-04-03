@@ -185,47 +185,7 @@ public class Main2Activity extends AppCompatActivity {
 
     public void sendMessage(String msg, ApplicationLayerPdu.TYPE type){
 
-        switch(type){
-            case QUESTION:
-                mApplicationLayerManager.sendData(
-                        ApplicationLayerPdu.TYPE.QUESTION,
-                        msg,
-                        Byte.parseByte(mToId.getText().toString()),
-                        (byte) 1,
-                        (byte) 1, (byte) 1, (byte) 1);
-                break;
-            case ANSWER:
-                mApplicationLayerManager.sendData(
-                        ApplicationLayerPdu.TYPE.ANSWER,
-                        msg,
-                        Byte.parseByte(mToId.getText().toString()),
-                        (byte) 1,
-                        (byte) 1, (byte) 1, (byte) 1);
-                break;
-            case QUESTION_VOTE:
-                mApplicationLayerManager.sendData(
-                        ApplicationLayerPdu.TYPE.QUESTION_VOTE,
-                        new String(
-                                new byte[]{AlVote.getVoteEncoded(AlVote.VOTE_TYPE.UPVOTE)},
-                                CHARSET
-                        ),
-                        Byte.parseByte(mToId.getText().toString()),
-                        (byte) 1,
-                        (byte) 1, (byte) 1, (byte) 1);
-                break;
-            case ANSWER_VOTE:
-                mApplicationLayerManager.sendData(
-                        ApplicationLayerPdu.TYPE.ANSWER_VOTE,
-                        new String(
-                                new byte[]{AlVote.getVoteEncoded(AlVote.VOTE_TYPE.UPVOTE)},
-                                CHARSET
-                        ),
-                        Byte.parseByte(mToId.getText().toString()),
-                        (byte) 1,
-                        (byte) 1, (byte) 1, (byte) 1);
-                break;
-        }
-        Toast.makeText(Main2Activity.this, "Message sent!", Toast.LENGTH_SHORT).show();
+
 
 
     }

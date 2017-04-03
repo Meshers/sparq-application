@@ -13,6 +13,8 @@ public abstract class ApplicationLayerPdu {
     public final static Charset CHARSET = Charset.forName("UTF-8");
 
     public enum TYPE {
+        POLL_QUESTION(1),
+        POLL_ANSWER(2),
         QUESTION(3),
         ANSWER(4),
         QUESTION_VOTE(5),

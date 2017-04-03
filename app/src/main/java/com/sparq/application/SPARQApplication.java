@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
 import android.os.CountDownTimer;
+import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
 import com.sparq.application.layer.ApplicationLayerManager;
@@ -25,11 +26,13 @@ import java.util.Date;
 
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
 
+import static java.util.Arrays.asList;
+
 /**
  * Created by sarahcs on 3/26/2017.
  */
 
-public class SPARQApplication extends Application {
+public class SPARQApplication extends MultiDexApplication {
 
     private static final String TAG = "SPARQApplication";
     public static SPARQApplication SPARQInstance;
@@ -293,7 +296,9 @@ public class SPARQApplication extends Application {
                         ApplicationLayerPdu.TYPE.QUESTION,
                         msg,
                         toAddr,
-                        (byte) creatorId, (byte) questionId, (byte) 0, (byte) 0);
+                        asList((byte) creatorId, (byte) questionId, (byte) 0, (byte) 0),
+                        null
+                );
 
                 if(isSent){
                     ConversationThread newThread = new ConversationThread(
@@ -318,7 +323,9 @@ public class SPARQApplication extends Application {
                         ApplicationLayerPdu.TYPE.ANSWER,
                         msg,
                         toAddr,
-                        (byte) creatorId, (byte) questionId, (byte) answerCreatotId, (byte) answerId);
+                        asList((byte) creatorId, (byte) questionId, (byte) answerCreatotId, (byte) answerId),
+                        null
+                );
 
                 if(isSent){
                     AnswerItem newAnswer = AnswerItem.getShortAnswer(
@@ -346,7 +353,9 @@ public class SPARQApplication extends Application {
                                 Constants.CHARSET
                         ),
                         toAddr,
-                        (byte) creatorId, (byte) questionId, (byte) 0, (byte) 0);
+                        asList((byte) creatorId, (byte) questionId, (byte) 0, (byte) 0),
+                        null
+                );
 
                 if(isSent){
                     ConversationThread thread = getConversationThread(questionId, creatorId);
@@ -380,7 +389,9 @@ public class SPARQApplication extends Application {
                                 Constants.CHARSET
                         ),
                         toAddr,
-                        (byte) creatorId, (byte) questionId, (byte) answerCreatotId, (byte) answerId);
+                        asList((byte) creatorId, (byte) questionId, (byte) answerCreatotId, (byte) answerId),
+                        null
+                );
 
                 if(isSent){
                     AnswerItem answer = getConversationThread(questionId, creatorId)

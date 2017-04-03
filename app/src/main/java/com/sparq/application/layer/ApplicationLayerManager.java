@@ -9,9 +9,11 @@ import android.util.Log;
 
 import com.sparq.application.layer.almessage.AlMessage;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
+import com.sparq.application.layer.pdu.PollPdu;
 import com.sparq.application.layer.pdu.ThreadPdu;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
 import test.com.blootoothtester.network.linklayer.DeviceDiscoveryHandler;
@@ -19,6 +21,8 @@ import test.com.blootoothtester.network.linklayer.LinkLayerManager;
 import test.com.blootoothtester.network.linklayer.LlContext;
 import test.com.blootoothtester.network.linklayer.LlMessage;
 import test.com.blootoothtester.util.Logger;
+
+import static com.sparq.application.layer.pdu.ApplicationLayerPdu.TYPE_BYTES;
 
 /**
  * This class contains information about the current context in which the ApplicatonLayer is running
@@ -76,19 +80,37 @@ public class ApplicationLayerManager {
 
     }
 
-    public boolean sendData(ApplicationLayerPdu.TYPE type, byte[] data, byte toAddr , byte... headers) {
+    public boolean sendData(ApplicationLayerPdu.TYPE type, byte[] data, byte toAddr , List<Byte> headers, List<Boolean> flags) {
 
         switch(type){
+            case POLL_QUESTION:
+            case POLL_ANSWER:
+                if(headers.size() + TYPE_BYTES + PollPdu.FLAG_BYTES == PollPdu.HEADER_POLL_MAX_BYTES
+                        && flags.size() == PollPdu.FLAGS_POLL_MAX_BITS){
+                    return sendPollData(
+                            type,
+                            headers.get(0), headers.get(1), headers.get(2), headers.get(3), headers.get(4),
+                            flags.get(0), flags.get(1), flags.get(2),
+                            data,
+                            toAddr
+                    );
+                }
+                else{
+                    throw new IllegalArgumentException("Illegal number of header/flag values (Found: " +
+                            (headers.size() + TYPE_BYTES + PollPdu.FLAG_BYTES) + " and flags" + flags.size() + " but expected " + PollPdu.HEADER_POLL_MAX_BYTES + " of header and" +
+                            PollPdu.FLAGS_POLL_MAX_BITS + " of flags)");
+                }
+
             case QUESTION:
             case ANSWER:
             case QUESTION_VOTE:
             case ANSWER_VOTE:
-                if(headers.length + 1 == ThreadPdu.HEADER_MAX_BYTES){
-                    return sendThreadData(type, headers[0], headers[1], headers[2], headers[3], data, toAddr);
+                if(headers.size() + 1 == ThreadPdu.HEADER_MAX_BYTES){
+                    return sendThreadData(type, headers.get(0), headers.get(1), headers.get(2), headers.get(3), data, toAddr);
                 }
                 else{
                     throw new IllegalArgumentException("Illegal number of header values (Found: " +
-                            headers.length + " but expected " + ThreadPdu.HEADER_MAX_BYTES + ")");
+                            headers.size() + " but expected " + ThreadPdu.HEADER_MAX_BYTES + ")");
                 }
         }
 
@@ -102,6 +124,16 @@ public class ApplicationLayerManager {
         return mAlContext.sendThreadPdu(type, threadCreatorId, threadId, subThreadCreatorId, subThreadId, data, toAddr);
     }
 
+    public boolean sendPollData(ApplicationLayerPdu.TYPE type, byte pollId,byte questionCreatorId,
+                                byte questionId, byte questionFormat, byte answerCreatorId, boolean hasMore, boolean endOfPoll, boolean isMainQuestion,
+                                byte[] data, byte toAddr){
+
+
+        return mAlContext.sendPollPdu(type, pollId,questionCreatorId, questionId, questionFormat,answerCreatorId,
+                hasMore, endOfPoll, isMainQuestion, data, toAddr);
+
+    }
+
     /**
      * called from the USER interface when data is to be sent to the application layer
      * @param type type of data to be sent
@@ -109,9 +141,9 @@ public class ApplicationLayerManager {
      * @param toAddr address of receiver
      * @param headers set of variables that make up header information
      */
-    public boolean sendData(ApplicationLayerPdu.TYPE type, String msg, byte toAddr, byte... headers) {
+    public boolean sendData(ApplicationLayerPdu.TYPE type, String msg, byte toAddr, List<Byte> headers, List<Boolean> flags) {
         try {
-            return sendData(type, msg.getBytes("UTF-8"), toAddr, headers);
+            return sendData(type, msg.getBytes("UTF-8"), toAddr, headers, flags);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return false;
