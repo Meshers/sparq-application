@@ -45,7 +45,11 @@ public class SPARQApplication extends Application {
     private static int currentQuestionId = 1;
     private static int currentAnswerId = 1;
 
-    private static boolean isTeacher;
+    public enum USER_TYPE{
+        TEACHER,
+        STUDENT
+    }
+    private static USER_TYPE userType;
     private static boolean isTimerElapsed = true;
 
     //handlers
@@ -97,12 +101,12 @@ public class SPARQApplication extends Application {
         return currentQuestionId;
     }
 
-    public static boolean isTeacher() {
-        return isTeacher;
+    public static USER_TYPE getUserType() {
+        return userType;
     }
 
-    public static void setIsTeacher(boolean isTeacher) {
-        SPARQApplication.isTeacher = isTeacher;
+    public static void setUserType(USER_TYPE userType) {
+        SPARQApplication.userType = userType;
     }
 
     public static boolean isTimerElapsed(){

@@ -90,14 +90,14 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         dialog.dismiss();
-                        SPARQApplication.setIsTeacher(false);
+                        SPARQApplication.setUserType(SPARQApplication.USER_TYPE.STUDENT);
                     }
                 })
                 .dismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
 
-                        if(SPARQApplication.isTeacher()){
+                        if(SPARQApplication.getUserType() == SPARQApplication.USER_TYPE.TEACHER){
                             layout.setVisibility(View.GONE);
                         }else{
                             layout.setVisibility(View.VISIBLE);
@@ -118,12 +118,12 @@ public class LoginActivity extends AppCompatActivity {
                     dialog.dismiss();
 
                     SPARQApplication.setOwnAddr((byte) 1);
-                    SPARQApplication.setIsTeacher(true);
+                    SPARQApplication.setUserType(SPARQApplication.USER_TYPE.TEACHER);
 
                 } else {
                     Toast.makeText(LoginActivity.this, "Failed to authenticate", Toast.LENGTH_SHORT).show();
                     pinEntry.setText(null);
-                    SPARQApplication.setIsTeacher(false);
+                    SPARQApplication.setUserType(SPARQApplication.USER_TYPE.STUDENT);
                 }
             }
         });
@@ -136,46 +136,38 @@ public class LoginActivity extends AppCompatActivity {
         String eventCode = mEventCode.getText().toString();
         String ownAddress = mOwnAddr.getText().toString();
 
-        if(eventCode.isEmpty() || ownAddress.isEmpty()){
+        if(eventCode.equals("")){
+            Toast.makeText(LoginActivity.this, "Fields cannot be empty", Toast.LENGTH_SHORT).show();
             return;
         }
-
-
-        //TODO: check if eventCode and addrStr are valid numbers < 127
-        //Fixed for now but we need to decide what exactly goes here for ownAddress
 
         if(Integer.valueOf(eventCode) > 127 || Integer.valueOf(eventCode) < 1){
             Toast.makeText(LoginActivity.this, "Invalid Event Code", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // FIXME: 29/3/17 on change of link layer logic
-        // Handles arrayindexoutofbounds exception in case ownAddress more than 40
-        if(Integer.valueOf(ownAddress) > MAX_USERS
-                || Integer.valueOf(eventCode) < 1){
-            Toast.makeText(LoginActivity.this, "Invalid address", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if(eventCode.equals("") || ownAddress.equals("")){
-            Toast.makeText(LoginActivity.this, "Fields cannot be empty", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         SPARQApplication.setSessionId(Byte.parseByte(eventCode));
 
-        if(!SPARQApplication.isTeacher()){
+        if(SPARQApplication.getUserType() == SPARQApplication.USER_TYPE.STUDENT){
 
             String addrStr = mOwnAddr.getText().toString();
             if(addrStr.equals("")){
+                Toast.makeText(LoginActivity.this, "Fields cannot be empty", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            if(Integer.valueOf(addrStr) > MAX_USERS
+                    || Integer.valueOf(eventCode) < 1){
+                Toast.makeText(LoginActivity.this, "Invalid address", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             SPARQApplication.setOwnAddr(Byte.parseByte(addrStr));
-            intent.putExtra(Main2Activity.EXTRA_EVENT_CODE, SPARQApplication.getOwnAddress());
+
 
         }
 
-
+        intent.putExtra(Main2Activity.EXTRA_EVENT_CODE, SPARQApplication.getOwnAddress());
         SPARQApplication.getInstance().initializeObjects(LoginActivity.this);
 
         startActivity(intent);
