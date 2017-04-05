@@ -104,7 +104,7 @@ public class PollFragment extends Fragment {
                 if(poll.getCreator().getUserType() == 0){
                     showStateDialog(poll, view);
                 }
-                else if(poll.getState() == 0){
+                else if(poll.getState() == PollItem.POLL_STATE.PLAY){
 
                     Intent intent = new Intent(getActivity(), EventActivity.class);
                     intent.putExtra("type", 1);
@@ -130,16 +130,16 @@ public class PollFragment extends Fragment {
 
         for(int i = 0; i < 10; i++){
 
-            PollItem poll = new PollItem(
-                    i,
-                    0,
-                    "Poll "+i,
-                    "this is a description",
-                    new Date(2011,2,3),
-                    0,
-                    user);
-
-            polls.add(poll);
+//            PollItem poll = new PollItem(
+//                    i,
+//                    0,
+//                    "Poll "+i,
+//                    "this is a description",
+//                    new Date(2011,2,3),
+//                    0,
+//                    user);
+//
+//            polls.add(poll);
         }
 
         return polls;
@@ -173,17 +173,17 @@ public class PollFragment extends Fragment {
             @Override
             public void onItemClicked(int itemIndex, MaterialDialog dialog) {
                 Toast.makeText(getActivity(), "Item Clicked:"+itemIndex, Toast.LENGTH_SHORT).show();
-                poll.setState(itemIndex);
+                poll.setState(PollItem.getStateFromInteger(itemIndex));
                 ImageView pollStatusImage = (ImageView) view.findViewById(R.id.poll_status);
 
                 switch(poll.getState()){
-                    case 0:
+                    case PLAY:
                         pollStatusImage.setBackgroundResource(R.drawable.ic_bookmark_play);
                         break;
-                    case 1:
+                    case PAUSE:
                         pollStatusImage.setBackgroundResource(R.drawable.ic_bookmark_pause);
                         break;
-                    case 2:
+                    case STOP:
                         pollStatusImage.setBackgroundResource(R.drawable.ic_bookmark_stop);
                         break;
                 }

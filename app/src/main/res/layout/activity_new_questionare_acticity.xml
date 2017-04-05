@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.sparq.application.NewQuestionareActicity">
+    tools:context="com.sparq.application.userinterface.NewQuestionareActicity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -108,7 +108,7 @@
     <include layout="@layout/content_new_questionare_acticity" />
 
     <com.getbase.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_new_quiz"
+        android:id="@+id/fab_new_questonare"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:fab_colorNormal="@color/colorAccent"

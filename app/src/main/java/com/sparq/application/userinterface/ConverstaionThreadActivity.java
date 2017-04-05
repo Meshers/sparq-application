@@ -135,7 +135,7 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                SPARQApplication.sendMessage(
+                SPARQApplication.sendThreadMessage(
                         ApplicationLayerPdu.TYPE.ANSWER,
                         SPARQApplication.getBdcastAddress(),
                         answerText.getText().toString(),

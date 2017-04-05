@@ -1,5 +1,7 @@
 package com.sparq.application.userinterface.model;
 
+import android.util.Log;
+
 import com.sparq.application.layer.almessage.AlAnswer;
 import com.sparq.util.Constants;
 
@@ -22,7 +24,6 @@ public class AnswerItem implements Serializable{
     private QuestionItem.FORMAT format;
 
     private String answer;
-    private int answerChoice;
     private ArrayList<Integer> answerChoices;
 
 
@@ -30,10 +31,12 @@ public class AnswerItem implements Serializable{
     }
 
     public AnswerItem(int answerId, UserItem answerCreator, int questionItemId, UserItem threadCreator,
-                      QuestionItem.FORMAT format, String answer, int answerChoice, ArrayList<Integer> answerChoices,int votes) {
+                      QuestionItem.FORMAT format, String answer, ArrayList<Integer> answerChoices,int votes) {
         this.answerId = answerId;
         this.questionItemId = questionItemId;
-        this.length = answer.length();
+        if(answer != null){
+            this.length = answer.length();
+        }
         this.format = format;
         this.answerCreator = answerCreator;
         this.threadCreator = threadCreator;
@@ -42,14 +45,10 @@ public class AnswerItem implements Serializable{
 
         switch(format){
             case MCQ_SINGLE:
-                this.answerChoice = answerChoice;
-                break;
             case MCQ_MULTIPLE:
-                answerChoices = answerChoices;
+                this.answerChoices = answerChoices;
                 break;
             case ONE_WORD:
-                this.answer = answer;
-                break;
             case SHORT:
                 this.answer = answer;
                 break;
@@ -78,6 +77,25 @@ public class AnswerItem implements Serializable{
 
     public void setAnswer(String answer) {
         this.answer = answer;
+    }
+
+
+    public ArrayList<Integer> getAnswerChoices() {
+        return answerChoices;
+    }
+
+    public void setAnswerChoices(ArrayList<Integer> answerChoices) {
+        this.answerChoices = answerChoices;
+    }
+
+    public String getAnswerChoicesAsString(){
+
+        String answers = "";
+        for(Integer answer: answerChoices){
+            answers += String.valueOf(answer) + ",";
+        }
+
+        return answers;
     }
 
     public int getLength() {
@@ -117,7 +135,12 @@ public class AnswerItem implements Serializable{
     }
 
     public static AnswerItem getMCQSingleAnswer(int answerId, UserItem answerCreator, int questionItemId, UserItem questionCreator,
-                                                int answerChoice){
+                                                String answerChoice){
+
+        answerChoice = answerChoice.substring(0, answerChoice.length()-1);
+        ArrayList<Integer> answer = new ArrayList<>();
+        answer.add(Integer.parseInt(answerChoice));
+
         return new AnswerItem(
                 answerId,
                 answerCreator,
@@ -125,14 +148,22 @@ public class AnswerItem implements Serializable{
                 questionCreator,
                 QuestionItem.FORMAT.MCQ_SINGLE,
                 null,
-                answerChoice,
-                null,
+                answer,
                 Constants.INITIAL_VOTE_COUNT
         );
     }
 
     public static AnswerItem getMCQMultipleAnswer(int answerId, UserItem answerCreator, int questionItemId, UserItem questionCreator,
-                                                ArrayList<Integer> answerChoices){
+                                                String answerChoices){
+
+        answerChoices = answerChoices.substring(0, answerChoices.length()-1);
+        String[] splitChoices = answerChoices.split("#");
+        ArrayList<Integer> answer = new ArrayList<>();
+
+        for(String splitChoice: splitChoices){
+            answer.add(Integer.parseInt(splitChoice));
+        }
+
         return new AnswerItem(
                 answerId,
                 answerCreator,
@@ -140,8 +171,7 @@ public class AnswerItem implements Serializable{
                 questionCreator,
                 QuestionItem.FORMAT.MCQ_MULTIPLE,
                 null,
-                -1,
-                answerChoices,
+                answer,
                 Constants.INITIAL_VOTE_COUNT
         );
     }
@@ -155,7 +185,6 @@ public class AnswerItem implements Serializable{
                 questionCreator,
                 QuestionItem.FORMAT.ONE_WORD,
                 answer,
-                -1,
                 null,
                 Constants.INITIAL_VOTE_COUNT
         );
@@ -170,7 +199,6 @@ public class AnswerItem implements Serializable{
                 questionCreator,
                 QuestionItem.FORMAT.SHORT,
                 answer,
-                -1,
                 null,
                 Constants.INITIAL_VOTE_COUNT
         );

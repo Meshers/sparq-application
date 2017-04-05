@@ -14,7 +14,7 @@ import com.sparq.application.userinterface.model.EventItem;
 
 import java.util.List;
 
-public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.MyViewHolder> {
+public class NewQuestionareAdapter extends RecyclerView.Adapter<NewQuestionareAdapter.MyViewHolder> {
 
     private List<EventItem> events;
 
@@ -26,13 +26,12 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.MyVi
         public MyViewHolder(View view) {
             super(view);
 //            eventName = (TextView) view.findViewById(R.id.event_name);
-//            eventDate = (TextView) view.findViewById(R.id.event_date);
             eventImage = (ImageView) view.findViewById(R.id.event_image);
         }
     }
 
 
-    public EventListAdapter(List<EventItem> events) {
+    public NewQuestionareAdapter(List<EventItem> events) {
         this.events = events;
     }
 

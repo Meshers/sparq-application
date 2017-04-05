@@ -35,20 +35,12 @@
             android:layout_weight="1">
 
             <TextView
-                android:id="@+id/event_name"
+                android:id="@+id/questionare_option"
                 android:textColor="@color/primaryText"
                 android:textSize="16dp"
                 android:text="NAME"
                 android:textStyle="bold"
                 android:layout_alignParentTop="true"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/event_date"
-                android:text="date"
-                android:layout_below="@id/event_name"
-                android:textColor="@color/secondaryText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
@@ -64,7 +56,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_alignParentRight="true"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_arrow_right"/>
+                android:src="@drawable/ic_cancel"/>
 
         </LinearLayout>
 

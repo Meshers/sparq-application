@@ -2,7 +2,6 @@ package com.sparq.application.userinterface.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,22 +12,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amulyakhare.textdrawable.TextDrawable;
-import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
-import com.sparq.application.layer.almessage.AlAnswer;
 import com.sparq.application.layer.almessage.AlVote;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.userinterface.ConverstaionThreadActivity;
 import com.sparq.application.userinterface.model.ConversationThread;
-import com.sparq.application.userinterface.model.QuizItem;
 import com.sparq.util.Constants;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by sarahcs on 2/24/2017.
@@ -110,7 +103,7 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
         holder.likeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SPARQApplication.sendMessage(
+                SPARQApplication.sendThreadMessage(
                         ApplicationLayerPdu.TYPE.QUESTION_VOTE,
                         SPARQApplication.getBdcastAddress(),
                         null,
@@ -128,7 +121,7 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
         holder.unlikeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SPARQApplication.sendMessage(
+                SPARQApplication.sendThreadMessage(
                         ApplicationLayerPdu.TYPE.QUESTION_VOTE,
                         SPARQApplication.getBdcastAddress(),
                         null,

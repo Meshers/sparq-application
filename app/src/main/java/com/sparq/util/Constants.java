@@ -15,6 +15,9 @@ public class Constants {
     public static final int MIN_QUESTION_MARKS = 0;
     public static final byte DEFAULT_ADDRESS = (byte) 0;
     public static final byte TEACHER_ADDRESS = (byte) 1;
+    public static final int MAX_NUMBER_OF_OPTIONS = 4;
+
+    public static final byte CONSTANT_DELIMITER = '#';
 
     public static final String UI_ENABLE_BROADCAST_INTENT = "com.sparq.application.UI_ENABLE_INTENT";
     public static final String UI_DISABLE_BROADCAST_INTENT = "com.sparq.application.UI_DISABLE_INTENT";

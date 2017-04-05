@@ -13,6 +13,7 @@ import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.layer.pdu.PollPdu;
 import com.sparq.application.layer.pdu.ThreadPdu;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -52,6 +53,7 @@ public class AlContext {
         this.mCallback = callback;
 
         mSessionThreads = new HashMap<>();
+        mSessionPolls = new HashMap<>();
 
     }
 
@@ -202,7 +204,7 @@ public class AlContext {
 
     public boolean sendPollPdu(ApplicationLayerPdu.TYPE type, byte pollId,
                                byte questionCreatorId, byte questionId, byte questionFormat,byte answerCreatorId,
-                               boolean hasMore, boolean endOfPoll, boolean isMainQuestion, byte[] data, byte toAddr){
+                               boolean hasMore, boolean endOfPoll, boolean isMainQuestion, byte[] data, byte[][] options, byte toAddr){
 
         ApplicationLayerPdu pdu = null;
         AlPollQuestion retreivedQuestion;
@@ -215,7 +217,8 @@ public class AlContext {
                         return false;
                     }
 
-                    AlPollQuestion question = new AlPollQuestion(pollId, questionCreatorId, questionId, questionFormat, hasMore, endOfPoll, isMainQuestion, data);
+                    AlPollQuestion question = new AlPollQuestion(pollId, questionCreatorId, questionId, questionFormat, hasMore, endOfPoll, isMainQuestion, data, options);
+
 
                     // check if it is the first question of a poll if not add it
                     if(!mSessionPolls.keySet().contains(pollId)){
@@ -226,7 +229,7 @@ public class AlContext {
 
                     mSessionPolls.get(pollId).add(question);
 
-                    pdu = PollPdu.getQuestionPdu(pollId, questionCreatorId, questionId, questionFormat, hasMore, endOfPoll, isMainQuestion, data);
+                    pdu = PollPdu.getQuestionPdu(pollId, questionCreatorId, questionId, questionFormat, hasMore, endOfPoll, isMainQuestion, data, options);
 
                     break;
                 case POLL_ANSWER:
@@ -244,7 +247,7 @@ public class AlContext {
                             throw new IllegalArgumentException("No such type of Poll packet exists");
                         }
 
-                        pdu = PollPdu.getAnswerPdu(pollId,questionCreatorId, questionId, answerCreatorId, data);
+                        pdu = PollPdu.getAnswerPdu(pollId,questionCreatorId, questionId, questionFormat,answerCreatorId, data);
                     }else{
                         throw new IllegalArgumentException("No such type of Thread packet exists");
                     }
@@ -314,10 +317,11 @@ public class AlContext {
         boolean isMainQuestion = pdu.isMainQuestion();
 
         byte[] data = pdu.getData();
+        byte[][] options = pdu.getOptions();
 
         switch(pdu.getType()){
             case POLL_QUESTION:
-                message = new AlPollQuestion(pollId, questionCreatorId, questionId, questionFormat, hasMore, endOfPoll, isMainQuestion, data);
+                message = new AlPollQuestion(pollId, questionCreatorId, questionId, questionFormat, hasMore, endOfPoll, isMainQuestion, data, options);
                 break;
             case POLL_ANSWER:
                 message = new AlPollAnswer(pollId, questionCreatorId, questionId, questionFormat,answerCreatorId, data);
@@ -528,6 +532,15 @@ public class AlContext {
 
                 AlPollQuestion alPollQuestion = (AlPollQuestion) alMessage;
 
+                Log.i(TAG, "POLL QUESTION RECEIVED " +
+                        alPollQuestion.getPollId() + ":" +
+                        alPollQuestion.getQeuestionCreatorId()+ ":" +
+                        alPollQuestion.getQeuestionCreatorId()+ ":" +
+                        alPollQuestion.getQuestionId()+ ":" +
+                        alPollQuestion.getQuestionFormat()+ ":" +
+                        alPollQuestion.getOptionsAsArray()+ ":" +
+                        alPollQuestion.getQuestionDataAsString()
+                );
                 // check if question was from teacher
                 if(alPollQuestion.getQeuestionCreatorId() != TEACHER_ADDRESS){
                     return;
@@ -559,6 +572,14 @@ public class AlContext {
 
                 AlPollAnswer alPollAnswer = (AlPollAnswer) alMessage;
 
+                Log.i(TAG, "POLL ANSWER RECEIVED " +
+                        alPollAnswer.getPollId() + ":" +
+                        alPollAnswer.getQuestionCreatorId()+ ":" +
+                        alPollAnswer.getQuestionId()+ ":" +
+                        alPollAnswer.getFormat()+ ":" +
+                        alPollAnswer.getAnswerDataAsString()
+                );
+
                 switch(SPARQApplication.getUserType()){
                     case STUDENT:
                         // check if answer belongs to given user
@@ -572,7 +593,7 @@ public class AlContext {
                         if(mSessionPolls.keySet().contains(pdu.getPollId())){
                             retreivedQuestion = getAlPollQuestion(
                                     mSessionPolls.get(pdu.getPollId()),
-                                    alPollAnswer.getCreatorId(),
+                                    alPollAnswer.getQuestionCreatorId(),
                                     alPollAnswer.getQuestionId()
                             );
 

@@ -128,7 +128,7 @@ public class AnswerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                SPARQApplication.sendMessage(
+                SPARQApplication.sendThreadMessage(
                         ApplicationLayerPdu.TYPE.ANSWER_VOTE,
                         SPARQApplication.getBdcastAddress(),
                         null,
@@ -155,7 +155,7 @@ public class AnswerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                SPARQApplication.sendMessage(
+                SPARQApplication.sendThreadMessage(
                         ApplicationLayerPdu.TYPE.ANSWER_VOTE,
                         SPARQApplication.getBdcastAddress(),
                         null,

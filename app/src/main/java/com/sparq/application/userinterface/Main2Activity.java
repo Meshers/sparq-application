@@ -33,6 +33,8 @@ import com.sparq.util.Constants;
 import java.nio.charset.Charset;
 import java.util.Date;
 
+import static com.sparq.application.userinterface.model.QuestionItem.FORMAT.SHORT;
+
 
 public class Main2Activity extends AppCompatActivity {
 

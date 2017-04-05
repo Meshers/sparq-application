@@ -69,13 +69,13 @@ public class PollListAdapter extends RecyclerView.Adapter<PollListAdapter.MyView
         holder.pollImage.setImageDrawable(drawable);
 
         switch(poll.getState()){
-            case 0:
+            case PLAY:
                 holder.pollStatusImage.setBackgroundResource(R.drawable.ic_bookmark_play);
                 break;
-            case 1:
+            case PAUSE:
                 holder.pollStatusImage.setBackgroundResource(R.drawable.ic_bookmark_pause);
                 break;
-            case 2:
+            case STOP:
                 holder.pollStatusImage.setBackgroundResource(R.drawable.ic_bookmark_stop);
                 break;
         }

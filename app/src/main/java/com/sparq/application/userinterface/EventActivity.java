@@ -30,11 +30,18 @@ import com.sparq.application.layer.ApplicationPacketDiscoveryHandler;
 import com.sparq.application.layer.almessage.AlMessage;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.userinterface.adapter.EventPagerAdapter;
+import com.sparq.application.userinterface.model.Questionare;
 import com.sparq.util.Constants;
+
+import java.util.ArrayList;
 
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
 
 import static com.sparq.application.SPARQApplication.SPARQInstance;
+import static com.sparq.application.userinterface.model.QuestionItem.FORMAT.MCQ_MULTIPLE;
+import static com.sparq.application.userinterface.model.QuestionItem.FORMAT.MCQ_SINGLE;
+import static com.sparq.application.userinterface.model.QuestionItem.FORMAT.ONE_WORD;
+import static com.sparq.application.userinterface.model.QuestionItem.FORMAT.SHORT;
 
 //import android.support.design.widget.FloatingActionButton;
 
@@ -44,7 +51,7 @@ public class EventActivity extends AppCompatActivity {
 
     TabLayout tabLayout;
     public FloatingActionsMenu newEvent;
-    FloatingActionButton newConvThread;
+    FloatingActionButton newQuiz ,newPoll, newConvThread;
 
     private MyBluetoothAdapter mBluetoothAdapter;
     private ApplicationPacketDiscoveryHandler mHandler;
@@ -121,12 +128,72 @@ public class EventActivity extends AppCompatActivity {
     public void initializeViews(){
 
         newEvent = (FloatingActionsMenu) findViewById(R.id.fab);
+
+        newQuiz = (FloatingActionButton) findViewById(R.id.fab_new_quiz);
+        newPoll = (FloatingActionButton) findViewById(R.id.fab_new_poll);
         newConvThread = (FloatingActionButton) findViewById(R.id.fab_new_thread);
+
+        newPoll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Intent intent = new Intent(EventActivity.this, Main2Activity.class);
+//                intent.putExtra(NewQuestionareActicity.QUESTIONARE_TYPE, Questionare.QUESTIONARE_TYPE.POLL);
+//                startActivity(intent);
+
+                ArrayList<String> options = new ArrayList<String>();
+                options.add("oneeee");
+                options.add("two");
+
+                SPARQApplication.sendPollMessage(
+                        ApplicationLayerPdu.TYPE.POLL_QUESTION,
+                        (byte) 41,
+                        "hello world",
+                        1,
+                        1,
+                        1,
+                        SHORT,
+                        null,
+                        0,
+                        false,false, true
+                );
+
+                newEvent.collapse();
+            }
+        });
+
+        newQuiz.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Intent intent = new Intent(EventActivity.this, Main2Activity.class);
+//                intent.putExtra(NewQuestionareActicity.QUESTIONARE_TYPE, Questionare.QUESTIONARE_TYPE.POLL);
+//                startActivity(intent);
+
+                ArrayList<String> options = new ArrayList<String>();
+                options.add("oneeee");
+                options.add("two");
+
+                SPARQApplication.sendPollMessage(
+                        ApplicationLayerPdu.TYPE.POLL_ANSWER,
+                        (byte) 41,
+                        "hello world i am here",
+                        1,
+                        1,
+                        1,
+                        SHORT,
+                        null,
+                        1,
+                        false,false, true
+                );
+
+                newEvent.collapse();
+            }
+        });
 
         newConvThread.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openDialog();
+
                 newEvent.collapse();
             }
         });
@@ -178,7 +245,7 @@ public class EventActivity extends AppCompatActivity {
                         }
                         else{
                             //send question
-                            SPARQApplication.sendMessage(
+                            SPARQApplication.sendThreadMessage(
                                     ApplicationLayerPdu.TYPE.QUESTION,
                                     SPARQApplication.getBdcastAddress(),
                                     questionText.getText().toString(),

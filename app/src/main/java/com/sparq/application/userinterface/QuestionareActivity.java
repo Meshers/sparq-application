@@ -63,11 +63,11 @@ public class QuestionareActivity extends AppCompatActivity {
         // get the quiz / poll object
         questionare = getData(type);
 
-        // get questions related to a perticular quiz or poll
+        // get questions related to a particular quiz or poll
         questions = questionare.getQuestions();
 
         mAdapter = new QuestionareAdapter(
-                new ArrayList<String>(questionare.getQuestions().get(0).getOptions().values()), questionare.getType()
+                new ArrayList<String>(questionare.getQuestions().get(0).getOptions()), questionare.getType()
         );
 
         DisplayMetrics displaymetrics = new DisplayMetrics();

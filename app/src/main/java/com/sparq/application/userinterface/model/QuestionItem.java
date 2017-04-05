@@ -2,6 +2,7 @@ package com.sparq.application.userinterface.model;
 
 import com.sparq.util.Constants;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -32,7 +33,7 @@ public class QuestionItem {
     private double totalMarks;
     private int votes;
     private boolean hasVoted;
-    private HashMap<Integer, String> options;
+    private ArrayList<String> options;
 
     public QuestionItem(int questionId, int questionareId, String question, FORMAT format, double totalMarks, int votes) {
         this.questionId = questionId;
@@ -46,7 +47,7 @@ public class QuestionItem {
     }
 
     public QuestionItem(int questionId, int questionareId, String question, FORMAT format, double totalMarks,
-                        HashMap<Integer, String> options, int votes) {
+                        ArrayList<String> options, int votes) {
         this(questionId, questionareId, question, format, totalMarks, votes);
 
         switch(getFormat()){
@@ -85,6 +86,14 @@ public class QuestionItem {
         return format;
     }
 
+    public static FORMAT getFormatFromByte(byte format){
+        return FORMAT.values()[(int) format];
+    }
+
+    public static byte getFormatAsByte(FORMAT format){
+        return (byte) format.ordinal();
+    }
+
     public void setFormat(FORMAT format) {
         this.format = format;
     }
@@ -117,24 +126,24 @@ public class QuestionItem {
         this.hasVoted = hasVoted;
     }
 
-    public HashMap<Integer, String> getOptions() {
+    public ArrayList<String> getOptions() {
         return options;
     }
 
-    public void setOptions(HashMap<Integer, String> options) {
+    public void setOptions(ArrayList<String> options) {
         this.options = options;
     }
 
-    public void addOption(int optionId, String option){
-        options.put(optionId, option);
+    public void addOption(String option){
+        options.add(option);
     }
 
-    public static QuestionItem getMCQSingleQuestion(int questionId, int questionareId, String question, HashMap<Integer, String> options, float totalMarks){
+    public static QuestionItem getMCQSingleQuestion(int questionId, int questionareId, String question, ArrayList<String> options, float totalMarks){
 
         return new QuestionItem(questionId, questionareId, question, FORMAT.MCQ_SINGLE, totalMarks, options, Constants.INITIAL_VOTE_COUNT);
     }
 
-    public static QuestionItem getMCQMultipleQuestion(int questionId, int questionareId, String question, HashMap<Integer, String> options, float totalMarks){
+    public static QuestionItem getMCQMultipleQuestion(int questionId, int questionareId, String question, ArrayList<String> options, float totalMarks){
 
         return new QuestionItem(questionId, questionareId, question, FORMAT.MCQ_MULTIPLE, totalMarks, options, Constants.INITIAL_VOTE_COUNT);
     }

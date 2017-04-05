@@ -50,7 +50,25 @@ public class ApplicationLayerManager {
             @Override
             public void handleDiscovery(LlMessage llMessage) {
                 Log.i("LLMSSG","Message Received from linklayer: "+ llMessage.getDataAsString());
-                ApplicationLayerPdu pdu = ThreadPdu.from(llMessage);
+
+                ApplicationLayerPdu pdu = null;
+
+                if(llMessage.getDataAsString().equalsIgnoreCase("init")){
+                    return;
+                }
+
+                switch(ApplicationLayerPdu.getTypeDecoded(llMessage.getData()[0])){
+                    case POLL_QUESTION:
+                    case POLL_ANSWER:
+                        pdu = PollPdu.from(llMessage);
+                        break;
+                    case QUESTION:
+                    case ANSWER:
+                    case QUESTION_VOTE:
+                    case ANSWER_VOTE:
+                        pdu = ThreadPdu.from(llMessage);
+                        break;
+                }
                 if(pdu != null){
                     mAlContext.receivePdu(pdu);
                 }
@@ -80,25 +98,43 @@ public class ApplicationLayerManager {
 
     }
 
-    public boolean sendData(ApplicationLayerPdu.TYPE type, byte[] data, byte toAddr , List<Byte> headers, List<Boolean> flags) {
+    public boolean sendData(ApplicationLayerPdu.TYPE type, byte[] data, byte[][] options,byte toAddr , List<Byte> headers, List<Boolean> flags) {
 
         switch(type){
             case POLL_QUESTION:
-            case POLL_ANSWER:
-                if(headers.size() + TYPE_BYTES + PollPdu.FLAG_BYTES == PollPdu.HEADER_POLL_MAX_BYTES
+                if(headers.size() + TYPE_BYTES + PollPdu.FLAG_BYTES + PollPdu.HEADER_SIZE_BYTES - PollPdu.ANSWER_CREATOR_ID_BYTES == PollPdu.PDU_POLL_QUESTION_HEADER_MIN_BYTES
                         && flags.size() == PollPdu.FLAGS_POLL_MAX_BITS){
                     return sendPollData(
                             type,
                             headers.get(0), headers.get(1), headers.get(2), headers.get(3), headers.get(4),
                             flags.get(0), flags.get(1), flags.get(2),
                             data,
+                            options,
                             toAddr
                     );
                 }
                 else{
                     throw new IllegalArgumentException("Illegal number of header/flag values (Found: " +
-                            (headers.size() + TYPE_BYTES + PollPdu.FLAG_BYTES) + " and flags" + flags.size() + " but expected " + PollPdu.HEADER_POLL_MAX_BYTES + " of header and" +
-                            PollPdu.FLAGS_POLL_MAX_BITS + " of flags)");
+                            (headers.size() + TYPE_BYTES + PollPdu.FLAG_BYTES + PollPdu.HEADER_SIZE_BYTES - PollPdu.ANSWER_CREATOR_ID_BYTES)
+                            + " and flags " + flags.size() + " but expected " + PollPdu.PDU_POLL_QUESTION_HEADER_MIN_BYTES + " of header and " +
+                            PollPdu.FLAG_BYTES + " of flags)");
+                }
+
+            case POLL_ANSWER:
+                if(headers.size() + TYPE_BYTES == PollPdu.PDU_POLL_ANSWER_HEADER_BYTES
+                        && flags.size() == PollPdu.FLAGS_POLL_MAX_BITS){
+                    return sendPollData(
+                            type,
+                            headers.get(0), headers.get(1), headers.get(2), headers.get(3), headers.get(4),
+                            flags.get(0), flags.get(1), flags.get(2),
+                            data,
+                            options,
+                            toAddr
+                    );
+                }
+                else{
+                    throw new IllegalArgumentException("Illegal number of header values (Found: " +
+                            (headers.size() + TYPE_BYTES) + " and flags " + flags.size() + " but expected " + PollPdu.PDU_POLL_ANSWER_HEADER_BYTES + " of headers)");
                 }
 
             case QUESTION:
@@ -126,11 +162,10 @@ public class ApplicationLayerManager {
 
     public boolean sendPollData(ApplicationLayerPdu.TYPE type, byte pollId,byte questionCreatorId,
                                 byte questionId, byte questionFormat, byte answerCreatorId, boolean hasMore, boolean endOfPoll, boolean isMainQuestion,
-                                byte[] data, byte toAddr){
-
+                                byte[] data, byte[][] options, byte toAddr){
 
         return mAlContext.sendPollPdu(type, pollId,questionCreatorId, questionId, questionFormat,answerCreatorId,
-                hasMore, endOfPoll, isMainQuestion, data, toAddr);
+                hasMore, endOfPoll, isMainQuestion, data, options,toAddr);
 
     }
 
@@ -141,9 +176,17 @@ public class ApplicationLayerManager {
      * @param toAddr address of receiver
      * @param headers set of variables that make up header information
      */
-    public boolean sendData(ApplicationLayerPdu.TYPE type, String msg, byte toAddr, List<Byte> headers, List<Boolean> flags) {
+    public boolean sendData(ApplicationLayerPdu.TYPE type, String msg, List<String> options, byte toAddr, List<Byte> headers, List<Boolean> flags) {
         try {
-            return sendData(type, msg.getBytes("UTF-8"), toAddr, headers, flags);
+            byte[][] optionsArray = null;
+            if(options != null){
+                optionsArray = new byte[options.size()][];
+                for(int i = 0; i < options.size(); i++){
+                    optionsArray[i] = options.get(i).getBytes("UTF-8");
+                }
+            }
+
+            return sendData(type, msg.getBytes("UTF-8"),optionsArray, toAddr, headers, flags);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return false;
