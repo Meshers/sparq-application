@@ -19,6 +19,13 @@
     <string name="long_question_msg">Only 160 characters allowed</string>
     <string name="ans_recorded">Your answer has been recorded</string>
     <string name="question_recorded">Your question has been recorded</string>
+    <string name="poll_question_prompt">Question Type</string>
+
+    <string-array name="poll_question_types">
+        <item>MCQ</item>
+        <item>Multiple MCQ</item>
+        <item>Short Answer</item>
+    </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Welcome to SPARQ. Hope you like the ad-hoc response system

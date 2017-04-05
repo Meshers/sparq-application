@@ -4,6 +4,10 @@ import com.sparq.application.userinterface.model.QuestionItem;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+
+import android.annotation.SuppressLint;
+import android.os.Build;
+
 import java.util.BitSet;
 
 import test.com.blootoothtester.network.linklayer.LlMessage;
@@ -192,6 +196,7 @@ public class PollPdu extends ApplicationLayerPdu {
         return   (int) headerSize;
     }
 
+    @SuppressLint("NewApi")
     @Override
     public byte[] encode() {
         int headerSize = 0;

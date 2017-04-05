@@ -105,7 +105,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_new_questionare_acticity" />
+    <include layout="@layout/content_new_questionare_activity" />
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_new_questonare"

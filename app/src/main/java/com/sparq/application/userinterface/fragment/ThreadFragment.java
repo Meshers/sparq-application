@@ -1,6 +1,9 @@
 package com.sparq.application.userinterface.fragment;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -18,12 +21,16 @@ import com.sparq.application.userinterface.NotifyUIHandler;
 import com.sparq.application.userinterface.adapter.ThreadListAdapter;
 import com.sparq.application.userinterface.model.ConversationThread;
 import com.sparq.application.userinterface.model.UserItem;
+import com.sparq.util.Constants;
 
 import java.sql.Date;
 import java.util.ArrayList;
 
+import static com.sparq.application.SPARQApplication.SPARQInstance;
 
 public class ThreadFragment extends Fragment {
+
+    private static final String TAG = "ThreadFragment";
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -37,6 +44,10 @@ public class ThreadFragment extends Fragment {
     private RecyclerView recyclerView;
     private ThreadListAdapter mAdapter;
     private TextView emptyView;
+
+    private BroadcastReceiver timerReceiver;
+    private boolean btnEnable;
+    boolean isReceiverRegistered;
 
     public ThreadFragment() {
         // Required empty public constructor
@@ -93,11 +104,26 @@ public class ThreadFragment extends Fragment {
             emptyView.setVisibility(View.GONE);
         }
 
-        mAdapter = new ThreadListAdapter(threadsArrayList, getActivity().getApplicationContext());
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
+        timerReceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+
+                String action = intent.getAction();
+                if(action.equalsIgnoreCase(Constants.UI_ENABLE_BROADCAST_INTENT)){
+                    Log.i(TAG, "Timer up!");
+                    btnEnable = true;
+                }
+                else if(action.equalsIgnoreCase(Constants.UI_DISABLE_BROADCAST_INTENT)){
+                    btnEnable = false;
+                }
+
+                // FIXME: 4/6/2017 I assume this redundancy is required?
+                initializeThreadAdapter();
+
+            }
+        };
+
+        //Moved the initilization to a function call, since we needed it at many occasions
+        initializeThreadAdapter();
 
 //        recyclerView.addOnItemTouchListener( new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
 //            @Override public void onItemClick(View view, int position) {
@@ -116,9 +142,15 @@ public class ThreadFragment extends Fragment {
         return view;
     }
 
+    public void initializeThreadAdapter(){
+        mAdapter = new ThreadListAdapter(threadsArrayList, getActivity().getApplicationContext(), btnEnable);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
+    }
 
     public void initializeView(View view){
-
         recyclerView = (RecyclerView) view.findViewById(R.id.thread_recycler_view);
         emptyView = (TextView) view.findViewById(R.id.empty_view);
     }
@@ -127,7 +159,6 @@ public class ThreadFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
     }
 
     @Override
@@ -139,17 +170,34 @@ public class ThreadFragment extends Fragment {
     public  void onResume(){
         super.onResume();
 
+        if (!isReceiverRegistered) {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(Constants.UI_ENABLE_BROADCAST_INTENT);
+            filter.addAction(Constants.UI_DISABLE_BROADCAST_INTENT);
+            filter.addCategory(Intent.CATEGORY_DEFAULT);
+            getActivity().registerReceiver(timerReceiver,filter);
+            isReceiverRegistered = true;
+        }
+
+        //Checks if the timer has elapsed, if it has the buttons can be active again
+        if(SPARQApplication.isTimerElapsed()){
+            Log.i(TAG, "OnResume: " + SPARQApplication.isTimerElapsed());
+            btnEnable = true;
+        }
+        else {
+            btnEnable = false;
+        }
+
+        // FIXME: 4/6/2017 Should we re-initialize here or UINotifier takes care of it?
+        initializeThreadAdapter();
+
         NotifyUIHandler uiHandler = new NotifyUIHandler() {
             @Override
             public void handleConversationThreadQuestions() {
 
                 Log.i("Size of Array List", String.valueOf(threadsArrayList.size()));
 
-                mAdapter = new ThreadListAdapter(threadsArrayList, getActivity().getApplicationContext());
-                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-                recyclerView.setLayoutManager(mLayoutManager);
-                recyclerView.setItemAnimator(new DefaultItemAnimator());
-                recyclerView.setAdapter(mAdapter);
+                initializeThreadAdapter();
 
                 if(threadsArrayList.size() == 0){
                     recyclerView.setVisibility(View.GONE);
@@ -173,6 +221,18 @@ public class ThreadFragment extends Fragment {
         };
 
         SPARQApplication.setUINotifier(uiHandler);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        Log.i(TAG, "onPause");
+
+        if (isReceiverRegistered) {
+            getActivity().unregisterReceiver(timerReceiver);
+            isReceiverRegistered = false;
+        }
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,9 @@ import com.sparq.util.Constants;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import static android.content.ContentValues.TAG;
+import static com.sparq.application.SPARQApplication.SPARQInstance;
+
 /**
  * Created by sarahcs on 2/24/2017.
  */
@@ -36,6 +40,7 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
 
     private List<ConversationThread> threads;
     private Context mContext;
+    private boolean mbtnEnable;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView threadName;
@@ -59,9 +64,10 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
     }
 
 
-    public ThreadListAdapter(List<ConversationThread> threads, Context context) {
+    public ThreadListAdapter(List<ConversationThread> threads, Context context, boolean btnEnable) {
         this.threads = threads;
         this.mContext = context;
+        this.mbtnEnable = btnEnable;
     }
 
     @Override
@@ -114,6 +120,7 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
                         AlVote.VOTE_TYPE.UPVOTE);
 
                 Toast.makeText(mContext, mContext.getResources().getString(R.string.vote_recorded), Toast.LENGTH_SHORT).show();
+                SPARQInstance.startTimer();
 
             }
         });
@@ -132,6 +139,7 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
                         AlVote.VOTE_TYPE.DOWNVOTE);
 
                 Toast.makeText(mContext, mContext.getResources().getString(R.string.vote_recorded), Toast.LENGTH_SHORT).show();
+                SPARQInstance.startTimer();
 
             }
         });
@@ -143,15 +151,14 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
             }
         });
 
-        if(thread.getQuestionItem().hasVoted()){
-            // deactivate the vote buttons
-            holder.likeBtn.setImageResource(R.drawable.ic_like_disabled);
-            holder.likeBtn.setEnabled(false);
-
-            holder.unlikeBtn.setImageResource(R.drawable.ic_unlike_disabled);
-            holder.unlikeBtn.setEnabled(false);
+        if(mbtnEnable == true && thread.getQuestionItem().hasVoted() == false){
+            activateVotes(holder);
+        }
+        else{
+            deactivateVotes(holder);
         }
 
+        Log.i(TAG, "onBindViewHolder: " + mbtnEnable);
 
         if(position % 2 == 0){
             holder.threadImage.setBackgroundColor(mContext.getResources().getColor(colors[0]));
@@ -160,6 +167,24 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
             holder.threadImage.setBackgroundColor(mContext.getResources().getColor(colors[1]));
         }
 
+    }
+
+    public void deactivateVotes(ThreadListAdapter.MyViewHolder holder){
+        // deactivate the vote buttons
+        holder.likeBtn.setImageResource(R.drawable.ic_like_disabled);
+        holder.likeBtn.setEnabled(false);
+
+        holder.unlikeBtn.setImageResource(R.drawable.ic_unlike_disabled);
+        holder.unlikeBtn.setEnabled(false);
+    }
+
+    public void activateVotes(ThreadListAdapter.MyViewHolder holder){
+        // deactivate the vote buttons
+        holder.likeBtn.setImageResource(R.drawable.ic_like);
+        holder.likeBtn.setEnabled(true);
+
+        holder.unlikeBtn.setImageResource(R.drawable.ic_unlike);
+        holder.unlikeBtn.setEnabled(true);
     }
 
     @Override
