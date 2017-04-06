@@ -1,5 +1,7 @@
 package com.sparq.application.userinterface.model;
 
+import android.util.Log;
+
 import com.sparq.util.Constants;
 
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ public class QuestionItem {
     private double totalMarks;
     private int votes;
     private boolean hasVoted;
+    private boolean isMainQuestion;
     private ArrayList<String> options;
 
     public QuestionItem(int questionId, int questionareId, String question, FORMAT format, double totalMarks, int votes) {
@@ -44,12 +47,15 @@ public class QuestionItem {
         this.votes = votes;
         this.hasVoted = false;
 
+        Log.i("format", getFormatAsString(format));
+
     }
 
     public QuestionItem(int questionId, int questionareId, String question, FORMAT format, double totalMarks,
                         ArrayList<String> options, int votes) {
         this(questionId, questionareId, question, format, totalMarks, votes);
 
+        Log.i("format", getFormatAsString(format));
         switch(getFormat()){
             case MCQ_SINGLE:
             case MCQ_MULTIPLE:
@@ -64,6 +70,14 @@ public class QuestionItem {
 
     public void setQuestionId(int questionId) {
         this.questionId = questionId;
+    }
+
+    public boolean isMainQuestion() {
+        return isMainQuestion;
+    }
+
+    public void setMainQuestion(boolean mainQuestion) {
+        isMainQuestion = mainQuestion;
     }
 
     public int getQuestionareId() {
@@ -96,6 +110,21 @@ public class QuestionItem {
 
     public void setFormat(FORMAT format) {
         this.format = format;
+    }
+
+    public static String getFormatAsString(FORMAT format){
+        switch(format){
+            case MCQ_SINGLE:
+                return "Single Choice MCQs";
+            case MCQ_MULTIPLE:
+                return "Multiple Choice MCQs";
+            case ONE_WORD:
+                return "One Word Answer Questions";
+            case SHORT:
+                return "Short Answer Questions";
+        }
+
+        return null;
     }
 
     public int getVotes(){

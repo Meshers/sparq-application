@@ -1,64 +1,100 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:focusable="true"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp"
-    android:clickable="true"
-    android:background="@color/white"
-    android:orientation="horizontal">
+    android:orientation="vertical"
+    android:tag="cards main container">
 
-
-    <LinearLayout
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_view"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp">
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight=".3">
+            android:layout_width="match_parent"
+            android:padding="10dp"
+            android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/event_image"
-                android:layout_width="50dp"
-                android:layout_height="50dp" />
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/question_image"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_weight=".01">
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:layout_weight="1">
+                <!--<ImageView-->
+                <!--android:id="@+id/thread_image"-->
+                <!--android:layout_width="20dp"-->
+                <!--android:layout_height="match_parent" />-->
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/questionare_option"
-                android:textColor="@color/primaryText"
-                android:textSize="16dp"
-                android:text="NAME"
-                android:textStyle="bold"
-                android:layout_alignParentTop="true"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight=".1">
-
-            <ImageView
-                android:id="@+id/year"
-                android:layout_width="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_alignParentRight="true"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_cancel"/>
+                android:orientation="vertical"
+                android:layout_weight="1">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="10dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="5dp"
+                    >
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:id="@+id/question_name"
+                            android:textColor="@color/primaryText"
+                            android:textSize="16dp"
+                            android:text="NAME"
+                            android:textStyle="bold"
+                            android:layout_alignParentTop="true"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/question_format"
+                            android:textSize="10dp"
+                            android:text="Format"
+                            android:gravity="center_vertical"
+                            android:textColor="@color/secondaryText"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:layout_weight=".1">
+
+                        <ImageView
+                            android:id="@+id/question_delete"
+                            android:layout_width="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:gravity="center_vertical"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_cancel"/>
+
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
         </LinearLayout>
 
-    </LinearLayout>
-</RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

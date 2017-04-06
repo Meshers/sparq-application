@@ -51,6 +51,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".application.userinterface.NewQuestionareActicity"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             android:label="@string/title_activity_new_questionare_acticity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

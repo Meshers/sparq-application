@@ -136,28 +136,28 @@ public class EventActivity extends AppCompatActivity {
         newPoll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent(EventActivity.this, Main2Activity.class);
-//                intent.putExtra(NewQuestionareActicity.QUESTIONARE_TYPE, Questionare.QUESTIONARE_TYPE.POLL);
-//                startActivity(intent);
+                Intent intent = new Intent(EventActivity.this, NewQuestionareActicity.class);
+                intent.putExtra(NewQuestionareActicity.QUESTIONARE_TYPE, Questionare.QUESTIONARE_TYPE.POLL);
+                startActivity(intent);
 
-                ArrayList<String> options = new ArrayList<String>();
-                options.add("oneeee");
-                options.add("two");
-
-                SPARQApplication.sendPollMessage(
-                        ApplicationLayerPdu.TYPE.POLL_QUESTION,
-                        (byte) 41,
-                        "hello world",
-                        1,
-                        1,
-                        1,
-                        SHORT,
-                        null,
-                        0,
-                        false,false, true
-                );
-
-                newEvent.collapse();
+//                ArrayList<String> options = new ArrayList<String>();
+//                options.add("oneeee");
+//                options.add("two");
+//
+//                SPARQApplication.sendPollMessage(
+//                        ApplicationLayerPdu.TYPE.POLL_QUESTION,
+//                        (byte) 41,
+//                        "hello world",
+//                        1,
+//                        1,
+//                        1,
+//                        MCQ_SINGLE,
+//                        options,
+//                        0,
+//                        false,false, true
+//                );
+//
+//                newEvent.collapse();
             }
         });
 
@@ -175,11 +175,11 @@ public class EventActivity extends AppCompatActivity {
                 SPARQApplication.sendPollMessage(
                         ApplicationLayerPdu.TYPE.POLL_ANSWER,
                         (byte) 41,
-                        "hello world i am here",
+                        "1#2#3#4#",
                         1,
                         1,
                         1,
-                        SHORT,
+                        MCQ_SINGLE,
                         null,
                         1,
                         false,false, true
