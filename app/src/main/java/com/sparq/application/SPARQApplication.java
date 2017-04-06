@@ -703,4 +703,8 @@ public class SPARQApplication extends MultiDexApplication {
         return conversationThreads;
     }
 
+    public static ArrayList<PollItem> getPolls(){
+        return polls;
+    }
+
 }

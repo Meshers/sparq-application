@@ -6,115 +6,81 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context="com.sparq.application.userinterface.NewQuestionareActicity">
-
+    <!--image used is downloaded from : https://pixabay.com/en/amsterdam-night-canals-evening-1150319/-->
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar"
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"      >
-
+        android:layout_height="150dp"
+        android:fitsSystemWindows="true"
+        android:theme="@style/AppTheme.AppBarOverlay">
         <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/collapsing_tool_bar_layout"
+            android:id="@+id/toolbar_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:elevation="0dp"
-            app:expandedTitleTextAppearance="@style/Widget.AppCompat.ActionBar.TabText"
-            app:layout_scrollFlags="scroll|enterAlways"
-            app:statusBarScrim="?attr/colorAccent">
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+             <LinearLayout
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:orientation="vertical"
+                 android:layout_marginTop="70dp"
+                 android:layout_marginLeft="10dp"
+                 android:layout_marginRight="10dp">
 
+                 <TextView
+                     android:id="@+id/edit_questionare_name"
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:textSize="30dp"
+                     android:scrollHorizontally="true"
+                     android:ellipsize="end"
+                     android:maxLines="1"
+                     android:textStyle="bold"
+                     android:text="New Questionxxxxxxxxxxxxx"
+                     android:layout_marginBottom="5dp"/>
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar_1"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@color/colorPrimary"
-                android:minHeight="?attr/actionBarSize"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                app:layout_collapseMode="none"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-            </android.support.v7.widget.Toolbar>
+                 <TextView
+                     android:id="@+id/edit_questionare"
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:textSize="16dp"
+                     android:textStyle="bold"
+                     android:text="Edit Question"/>
 
+             </LinearLayout>
         </android.support.design.widget.CollapsingToolbarLayout>
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar_2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:layout_collapseMode="none"
-            app:elevation="0dp"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="32dp"
-                android:paddingBottom="56dp"
-                android:paddingRight="16dp">
-
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/lNameLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/fNameLayout"
-                    android:layout_marginTop="10dp">
-
-                    <EditText
-                        android:id="@+id/questionareName_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ems="10"
-                        android:hint="Name"/>
-                </android.support.design.widget.TextInputLayout>
-
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/lNameLayout2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/fNameLayout"
->
-
-                    <EditText
-                        android:id="@+id/description_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ems="4"
-                        android:hint="Description"/>
-                </android.support.design.widget.TextInputLayout>
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/fNameLayout">
-
-                    <EditText
-                        android:id="@+id/duration_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ems="4"
-                        android:hint="Duration"/>
-                </android.support.design.widget.TextInputLayout>
-
-
-            </LinearLayout>
-        </android.support.v7.widget.Toolbar>
-
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_new_questionare_acticity" />
+
+    <!--<android.support.design.widget.FloatingActionButton-->
+        <!--android:id="@+id/fab"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_margin="@dimen/fab_margin"-->
+        <!--android:src="@android:drawable/ic_dialog_email"-->
+        <!--app:layout_anchor="@id/app_bar"-->
+        <!--app:layout_anchorGravity="bottom|end" />-->
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_new_questonare"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="80dp"
+        app:fab_size="mini"
         app:fab_colorNormal="@color/colorAccent"
-        android:layout_gravity="center|end"
-        android:layout_margin="16dp"
-        app:fab_addButtonPlusIconColor="@color/white"
-        app:fab_colorPressed="@color/colorAccentDark"/>
+        app:fab_title="Create Quiz"
+        app:fab_colorPressed="@color/colorAccentDark"
+        app:layout_anchor="@id/app_bar"
+        app:layout_anchorGravity="bottom|end" />
+
+    <com.getbase.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_questionare"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fab_colorNormal="@color/colorAccent"
+        app:fab_colorPressed="@color/colorAccentDark"
+        app:layout_anchor="@id/app_bar"
+        android:src="@drawable/ic_play"
+        app:layout_anchorGravity="bottom|end" />
 
 </android.support.design.widget.CoordinatorLayout>
