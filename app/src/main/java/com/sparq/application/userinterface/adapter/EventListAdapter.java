@@ -25,8 +25,8 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.MyVi
 
         public MyViewHolder(View view) {
             super(view);
-//            eventName = (TextView) view.findViewById(R.id.event_name);
-//            eventDate = (TextView) view.findViewById(R.id.event_date);
+//            questionName = (TextView) view.findViewById(R.id.event_name);
+//            questionFormat = (TextView) view.findViewById(R.id.event_date);
             eventImage = (ImageView) view.findViewById(R.id.event_image);
         }
     }

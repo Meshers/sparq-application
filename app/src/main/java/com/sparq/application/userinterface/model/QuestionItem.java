@@ -98,6 +98,21 @@ public class QuestionItem {
         this.format = format;
     }
 
+    public static String getFormatAsString(FORMAT format){
+        switch(format){
+            case MCQ_SINGLE:
+                return "Single Choice MCQs";
+            case MCQ_MULTIPLE:
+                return "Multiple Choice MCQs";
+            case ONE_WORD:
+                return "One Word Answer Questions";
+            case SHORT:
+                return "Short Answer Questions";
+        }
+
+        return null;
+    }
+
     public int getVotes(){
         return this.votes;
     }

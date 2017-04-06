@@ -151,8 +151,8 @@ public class EventActivity extends AppCompatActivity {
                         1,
                         1,
                         1,
-                        SHORT,
-                        null,
+                        MCQ_SINGLE,
+                        options,
                         0,
                         false,false, true
                 );
@@ -175,11 +175,11 @@ public class EventActivity extends AppCompatActivity {
                 SPARQApplication.sendPollMessage(
                         ApplicationLayerPdu.TYPE.POLL_ANSWER,
                         (byte) 41,
-                        "hello world i am here",
+                        "1#2#3#4#",
                         1,
                         1,
                         1,
-                        SHORT,
+                        MCQ_SINGLE,
                         null,
                         1,
                         false,false, true
