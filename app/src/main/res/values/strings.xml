@@ -27,6 +27,9 @@
         <item>Short Answer</item>
     </string-array>
 
+    <string name="enter_option">Enter an option</string>
+    <string name="more_options">Should have more options</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Welcome to SPARQ. Hope you like the ad-hoc response system
         we have built as part of our final semester project.

@@ -55,6 +55,7 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
             }
         });
 
+        // FIXME: 4/7/2017 We need a better solution than this when the size becomes 0 throws nullpointerexception if everything is deleted
         if(options.size() == 1){
             holder.deleteOption.setEnabled(false);
         }
@@ -69,4 +70,5 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
     public ArrayList<String> getOptions(){
         return this.options;
     }
+
 }

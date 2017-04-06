@@ -18,35 +18,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
-             <LinearLayout
-                 android:layout_width="match_parent"
-                 android:layout_height="wrap_content"
-                 android:orientation="vertical"
-                 android:layout_marginTop="70dp"
-                 android:layout_marginLeft="10dp"
-                 android:layout_marginRight="10dp">
-
-                 <TextView
-                     android:id="@+id/edit_questionare_name"
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"
-                     android:textSize="30dp"
-                     android:scrollHorizontally="true"
-                     android:ellipsize="end"
-                     android:maxLines="1"
-                     android:textStyle="bold"
-                     android:text="New Questionxxxxxxxxxxxxx"
-                     android:layout_marginBottom="5dp"/>
-
-                 <TextView
-                     android:id="@+id/edit_questionare"
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"
-                     android:textSize="16dp"
-                     android:textStyle="bold"
-                     android:text="Edit Question"/>
-
-             </LinearLayout>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/MyToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="parallax" />
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
@@ -70,6 +46,7 @@
         app:fab_colorNormal="@color/colorAccent"
         app:fab_title="Create Quiz"
         app:fab_colorPressed="@color/colorAccentDark"
+        android:src="@drawable/ic_add"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end" />
 
@@ -80,7 +57,7 @@
         app:fab_colorNormal="@color/colorAccent"
         app:fab_colorPressed="@color/colorAccentDark"
         app:layout_anchor="@id/app_bar"
-        android:src="@drawable/ic_play"
+        android:src="@drawable/ic_arrow_right"
         app:layout_anchorGravity="bottom|end" />
 
 </android.support.design.widget.CoordinatorLayout>

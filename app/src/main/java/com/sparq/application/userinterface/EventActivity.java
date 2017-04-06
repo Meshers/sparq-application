@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
 
 import static com.sparq.application.SPARQApplication.SPARQInstance;
+import static com.sparq.application.SPARQApplication.getUserType;
 import static com.sparq.application.userinterface.model.QuestionItem.FORMAT.MCQ_MULTIPLE;
 import static com.sparq.application.userinterface.model.QuestionItem.FORMAT.MCQ_SINGLE;
 import static com.sparq.application.userinterface.model.QuestionItem.FORMAT.ONE_WORD;
@@ -128,19 +129,32 @@ public class EventActivity extends AppCompatActivity {
     public void initializeViews(){
 
         // TODO: handle the view when user logs in as student. Donot allow him to dreate polls. Disable the newPoll fab in Event Activity. Use the USER_TYPE enum in SPARQ to check the usr type
-        newEvent = (FloatingActionsMenu) findViewById(R.id.fab);
 
-        newQuiz = (FloatingActionButton) findViewById(R.id.fab_new_quiz);
+        SPARQApplication.USER_TYPE userType = getUserType();
+
+        newEvent = (FloatingActionsMenu) findViewById(R.id.fab);
         newPoll = (FloatingActionButton) findViewById(R.id.fab_new_poll);
+        newQuiz = (FloatingActionButton) findViewById(R.id.fab_new_quiz);
         newConvThread = (FloatingActionButton) findViewById(R.id.fab_new_thread);
 
-        newPoll.setOnClickListener(new View.OnClickListener() {
+        newConvThread.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(EventActivity.this, NewQuestionareActicity.class);
-                intent.putExtra(NewQuestionareActicity.QUESTIONARE_TYPE, Questionare.QUESTIONARE_TYPE.POLL);
-                startActivity(intent);
+                openDialog();
+                newEvent.collapse();
+            }
+        });
 
+        switch (userType){
+            case TEACHER:
+                newPoll.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(EventActivity.this, NewQuestionareActicity.class);
+                        intent.putExtra(NewQuestionareActicity.QUESTIONARE_TYPE, Questionare.QUESTIONARE_TYPE.POLL);
+                        startActivity(intent);
+
+                        // FIXME: 4/6/2017 
 //                ArrayList<String> options = new ArrayList<String>();
 //                options.add("oneeee");
 //                options.add("two");
@@ -159,45 +173,46 @@ public class EventActivity extends AppCompatActivity {
 //                );
 //
 //                newEvent.collapse();
-            }
-        });
+                    }
+                });
 
-        newQuiz.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                newQuiz.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
 //                Intent intent = new Intent(EventActivity.this, Main2Activity.class);
 //                intent.putExtra(NewQuestionareActicity.QUESTIONARE_TYPE, Questionare.QUESTIONARE_TYPE.POLL);
 //                startActivity(intent);
 
-                ArrayList<String> options = new ArrayList<String>();
-                options.add("oneeee");
-                options.add("two");
+                        // FIXME: 4/6/2017
+                        ArrayList<String> options = new ArrayList<String>();
+                        options.add("oneeee");
+                        options.add("two");
 
-                SPARQApplication.sendPollMessage(
-                        ApplicationLayerPdu.TYPE.POLL_ANSWER,
-                        (byte) 41,
-                        "1#2#3#4#",
-                        1,
-                        1,
-                        1,
-                        MCQ_SINGLE,
-                        null,
-                        1,
-                        false,false, true
-                );
+                        SPARQApplication.sendPollMessage(
+                                ApplicationLayerPdu.TYPE.POLL_ANSWER,
+                                (byte) 41,
+                                "1#2#3#4#",
+                                1,
+                                1,
+                                1,
+                                MCQ_SINGLE,
+                                null,
+                                1,
+                                false,false, true
+                        );
 
-                newEvent.collapse();
-            }
-        });
+                        newEvent.collapse();
+                    }
+                });
 
-        newConvThread.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openDialog();
-
-                newEvent.collapse();
-            }
-        });
+                break;
+            case STUDENT:
+                newPoll.setVisibility(View.GONE);
+                newQuiz.setVisibility(View.GONE);
+                break;
+            default:
+                throw new IllegalArgumentException("Illegal user type.");
+        }
 
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
@@ -305,7 +320,6 @@ public class EventActivity extends AppCompatActivity {
 
             //Checks if the timer has elapsed, if it has the buttons can be active again
             if(SPARQApplication.isTimerElapsed()){
-                Log.i(TAG, "onResume: " + SPARQApplication.isTimerElapsed());
                 newEvent.setEnabled(true);
             }
             else {
@@ -317,8 +331,6 @@ public class EventActivity extends AppCompatActivity {
     @Override
     public void onPause(){
         super.onPause();
-
-        Log.i(TAG, "onPause");
 
         if (isReceiverRegistered) {
             unregisterReceiver(timerReceiver);
@@ -343,7 +355,6 @@ public class EventActivity extends AppCompatActivity {
 
                 Rect outRect = new Rect();
                 newEvent.getGlobalVisibleRect(outRect);
-
 
                 if(!outRect.contains((int)event.getRawX(), (int)event.getRawY()))
                     newEvent.collapse();
