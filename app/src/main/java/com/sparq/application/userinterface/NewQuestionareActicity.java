@@ -77,6 +77,8 @@ public class NewQuestionareActicity extends AppCompatActivity {
 
     public void initializeViews(){
 
+        // TODO: in the view, remove the "edit option" over the blue area. Relpace the textview in the collapsable layout with a toolbar as present in activity_questionare.xml_
+
         newQuestion = (FloatingActionButton) findViewById(R.id.fab_new_questonare);
         newQuestion.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,6 +117,8 @@ public class NewQuestionareActicity extends AppCompatActivity {
     }
 
     public void openNewQuestionDalog(){
+
+        // TODO: donot allow users leave options blank if they choose MCQs. Atleast 1 option should exist
 
         final String[] SPINNERLIST = {
                 "Single Choice MCQ",
@@ -227,6 +231,10 @@ public class NewQuestionareActicity extends AppCompatActivity {
 
     public void sendPollMessage(ApplicationLayerPdu.TYPE type, byte toAddr, PollItem poll){
 
+        /**
+         * TODO: set a timer to call the sendPoll from NewQuestionareActivity for each question. the timer should have a gap of 12s.
+         * alternatively u can change it in SPARQApplication
+         */
         ArrayList<QuestionItem> questions = new ArrayList<>(poll.getQuestions().values());
         int i = 0;
         for(; i < questions.size() - 1; i++){

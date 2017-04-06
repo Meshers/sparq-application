@@ -56,8 +56,8 @@ public class NewPollActivity extends AppCompatActivity {
             }
         });
 
-        pollNameText = (EditText) findViewById(R.id.questionareName_text);
-        descriptionText = (EditText) findViewById(R.id.description_text);
+//        pollNameText = (EditText) findViewById(R.id.questionareName_text);
+//        descriptionText = (EditText) findViewById(R.id.description_text);
         durationText = (EditText) findViewById(R.id.duration_text);
         questions = (RecyclerView) findViewById(R.id.questionare_recycler_view);
     }

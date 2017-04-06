@@ -127,6 +127,7 @@ public class EventActivity extends AppCompatActivity {
 
     public void initializeViews(){
 
+        // TODO: handle the view when user logs in as student. Donot allow him to dreate polls. Disable the newPoll fab in Event Activity. Use the USER_TYPE enum in SPARQ to check the usr type
         newEvent = (FloatingActionsMenu) findViewById(R.id.fab);
 
         newQuiz = (FloatingActionButton) findViewById(R.id.fab_new_quiz);

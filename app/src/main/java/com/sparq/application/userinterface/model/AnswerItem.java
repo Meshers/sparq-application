@@ -63,6 +63,15 @@ public class AnswerItem implements Serializable{
         this.answerId = answerId;
     }
 
+
+    public QuestionItem.FORMAT getFormat() {
+        return format;
+    }
+
+    public void setFormat(QuestionItem.FORMAT format) {
+        this.format = format;
+    }
+
     public int getQuestionItemId() {
         return questionItemId;
     }
@@ -92,7 +101,7 @@ public class AnswerItem implements Serializable{
 
         String answers = "";
         for(Integer answer: answerChoices){
-            answers += String.valueOf(answer) + ",";
+            answers += String.valueOf(answer) + "#";
         }
 
         return answers;
@@ -137,9 +146,12 @@ public class AnswerItem implements Serializable{
     public static AnswerItem getMCQSingleAnswer(int answerId, UserItem answerCreator, int questionItemId, UserItem questionCreator,
                                                 String answerChoice){
 
-        answerChoice = answerChoice.substring(0, answerChoice.length()-1);
-        ArrayList<Integer> answer = new ArrayList<>();
-        answer.add(Integer.parseInt(answerChoice));
+        ArrayList<Integer> answer = null;
+        if(answerChoice != null){
+            answerChoice = answerChoice.substring(0, answerChoice.length()-1);
+            answer = new ArrayList<>();
+            answer.add(Integer.parseInt(answerChoice));
+        }
 
         return new AnswerItem(
                 answerId,
@@ -156,12 +168,16 @@ public class AnswerItem implements Serializable{
     public static AnswerItem getMCQMultipleAnswer(int answerId, UserItem answerCreator, int questionItemId, UserItem questionCreator,
                                                 String answerChoices){
 
-        answerChoices = answerChoices.substring(0, answerChoices.length()-1);
-        String[] splitChoices = answerChoices.split("#");
-        ArrayList<Integer> answer = new ArrayList<>();
+        ArrayList<Integer> answer = null;
 
-        for(String splitChoice: splitChoices){
-            answer.add(Integer.parseInt(splitChoice));
+        if(answerChoices != null){
+            answerChoices = answerChoices.substring(0, answerChoices.length()-1);
+            String[] splitChoices = answerChoices.split("#");
+            answer = new ArrayList<>();
+
+            for(String splitChoice: splitChoices){
+                answer.add(Integer.parseInt(splitChoice));
+            }
         }
 
         return new AnswerItem(

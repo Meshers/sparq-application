@@ -1,7 +1,9 @@
 package com.sparq.application.userinterface.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +14,15 @@ import android.widget.TextView;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.sparq.R;
+import com.sparq.application.userinterface.ConverstaionThreadActivity;
+import com.sparq.application.userinterface.QuestionareActivity;
+import com.sparq.application.userinterface.model.ConversationThread;
 import com.sparq.application.userinterface.model.PollItem;
+import com.sparq.application.userinterface.model.Questionare;
 
 import java.util.List;
+
+import static com.sparq.application.userinterface.model.Questionare.QUESTIONARE_TYPE.POLL;
 
 /**
  * Created by sarahcs on 2/25/2017.
@@ -30,6 +38,7 @@ public class PollListAdapter extends RecyclerView.Adapter<PollListAdapter.MyView
         public TextView pollDate;
         public ImageView pollImage;
         public ImageView pollStatusImage;
+        public CardView cardView;
 
         public MyViewHolder(View view) {
             super(view);
@@ -37,6 +46,7 @@ public class PollListAdapter extends RecyclerView.Adapter<PollListAdapter.MyView
             pollDate = (TextView) view.findViewById(R.id.poll_date);
             pollImage = (ImageView) view.findViewById(R.id.poll_image);
             pollStatusImage = (ImageView) view.findViewById(R.id.poll_status);
+            cardView = (CardView) view.findViewById(R.id.card_view);
         }
     }
 
@@ -56,17 +66,29 @@ public class PollListAdapter extends RecyclerView.Adapter<PollListAdapter.MyView
 
     @Override
     public void onBindViewHolder(PollListAdapter.MyViewHolder holder, int position) {
-        PollItem poll = polls.get(position);
+        final PollItem poll = polls.get(position);
         holder.pollName.setText(poll.getName());
         holder.pollDate.setText(poll.getDate().toString());
 
-        ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
-        // generate color based on a key (same key returns the same color), useful for list/grid views
-        int color = generator.getColor(poll.getName());
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-        TextDrawable drawable = TextDrawable.builder()
-                .buildRound(String.valueOf(poll.getName().charAt(0)), color);
-        holder.pollImage.setImageDrawable(drawable);
+                Intent intent = new Intent(mContext, QuestionareActivity.class);
+                intent.putExtra(QuestionareActivity.QUESTIONARE_TYPE, POLL);
+                intent.putExtra(QuestionareActivity.QUESTIONARE_ID, poll.getQuestionareId());
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                mContext.startActivity(intent);
+            }
+        });
+
+//        ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
+//        // generate color based on a key (same key returns the same color), useful for list/grid views
+//        int color = generator.getColor(poll.getName());
+//
+//        TextDrawable drawable = TextDrawable.builder()
+//                .buildRound(String.valueOf(poll.getName().charAt(0)), color);
+//        holder.pollImage.setImageDrawable(drawable);
 
         switch(poll.getState()){
             case PLAY:

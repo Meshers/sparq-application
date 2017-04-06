@@ -15,7 +15,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sparq.R;
+import com.sparq.application.SPARQApplication;
 import com.sparq.application.userinterface.adapter.AnswerListAdapter;
+import com.sparq.application.userinterface.adapter.QuestionAnswerListAdapter;
 import com.sparq.application.userinterface.adapter.QuestionareAdapter;
 import com.sparq.application.userinterface.adapter.RecyclerItemClickListener;
 import com.sparq.application.userinterface.model.AnswerItem;
@@ -33,16 +35,18 @@ import java.util.HashMap;
 public class QuestionareActivity extends AppCompatActivity {
 
     private TextView timer;
-    private TextView questionText;
-    private View layoutShortAns;
-    private RecyclerView recyclerView;
-    private TextView answerText;
+    private RecyclerView questionView;
+    private com.getbase.floatingactionbutton.FloatingActionButton submitAnswers;
+
 
     private Questionare questionare;
     private HashMap<Integer, QuestionItem> questions;
-    private QuestionareAdapter mAdapter;
+    private QuestionAnswerListAdapter mAdapter;
+    private int questionareId;
     private Questionare.QUESTIONARE_TYPE type;
 
+    public static final String QUESTIONARE_TYPE = "questionare_type";
+    public static final String QUESTIONARE_ID = "questionare_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +56,13 @@ public class QuestionareActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         Bundle bundle = getIntent().getExtras();
-        type = (Questionare.QUESTIONARE_TYPE) bundle.getSerializable("type");
+        if(bundle != null){
+            questionareId = bundle.getInt(QUESTIONARE_ID);
+            type = (Questionare.QUESTIONARE_TYPE) bundle.getSerializable(QUESTIONARE_TYPE);
+        }
 
         timer = (TextView) findViewById(R.id.count_down_timer);
-        questionText = (TextView) findViewById(R.id.question_text);
-        layoutShortAns = (View) findViewById(R.id.layout_short_ans);
-        recyclerView = (RecyclerView) findViewById(R.id.questionare_recycler_view);
-        answerText = (TextView) findViewById(R.id.answer_text);
+
 
         // get the quiz / poll object
         questionare = getData(type);
@@ -66,26 +70,7 @@ public class QuestionareActivity extends AppCompatActivity {
         // get questions related to a particular quiz or poll
         questions = questionare.getQuestions();
 
-        mAdapter = new QuestionareAdapter(
-                new ArrayList<String>(questionare.getQuestions().get(0).getOptions()), questionare.getType()
-        );
-
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int a =  (displaymetrics.heightPixels*45)/100;
-        recyclerView.getLayoutParams().height =a;
-
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
-
-        recyclerView.addOnItemTouchListener( new RecyclerItemClickListener(QuestionareActivity.this, new RecyclerItemClickListener.OnItemClickListener() {
-            @Override public void onItemClick(View view, int position) {
-
-
-            }
-        }));
+        initializeViews();
 
         switch(questionare.getType()){
             case QUIZ:
@@ -98,6 +83,29 @@ public class QuestionareActivity extends AppCompatActivity {
                 break;
         }
 
+
+    }
+
+    public void initializeViews(){
+
+
+        questionView = (RecyclerView) findViewById(R.id.question_recycler_view);
+        submitAnswers = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.submit_answers);
+
+        ArrayList<QuestionItem> questionsArray = new ArrayList<>(questions.values());
+        mAdapter = new QuestionAnswerListAdapter(QuestionareActivity.this, questionsArray);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(QuestionareActivity.this);
+        questionView.setLayoutManager(mLayoutManager);
+        questionView.setItemAnimator(new DefaultItemAnimator());
+        questionView.setAdapter(mAdapter);
+
+        submitAnswers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAdapter.getAnswerForQuestion();
+                finish();
+            }
+        });
 
     }
 
@@ -116,15 +124,10 @@ public class QuestionareActivity extends AppCompatActivity {
 //                        new QuestionItem(0, 1, "Do you like the app?", 1, , options1, Constants.INITIAL_VOTE_COUNT)
 //                );
 //
-//                return quiz;
+                return null;
             case POLL:
-//                PollItem poll = new PollItem(1,1,"Quiz 0", "blah blah", new Date(11,12,2011), 2, user);
-//                HashMap<Integer, String> options2 = new HashMap<Integer, String>();
-//                options2.put(0, "YES");
-//                options2.put(1, "NO");
-//                poll.addQuestionToList(0, 1, "Do you like the app?", 1, 1, options2, Constants.INITIAL_VOTE_COUNT);
-//
-//                return poll;
+
+                return SPARQApplication.getPoll(questionareId);
         }
 
         return null;

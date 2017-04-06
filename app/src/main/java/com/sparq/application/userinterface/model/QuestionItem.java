@@ -47,15 +47,12 @@ public class QuestionItem {
         this.votes = votes;
         this.hasVoted = false;
 
-        Log.i("format", getFormatAsString(format));
-
     }
 
     public QuestionItem(int questionId, int questionareId, String question, FORMAT format, double totalMarks,
                         ArrayList<String> options, int votes) {
         this(questionId, questionareId, question, format, totalMarks, votes);
 
-        Log.i("format", getFormatAsString(format));
         switch(getFormat()){
             case MCQ_SINGLE:
             case MCQ_MULTIPLE:

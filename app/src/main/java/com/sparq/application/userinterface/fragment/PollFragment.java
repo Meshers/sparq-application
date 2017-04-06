@@ -22,7 +22,9 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.sparq.R;
+import com.sparq.application.SPARQApplication;
 import com.sparq.application.userinterface.EventActivity;
+import com.sparq.application.userinterface.NotifyPollHandler;
 import com.sparq.application.userinterface.adapter.DialogListAdapter;
 import com.sparq.application.userinterface.adapter.PollListAdapter;
 import com.sparq.application.userinterface.adapter.QuizListAdapter;
@@ -88,7 +90,7 @@ public class PollFragment extends Fragment {
 
         initializeView(view);
 
-        pollsArrayList = getData();
+        pollsArrayList = SPARQApplication.getPolls();
 
         mAdapter = new PollListAdapter(getActivity(),pollsArrayList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -96,23 +98,23 @@ public class PollFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
-        recyclerView.addOnItemTouchListener( new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
-            @Override public void onItemClick(View view, int position) {
-
-                PollItem poll =  pollsArrayList.get(position);
-
-                if(poll.getCreator().getUserType() == 0){
-                    showStateDialog(poll, view);
-                }
-                else if(poll.getState() == PollItem.POLL_STATE.PLAY){
-
-                    Intent intent = new Intent(getActivity(), EventActivity.class);
-                    intent.putExtra("type", 1);
-                    startActivity(intent);
-                }
-
-            }
-        }));
+//        recyclerView.addOnItemTouchListener( new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
+//            @Override public void onItemClick(View view, int position) {
+//
+//                PollItem poll =  pollsArrayList.get(position);
+//
+//                if(poll.getCreator().getUserType() == 0){
+//                    showStateDialog(poll, view);
+//                }
+//                else if(poll.getState() == PollItem.POLL_STATE.PLAY){
+//
+//                    Intent intent = new Intent(getActivity(), EventActivity.class);
+//                    intent.putExtra("type", 1);
+//                    startActivity(intent);
+//                }
+//
+//            }
+//        }));
 
         return view;
     }
@@ -122,29 +124,29 @@ public class PollFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.poll_recycler_view);
     }
 
-    public ArrayList<PollItem> getData(){
-
-        ArrayList<PollItem> polls = new ArrayList<PollItem>();
-
-        UserItem user = new UserItem();
-
-        for(int i = 0; i < 10; i++){
-
-//            PollItem poll = new PollItem(
-//                    i,
-//                    0,
-//                    "Poll "+i,
-//                    "this is a description",
-//                    new Date(2011,2,3),
-//                    0,
-//                    user);
+//    public ArrayList<PollItem> getData(){
 //
-//            polls.add(poll);
-        }
-
-        return polls;
-
-    }
+//        ArrayList<PollItem> polls = new ArrayList<PollItem>();
+//
+//        UserItem user = new UserItem();
+//
+//        for(int i = 0; i < 10; i++){
+//
+////            PollItem poll = new PollItem(
+////                    i,
+////                    0,
+////                    "Poll "+i,
+////                    "this is a description",
+////                    new Date(2011,2,3),
+////                    0,
+////                    user);
+////
+////            polls.add(poll);
+//        }
+//
+//        return polls;
+//
+//    }
 
     @Override
     public void onAttach(Context context) {
@@ -204,6 +206,27 @@ public class PollFragment extends Fragment {
         adapter.setCallbacks(itemCallback, dialog);
 
         RecyclerView list = dialog.getRecyclerView();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        NotifyPollHandler pollHandler = new NotifyPollHandler() {
+            @Override
+            public void handlePollQuestions() {
+                mAdapter = new PollListAdapter(getActivity(),pollsArrayList);
+                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+                recyclerView.setLayoutManager(mLayoutManager);
+                recyclerView.setItemAnimator(new DefaultItemAnimator());
+                recyclerView.setAdapter(mAdapter);
+            }
+
+            @Override
+            public void handlePollAnswers() {
+                // do nothing
+            }
+        };
     }
 
 }

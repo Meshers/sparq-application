@@ -16,6 +16,7 @@ import com.sparq.application.layer.almessage.AlPollQuestion;
 import com.sparq.application.layer.almessage.AlQuestion;
 import com.sparq.application.layer.almessage.AlVote;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
+import com.sparq.application.userinterface.NotifyPollHandler;
 import com.sparq.application.userinterface.NotifyUIHandler;
 import com.sparq.application.userinterface.model.AnswerItem;
 import com.sparq.application.userinterface.model.ConversationThread;
@@ -61,6 +62,7 @@ public class SPARQApplication extends MultiDexApplication {
 
     //handlers
     static NotifyUIHandler uihandler;
+    static NotifyPollHandler pollhandler;
 
     //timers
     private static CountDownTimer uiTimer;
@@ -197,6 +199,14 @@ public class SPARQApplication extends MultiDexApplication {
         }
     }
 
+    public static void notifyPoll(){
+
+        if(pollhandler != null){
+            pollhandler.handlePollQuestions();
+            pollhandler.handlePollAnswers();
+        }
+    }
+
     public static void handlePackets(ApplicationLayerPdu.TYPE type, AlMessage alMessage){
 
         PollItem poll;
@@ -265,6 +275,11 @@ public class SPARQApplication extends MultiDexApplication {
                     poll.setName(alPollQuestion.getQuestionDataAsString());
                 }
 
+                if(alPollQuestion.isEndOfPoll()){
+                    //notify the handler
+                    notifyPoll();
+                }
+
                 break;
             case POLL_ANSWER:
 
@@ -288,9 +303,9 @@ public class SPARQApplication extends MultiDexApplication {
                     case MCQ_SINGLE:
                         pollAnswer = AnswerItem.getMCQSingleAnswer(
                                 alPollAnswer.getQuestionId(),
-                                new UserItem(alPollAnswer.getQuestionCreatorId()),
-                                alPollAnswer.getQuestionId(),
                                 new UserItem(alPollAnswer.getAnswerCreatorId()),
+                                alPollAnswer.getQuestionId(),
+                                new UserItem(alPollAnswer.getQuestionCreatorId()),
                                 alPollAnswer.getAnswerChoicesAsString()
                         );
 
@@ -298,9 +313,9 @@ public class SPARQApplication extends MultiDexApplication {
                     case MCQ_MULTIPLE:
                         pollAnswer = AnswerItem.getMCQMultipleAnswer(
                                 alPollAnswer.getQuestionId(),
-                                new UserItem(alPollAnswer.getQuestionCreatorId()),
-                                alPollAnswer.getQuestionId(),
                                 new UserItem(alPollAnswer.getAnswerCreatorId()),
+                                alPollAnswer.getQuestionId(),
+                                new UserItem(alPollAnswer.getQuestionCreatorId()),
                                 alPollAnswer.getAnswerChoicesAsString()
                         );
 
@@ -308,24 +323,26 @@ public class SPARQApplication extends MultiDexApplication {
                     case ONE_WORD:
                         pollAnswer = AnswerItem.getMCQOneWordAnswer(
                                 alPollAnswer.getQuestionId(),
-                                new UserItem(alPollAnswer.getQuestionCreatorId()),
-                                alPollAnswer.getQuestionId(),
                                 new UserItem(alPollAnswer.getAnswerCreatorId()),
+                                alPollAnswer.getQuestionId(),
+                                new UserItem(alPollAnswer.getQuestionCreatorId()),
                                 alPollAnswer.getAnswerDataAsString()
                         );
                         break;
                     case SHORT:
                         pollAnswer = AnswerItem.getShortAnswer(
                                 alPollAnswer.getQuestionId(),
-                                new UserItem(alPollAnswer.getQuestionCreatorId()),
-                                alPollAnswer.getQuestionId(),
                                 new UserItem(alPollAnswer.getAnswerCreatorId()),
+                                alPollAnswer.getQuestionId(),
+                                new UserItem(alPollAnswer.getQuestionCreatorId()),
                                 alPollAnswer.getAnswerDataAsString()
                         );
                         break;
                 }
 
                 poll.addAnswerToQuestion(alPollAnswer.getQuestionId(), pollAnswer);
+
+                notifyPoll();
 
                 break;
             case QUESTION:
