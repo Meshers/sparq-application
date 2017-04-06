@@ -145,7 +145,7 @@ public class QuestionAnswerListAdapter extends RecyclerView.Adapter<QuestionAnsw
         return questions.size();
     }
 
-    public HashMap<Integer, AnswerItem> getAnswerForQuestion(){
+    public ArrayList<AnswerItem> getAnswerForQuestion(){
 
         for(int questionId: answers.keySet()){
             AnswerItem answer = answers.get(questionId);
@@ -167,6 +167,8 @@ public class QuestionAnswerListAdapter extends RecyclerView.Adapter<QuestionAnsw
             }
         }
 
-        return answers;
+        ArrayList<AnswerItem> answerArray = new ArrayList<AnswerItem>(answers.values());
+
+        return answerArray;
     }
 }

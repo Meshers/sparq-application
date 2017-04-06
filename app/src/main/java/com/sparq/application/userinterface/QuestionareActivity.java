@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
+import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.userinterface.adapter.AnswerListAdapter;
 import com.sparq.application.userinterface.adapter.QuestionAnswerListAdapter;
 import com.sparq.application.userinterface.adapter.QuestionareAdapter;
@@ -102,8 +103,11 @@ public class QuestionareActivity extends AppCompatActivity {
         submitAnswers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mAdapter.getAnswerForQuestion();
+
+                sendPollMessage( mAdapter.getAnswerForQuestion());
                 finish();
+
+//                ((PollItem) questionare).addAnswerArrayToQuestion(questionareId, answersArray);
             }
         });
 
@@ -136,6 +140,45 @@ public class QuestionareActivity extends AppCompatActivity {
     public void callTimer(){
         //set a timer here
 
+    }
+
+    public void sendPollMessage(ArrayList<AnswerItem> answers){
+
+        /**
+         * TODO: set a timer to call the sendPoll from NewQuestionareActivity for each question. the timer should have a gap of 12s.
+         * alternatively u can change it in SPARQApplication
+         */
+
+        for(AnswerItem answer: answers){
+
+            String answerMessage = null;
+            switch(answer.getFormat()){
+                case MCQ_SINGLE:
+                case MCQ_MULTIPLE:
+                    answerMessage = answer.getAnswerChoicesAsString();
+                    break;
+                case ONE_WORD:
+                case SHORT:
+                    answerMessage= answer.getAnswer();
+                    break;
+            }
+
+            SPARQApplication.sendPollMessage(
+                    ApplicationLayerPdu.TYPE.POLL_ANSWER,
+                    SPARQApplication.getBdcastAddress(),
+                    answerMessage,
+                    questionareId,
+                    (int) SPARQApplication.getOwnAddress(),
+                    answer.getQuestionItemId(),
+                    answer.getFormat(),
+                    null,
+                    SPARQApplication.getOwnAddress(),
+                    false,
+                    false,
+                    false
+            );
+
+        }
     }
 
 }

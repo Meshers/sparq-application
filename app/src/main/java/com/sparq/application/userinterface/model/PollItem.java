@@ -90,4 +90,13 @@ public class PollItem extends Questionare{
         return false;
     }
 
+    public boolean addAnswerArrayToQuestion(int questionId, ArrayList<AnswerItem> answerList){
+        if(questions.containsKey(questionId)){
+
+            answers.put(questionId, answerList);
+            return true;
+        }
+        return false;
+    }
+
 }

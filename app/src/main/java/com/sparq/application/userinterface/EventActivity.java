@@ -222,7 +222,7 @@ public class EventActivity extends AppCompatActivity {
 
         MaterialDialog dialog = new MaterialDialog.Builder(EventActivity.this)
                 .title(getResources().getString(R.string.new_question))
-                .customView(R.layout.dialog_new_question, true)
+                .customView(R.layout.dialog_new_thread_question, true)
                 .positiveText("POST")
                 .negativeText("CANCEL")
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
