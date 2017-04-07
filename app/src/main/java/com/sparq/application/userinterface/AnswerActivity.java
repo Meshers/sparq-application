@@ -24,6 +24,7 @@ import com.sparq.util.Constants;
 import java.nio.charset.Charset;
 
 import static com.sparq.application.SPARQApplication.SPARQInstance;
+import static com.sparq.application.SPARQApplication.getInstance;
 
 public class AnswerActivity extends AppCompatActivity {
 
@@ -167,7 +168,7 @@ public class AnswerActivity extends AppCompatActivity {
 
                 Toast.makeText(AnswerActivity.this, getResources().getString(R.string.vote_recorded), Toast.LENGTH_SHORT).show();
                 //Re-start the timer to disable buttons
-                SPARQInstance.startTimer();
+                getInstance().startTimer();
             }
         });
 

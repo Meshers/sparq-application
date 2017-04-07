@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
 
 import static com.sparq.application.SPARQApplication.SPARQInstance;
+import static com.sparq.application.SPARQApplication.getInstance;
 import static com.sparq.application.SPARQApplication.getUserType;
 import static com.sparq.application.userinterface.model.QuestionItem.FORMAT.MCQ_MULTIPLE;
 import static com.sparq.application.userinterface.model.QuestionItem.FORMAT.MCQ_SINGLE;
@@ -276,7 +277,7 @@ public class EventActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
 
                             //Re-start timer to disable buttons
-                            SPARQInstance.startTimer();
+                            getInstance().startTimer();
                         }
 
                     }

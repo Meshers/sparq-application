@@ -30,6 +30,7 @@ import com.sparq.util.Constants;
 import java.util.ArrayList;
 
 import static com.sparq.application.SPARQApplication.SPARQInstance;
+import static com.sparq.application.SPARQApplication.getInstance;
 
 public class ConverstaionThreadActivity extends AppCompatActivity {
 
@@ -147,7 +148,7 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
                 );
                 Toast.makeText(ConverstaionThreadActivity.this, getResources().getString(R.string.ans_recorded), Toast.LENGTH_SHORT).show();
                 //Re-start the timer to disable buttons
-                SPARQInstance.startTimer();
+                getInstance().startTimer();
             }
         });
     }
