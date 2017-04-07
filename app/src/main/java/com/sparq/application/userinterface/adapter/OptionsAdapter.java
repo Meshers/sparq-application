@@ -50,21 +50,34 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
         holder.deleteOption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                options.remove(position);
-                notifyItemRemoved(position);
+                if(options.size() > 1){
+                    options.remove(position);
+                    notifyItemRemoved(position);
+                }
+                else {
+                    options = null;
+                    notifyItemRemoved(position);
+                }
+
             }
         });
 
         // FIXME: 4/7/2017 We need a better solution than this when the size becomes 0 throws nullpointerexception if everything is deleted
-        if(options.size() == 1){
+        /*if(options.size() == 1){
             holder.deleteOption.setEnabled(false);
-        }
+        }*/
 
     }
 
     @Override
     public int getItemCount() {
-        return options.size();
+        if(options != null) {
+            return options.size();
+        }
+        else{
+            return 0;
+        }
+
     }
 
     public ArrayList<String> getOptions(){

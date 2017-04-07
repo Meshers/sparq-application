@@ -40,6 +40,7 @@ import com.sparq.util.Constants;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class NewQuestionareActicity extends AppCompatActivity {
 
@@ -134,9 +135,8 @@ public class NewQuestionareActicity extends AppCompatActivity {
         final QuestionItem.FORMAT format[] = new QuestionItem.FORMAT[1];
         format[0] = QuestionItem.getFormatFromByte((byte) 1);
         final OptionsAdapter mAdapter = new OptionsAdapter(options);
-        final boolean[] disableButton = new boolean[1];
 
-        MaterialDialog dialog = new MaterialDialog.Builder(NewQuestionareActicity.this)
+        final MaterialDialog dialog = new MaterialDialog.Builder(NewQuestionareActicity.this)
                 .title("Add a New Question")
                 .customView(R.layout.dialog_new_question, true)
                 .positiveText("ADD")
@@ -150,34 +150,25 @@ public class NewQuestionareActicity extends AppCompatActivity {
                         EditText questionName = (EditText) view.findViewById(R.id.question_text);
                         SwitchCompat mainQuestion = (SwitchCompat) view.findViewById(R.id.switchButton);
 
-                        if(mAdapter.getItemCount() < 2){
+                        QuestionItem newQuestion = new QuestionItem(
+                                questionsArray.size()+1,
+                                newPoll.getQuestionareId(),
+                                questionName.getText().toString(),
+                                format[0],
+                                Constants.MIN_QUESTION_MARKS,
+                                mAdapter.getOptions(),
+                                Constants.INITIAL_VOTE_COUNT
+                        );
+                        questionsArray.put(questionsArray.size()+1, newQuestion);
 
-                            disableButton[0] = true;
-                            // FIXME: 4/7/2017 make the options dialog stay with the toast use disableButton variable
-                            Toast.makeText(NewQuestionareActicity.this, getResources().getString(R.string.more_options),
-                                    Toast.LENGTH_SHORT).show();
+                        //notify dataset changed
+                        mQuestionAdapter.notifyDataSetChanged();
+
+                        if(mainQuestion.isChecked()){
+                            newQuestion.setMainQuestion(true);
+                            newPoll.setName(questionName.getText().toString());
                         }
-                        else{
-                            disableButton[0] = false;
-                            QuestionItem newQuestion = new QuestionItem(
-                                    questionsArray.size()+1,
-                                    newPoll.getQuestionareId(),
-                                    questionName.getText().toString(),
-                                    format[0],
-                                    Constants.MIN_QUESTION_MARKS,
-                                    mAdapter.getOptions(),
-                                    Constants.INITIAL_VOTE_COUNT
-                            );
-                            questionsArray.put(questionsArray.size()+1, newQuestion);
 
-                            //notify dataset changed
-                            mQuestionAdapter.notifyDataSetChanged();
-
-                            if(mainQuestion.isChecked()){
-                                newQuestion.setMainQuestion(true);
-                                newPoll.setName(questionName.getText().toString());
-                            }
-                        }
                     }
                 })
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
@@ -234,20 +225,24 @@ public class NewQuestionareActicity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // FIXME: 4/7/2017 Handle same option being added twice
-                if(option.getText().toString().compareTo("") != 0){
+                if(option.getText().toString().compareTo("") != 0 && options.contains(option.getText().toString()) == false){
                     options.add(option.getText().toString());
                     mAdapter.notifyDataSetChanged();
                     option.setText("");
                 }
 
+                if(mAdapter.getItemCount() > 1){
+                    (dialog).getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                }
             }
         });
+
+        dialog.show();
 
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialog) {
-                Log.i("onShow: ", String.valueOf(disableButton[0]));
-                if(disableButton[0] == true){
+                if(mAdapter.getItemCount() < 2){
                     ((MaterialDialog)dialog).getActionButton(DialogAction.POSITIVE).setEnabled(false);
                 }
                 else{
@@ -256,7 +251,7 @@ public class NewQuestionareActicity extends AppCompatActivity {
             }
         });
 
-        dialog.show();
+
     }
 
     public void sendPollMessage(final ApplicationLayerPdu.TYPE type, final byte toAddr, final PollItem poll){
