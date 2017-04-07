@@ -233,7 +233,7 @@ public class NewQuestionareActicity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // FIXME: 4/7/2017 Disallow placeholder text be an option
-                if(option.getText().toString().compareTo(getResources().getString(R.string.enter_option)) == 0){
+                if(option.getText().toString().compareTo(getResources().getString(R.string.enter_option)) != 0){
                     options.add(option.getText().toString());
                     mAdapter.notifyDataSetChanged();
                     option.setText("");
