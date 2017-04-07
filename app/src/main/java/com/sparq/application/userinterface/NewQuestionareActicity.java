@@ -1,6 +1,7 @@
 package com.sparq.application.userinterface;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -232,8 +233,8 @@ public class NewQuestionareActicity extends AppCompatActivity {
         addOption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // FIXME: 4/7/2017 Disallow placeholder text be an option
-                if(option.getText().toString().compareTo(getResources().getString(R.string.enter_option)) != 0){
+                // FIXME: 4/7/2017 Handle same option being added twice
+                if(option.getText().toString().compareTo("") != 0){
                     options.add(option.getText().toString());
                     mAdapter.notifyDataSetChanged();
                     option.setText("");
@@ -242,12 +243,19 @@ public class NewQuestionareActicity extends AppCompatActivity {
             }
         });
 
-        if(disableButton[0] == true){
-            dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
-        }
-        else{
-            dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
-        }
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                Log.i("onShow: ", String.valueOf(disableButton[0]));
+                if(disableButton[0] == true){
+                    ((MaterialDialog)dialog).getActionButton(DialogAction.POSITIVE).setEnabled(false);
+                }
+                else{
+                    ((MaterialDialog)dialog).getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                }
+            }
+        });
+
         dialog.show();
     }
 
