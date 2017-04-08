@@ -120,8 +120,6 @@ public class NewQuestionareActicity extends AppCompatActivity {
 
     public void openNewQuestionDalog(){
 
-        // TODO: donot allow users leave options blank if they choose MCQs. Atleast 1 option should exist
-
         final String[] SPINNERLIST = {
                 "Single Choice MCQ",
                 "Multiple Choice MCQ",
@@ -148,7 +146,6 @@ public class NewQuestionareActicity extends AppCompatActivity {
                         EditText questionName = (EditText) view.findViewById(R.id.question_text);
                         SwitchCompat mainQuestion = (SwitchCompat) view.findViewById(R.id.switchButton);
 
-<<<<<<< Updated upstream
                         QuestionItem newQuestion = new QuestionItem(
                                 questionsArray.size()+1,
                                 newPoll.getQuestionareId(),
@@ -166,40 +163,9 @@ public class NewQuestionareActicity extends AppCompatActivity {
                         if(mainQuestion.isChecked()){
                             newQuestion.setMainQuestion(true);
                             newPoll.setName(questionName.getText().toString());
-=======
-                        if((format[0] == QuestionItem.FORMAT.MCQ_SINGLE || format[0] == QuestionItem.FORMAT.MCQ_MULTIPLE)
-                                && mAdapter.getItemCount() < 2){
-
-                            disableButton[0] = true;
-                            // FIXME: 4/7/2017 make the options dialog stay with the toast use disableButton variable
-                            Toast.makeText(NewQuestionareActicity.this, getResources().getString(R.string.more_options),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                        else{
-                            disableButton[0] = false;
-                            QuestionItem newQuestion = new QuestionItem(
-                                    questionsArray.size()+1,
-                                    newPoll.getQuestionareId(),
-                                    questionName.getText().toString(),
-                                    format[0],
-                                    Constants.MIN_QUESTION_MARKS,
-                                    mAdapter.getOptions(),
-                                    Constants.INITIAL_VOTE_COUNT
-                            );
-                            questionsArray.put(questionsArray.size()+1, newQuestion);
-
-                            //notify dataset changed
-                            mQuestionAdapter.notifyDataSetChanged();
-
-                            if(mainQuestion.isChecked()){
-                                newQuestion.setMainQuestion(true);
-                                newPoll.setName(questionName.getText().toString());
-                            }
-
-                            dialog.dismiss();
->>>>>>> Stashed changes
                         }
 
+                        dialog.dismiss();
                     }
                 })
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
