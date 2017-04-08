@@ -156,6 +156,13 @@ public class QuestionItem {
         return options;
     }
 
+    public int getOptionsCount(){
+        if(options != null){
+            return options.size();
+        }
+        return 0;
+    }
+
     public void setOptions(ArrayList<String> options) {
         this.options = options;
     }

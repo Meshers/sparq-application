@@ -146,6 +146,8 @@ public class QuestionareAdapter extends RecyclerView.Adapter<QuestionareAdapter.
                             choices.add(clickedPos);
                         else
                             choices.remove(Integer.valueOf(clickedPos));
+
+                        Log.i("HERE", choices.toString());
                     }
                 });
 

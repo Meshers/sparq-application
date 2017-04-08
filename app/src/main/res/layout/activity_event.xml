@@ -50,6 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fab_colorNormal="@color/colorAccent"
+            app:fab_icon="@drawable/ic_quiz_icon"
             app:fab_title="Create Quiz"
             app:fab_size="mini"
             app:fab_colorPressed="@color/colorAccentDark"/>
@@ -60,6 +61,7 @@
             android:layout_height="wrap_content"
             app:fab_colorNormal="@color/colorAccent"
             app:fab_size="mini"
+            app:fab_icon="@drawable/ic_poll_icon"
             app:fab_title="Create Poll"
             app:fab_colorPressed="@color/colorAccentDark"/>
 
@@ -70,6 +72,7 @@
             android:layout_height="wrap_content"
             app:fab_colorNormal="@color/colorAccent"
             app:fab_size="mini"
+            app:fab_icon="@drawable/ic_thread_icon"
             app:fab_title="Post Question"
             app:fab_colorPressed="@color/colorAccentDark"/>
 

@@ -91,7 +91,6 @@ public class NewQuestionareActicity extends AppCompatActivity {
             }
         });
 
-//        questionareNameText = (TextView) findViewById(R.id.edit_questionare_name);
         durationText = (EditText) findViewById(R.id.duration_text);
         questionsRecyclerView = (RecyclerView) findViewById(R.id.questionare_recycler_view);
         addQuestionare = (FloatingActionButton) findViewById(R.id.add_questionare);
@@ -112,7 +111,7 @@ public class NewQuestionareActicity extends AppCompatActivity {
             }
         });
 
-        mQuestionAdapter = new QuestionAdapter(questionsArray);
+        mQuestionAdapter = new QuestionAdapter(NewQuestionareActicity.this,questionsArray);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(NewQuestionareActicity.this);
         questionsRecyclerView.setLayoutManager(mLayoutManager);
         questionsRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -144,12 +143,12 @@ public class NewQuestionareActicity extends AppCompatActivity {
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        dialog.dismiss();
 
                         View view = dialog.getCustomView();
                         EditText questionName = (EditText) view.findViewById(R.id.question_text);
                         SwitchCompat mainQuestion = (SwitchCompat) view.findViewById(R.id.switchButton);
 
+<<<<<<< Updated upstream
                         QuestionItem newQuestion = new QuestionItem(
                                 questionsArray.size()+1,
                                 newPoll.getQuestionareId(),
@@ -167,6 +166,38 @@ public class NewQuestionareActicity extends AppCompatActivity {
                         if(mainQuestion.isChecked()){
                             newQuestion.setMainQuestion(true);
                             newPoll.setName(questionName.getText().toString());
+=======
+                        if((format[0] == QuestionItem.FORMAT.MCQ_SINGLE || format[0] == QuestionItem.FORMAT.MCQ_MULTIPLE)
+                                && mAdapter.getItemCount() < 2){
+
+                            disableButton[0] = true;
+                            // FIXME: 4/7/2017 make the options dialog stay with the toast use disableButton variable
+                            Toast.makeText(NewQuestionareActicity.this, getResources().getString(R.string.more_options),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            disableButton[0] = false;
+                            QuestionItem newQuestion = new QuestionItem(
+                                    questionsArray.size()+1,
+                                    newPoll.getQuestionareId(),
+                                    questionName.getText().toString(),
+                                    format[0],
+                                    Constants.MIN_QUESTION_MARKS,
+                                    mAdapter.getOptions(),
+                                    Constants.INITIAL_VOTE_COUNT
+                            );
+                            questionsArray.put(questionsArray.size()+1, newQuestion);
+
+                            //notify dataset changed
+                            mQuestionAdapter.notifyDataSetChanged();
+
+                            if(mainQuestion.isChecked()){
+                                newQuestion.setMainQuestion(true);
+                                newPoll.setName(questionName.getText().toString());
+                            }
+
+                            dialog.dismiss();
+>>>>>>> Stashed changes
                         }
 
                     }

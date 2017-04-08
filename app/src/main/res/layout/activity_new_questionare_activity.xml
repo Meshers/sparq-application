@@ -26,6 +26,7 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
+
     <include layout="@layout/content_new_questionare_activity" />
 
     <!--<android.support.design.widget.FloatingActionButton-->
@@ -46,18 +47,18 @@
         app:fab_colorNormal="@color/colorAccent"
         app:fab_title="Create Quiz"
         app:fab_colorPressed="@color/colorAccentDark"
-        android:src="@drawable/ic_add"
+        app:fab_icon="@drawable/ic_add"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end" />
 
-    <com.getbase.floatingactionbutton.FloatingActionButton
+        <com.getbase.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_questionare"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:fab_colorNormal="@color/colorAccent"
         app:fab_colorPressed="@color/colorAccentDark"
         app:layout_anchor="@id/app_bar"
-        android:src="@drawable/ic_arrow_right"
+            app:fab_icon="@drawable/ic_submit_arrow"
         app:layout_anchorGravity="bottom|end" />
 
 </android.support.design.widget.CoordinatorLayout>

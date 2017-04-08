@@ -9,19 +9,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.sparq.R;
+import com.sparq.application.SPARQApplication;
 import com.sparq.application.userinterface.ConverstaionThreadActivity;
+import com.sparq.application.userinterface.PollResultsActivity;
 import com.sparq.application.userinterface.QuestionareActivity;
 import com.sparq.application.userinterface.model.ConversationThread;
 import com.sparq.application.userinterface.model.PollItem;
 import com.sparq.application.userinterface.model.Questionare;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
+import static com.sparq.application.SPARQApplication.USER_TYPE.TEACHER;
 import static com.sparq.application.userinterface.model.Questionare.QUESTIONARE_TYPE.POLL;
 
 /**
@@ -33,10 +38,16 @@ public class PollListAdapter extends RecyclerView.Adapter<PollListAdapter.MyView
     private Context mContext;
     private List<PollItem> polls;
 
+    private static int colors[] = {
+            R.color.warning,
+            R.color.warningDark,
+    };
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView pollName;
         public TextView pollDate;
-        public ImageView pollImage;
+        public TextView pollQuestions;
+        public LinearLayout pollImage;
         public ImageView pollStatusImage;
         public CardView cardView;
 
@@ -44,7 +55,8 @@ public class PollListAdapter extends RecyclerView.Adapter<PollListAdapter.MyView
             super(view);
             pollName = (TextView) view.findViewById(R.id.poll_name);
             pollDate = (TextView) view.findViewById(R.id.poll_date);
-            pollImage = (ImageView) view.findViewById(R.id.poll_image);
+            pollQuestions = (TextView) view.findViewById(R.id.poll_questions);
+            pollImage = (LinearLayout) view.findViewById(R.id.poll_image);
             pollStatusImage = (ImageView) view.findViewById(R.id.poll_status);
             cardView = (CardView) view.findViewById(R.id.card_view);
         }
@@ -68,17 +80,26 @@ public class PollListAdapter extends RecyclerView.Adapter<PollListAdapter.MyView
     public void onBindViewHolder(PollListAdapter.MyViewHolder holder, int position) {
         final PollItem poll = polls.get(position);
         holder.pollName.setText(poll.getName());
-        holder.pollDate.setText(poll.getDate().toString());
+        holder.pollDate.setText(new SimpleDateFormat("yyyy-MM-dd").format(poll.getDate()));
+        holder.pollQuestions.setText(String.valueOf(poll.getNumberOfQuestions()));
 
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(mContext, QuestionareActivity.class);
-                intent.putExtra(QuestionareActivity.QUESTIONARE_TYPE, POLL);
-                intent.putExtra(QuestionareActivity.QUESTIONARE_ID, poll.getQuestionareId());
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(intent);
+                if(SPARQApplication.getUserType() == TEACHER){
+                    Intent intent = new Intent(mContext, PollResultsActivity.class);
+                    intent.putExtra(PollResultsActivity.QUESTIONARE_TYPE, POLL);
+                    intent.putExtra(PollResultsActivity.QUESTIONARE_ID, poll.getQuestionareId());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    mContext.startActivity(intent);
+                }else{
+                    Intent intent = new Intent(mContext, QuestionareActivity.class);
+                    intent.putExtra(QuestionareActivity.QUESTIONARE_TYPE, POLL);
+                    intent.putExtra(QuestionareActivity.QUESTIONARE_ID, poll.getQuestionareId());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    mContext.startActivity(intent);
+                }
             }
         });
 
@@ -100,6 +121,13 @@ public class PollListAdapter extends RecyclerView.Adapter<PollListAdapter.MyView
             case STOP:
                 holder.pollStatusImage.setBackgroundResource(R.drawable.ic_bookmark_stop);
                 break;
+        }
+
+        if(position % 2 == 0){
+            holder.pollImage.setBackgroundColor(mContext.getResources().getColor(colors[0]));
+        }
+        else{
+            holder.pollImage.setBackgroundColor(mContext.getResources().getColor(colors[1]));
         }
 
     }
