@@ -50,15 +50,9 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
         holder.deleteOption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // FIXME: 4/8/2017 Handle case when everything is deleted
-                if(options.size() > 1){
-                    options.remove(position);
-                    notifyItemRemoved(position);
-                }
-                else {
-                    options = null;
-                    notifyItemRemoved(position);
-                }
+
+                options.remove(position);
+                notifyItemRemoved(position);
 
             }
         });
