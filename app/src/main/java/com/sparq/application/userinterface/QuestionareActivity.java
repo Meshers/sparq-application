@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -44,6 +45,7 @@ public class QuestionareActivity extends AppCompatActivity {
     private HashMap<Integer, QuestionItem> questions;
     private QuestionAnswerListAdapter mAdapter;
     private int questionareId;
+    private int questionCreatorId;
     private Questionare.QUESTIONARE_TYPE type;
 
     public static final String QUESTIONARE_TYPE = "questionare_type";
@@ -67,6 +69,8 @@ public class QuestionareActivity extends AppCompatActivity {
 
         // get the quiz / poll object
         questionare = getData(type);
+        //initialize the question creator
+        questionCreatorId = questionare.getCreator().getUserId();
 
         // get questions related to a particular quiz or poll
         questions = questionare.getQuestions();
@@ -106,8 +110,6 @@ public class QuestionareActivity extends AppCompatActivity {
 
                 sendPollMessage( mAdapter.getAnswerForQuestion());
                 finish();
-
-//                ((PollItem) questionare).addAnswerArrayToQuestion(questionareId, answersArray);
             }
         });
 
@@ -144,11 +146,6 @@ public class QuestionareActivity extends AppCompatActivity {
 
     public void sendPollMessage(ArrayList<AnswerItem> answers){
 
-        /**
-         * TODO: set a timer to call the sendPoll from NewQuestionareActivity for each question. the timer should have a gap of 12s.
-         * alternatively u can change it in SPARQApplication
-         */
-
         for(AnswerItem answer: answers){
 
             String answerMessage = null;
@@ -168,7 +165,7 @@ public class QuestionareActivity extends AppCompatActivity {
                     SPARQApplication.getBdcastAddress(),
                     answerMessage,
                     questionareId,
-                    (int) SPARQApplication.getOwnAddress(),
+                    questionCreatorId,
                     answer.getQuestionItemId(),
                     answer.getFormat(),
                     null,

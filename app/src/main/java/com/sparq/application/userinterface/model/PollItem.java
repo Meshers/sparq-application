@@ -16,6 +16,7 @@ public class PollItem extends Questionare{
         STOP
     }
     private POLL_STATE state;
+    private boolean hasAnswered;
     private HashMap<Integer, ArrayList<AnswerItem>> answers;
 
     public PollItem(){
@@ -38,6 +39,14 @@ public class PollItem extends Questionare{
     }
     public void setState(POLL_STATE state) {
         this.state = state;
+    }
+
+    public boolean hasAnswered() {
+        return hasAnswered;
+    }
+
+    public void setHasAnswered(boolean hasAnswered) {
+        this.hasAnswered = hasAnswered;
     }
 
     public HashMap<Integer, ArrayList<AnswerItem>> getAllAnswers(){

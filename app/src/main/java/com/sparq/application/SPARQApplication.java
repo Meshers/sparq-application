@@ -1,7 +1,6 @@
 package com.sparq.application;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Intent;
 import android.os.CountDownTimer;
 import android.support.multidex.MultiDexApplication;
@@ -17,7 +16,7 @@ import com.sparq.application.layer.almessage.AlQuestion;
 import com.sparq.application.layer.almessage.AlVote;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.userinterface.NotifyPollHandler;
-import com.sparq.application.userinterface.NotifyUIHandler;
+import com.sparq.application.userinterface.NotifyThreadHandler;
 import com.sparq.application.userinterface.model.AnswerItem;
 import com.sparq.application.userinterface.model.ConversationThread;
 import com.sparq.application.userinterface.model.PollItem;
@@ -27,7 +26,6 @@ import com.sparq.util.Constants;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
 
@@ -61,8 +59,8 @@ public class SPARQApplication extends MultiDexApplication {
     private static boolean isTimerElapsed = true;
 
     //handlers
-    static NotifyUIHandler uihandler;
-    static NotifyPollHandler pollhandler;
+    static NotifyThreadHandler threadHandler;
+    static NotifyPollHandler pollHandler;
 
     //timers
     private static CountDownTimer uiTimer;
@@ -163,8 +161,12 @@ public class SPARQApplication extends MultiDexApplication {
         Log.i(TAG, "Timer started");
     }
 
-    public static void setUINotifier(NotifyUIHandler handler){
-        uihandler = handler;
+    public static void setPollNotifier(NotifyPollHandler handler){
+        pollHandler = handler;
+    }
+
+    public static void setThreadNotifier(NotifyThreadHandler handler){
+        threadHandler = handler;
     }
 
     public static ConversationThread getConversationThread(int questionId, int creatorId){
@@ -192,18 +194,18 @@ public class SPARQApplication extends MultiDexApplication {
 
     public static void notifyConversationThread(){
 
-        if(uihandler != null){
-            uihandler.handleConversationThreadQuestions();
-            uihandler.handleConversationThreadAnswers();
-            uihandler.handleConversationThreadAnswerVotes();
+        if(threadHandler != null){
+            threadHandler.handleConversationThreadQuestions();
+            threadHandler.handleConversationThreadAnswers();
+            threadHandler.handleConversationThreadAnswerVotes();
         }
     }
 
     public static void notifyPoll(){
 
-        if(pollhandler != null){
-            pollhandler.handlePollQuestions();
-            pollhandler.handlePollAnswers();
+        if(pollHandler != null){
+            pollHandler.handlePollQuestions();
+            pollHandler.handlePollAnswers();
         }
     }
 
@@ -311,6 +313,7 @@ public class SPARQApplication extends MultiDexApplication {
 
                         break;
                     case MCQ_MULTIPLE:
+                        Log.i("HERE",alPollAnswer.getAnswerChoicesAsString() );
                         pollAnswer = AnswerItem.getMCQMultipleAnswer(
                                 alPollAnswer.getQuestionId(),
                                 new UserItem(alPollAnswer.getAnswerCreatorId()),
@@ -509,6 +512,7 @@ public class SPARQApplication extends MultiDexApplication {
                 break;
             case POLL_ANSWER:
 
+                Log.i("HERE", "POLL ANSWER");
                 isSent = mManager.sendData(
                         ApplicationLayerPdu.TYPE.POLL_ANSWER,
                         msg,
@@ -520,6 +524,7 @@ public class SPARQApplication extends MultiDexApplication {
                 );
 
                 if(isSent){
+                    Log.i("HERE", "SENT");
                     PollItem poll = getPoll(pollId);
 
                     if(poll == null){
@@ -555,6 +560,8 @@ public class SPARQApplication extends MultiDexApplication {
                     }
 
                     poll.addAnswerToQuestion(questionId, answer);
+                    poll.setHasAnswered(true);
+                    notifyPoll();
 
                 }
                 break;

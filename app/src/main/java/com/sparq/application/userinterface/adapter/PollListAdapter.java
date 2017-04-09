@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
@@ -94,22 +95,19 @@ public class PollListAdapter extends RecyclerView.Adapter<PollListAdapter.MyView
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     mContext.startActivity(intent);
                 }else{
-                    Intent intent = new Intent(mContext, QuestionareActivity.class);
-                    intent.putExtra(QuestionareActivity.QUESTIONARE_TYPE, POLL);
-                    intent.putExtra(QuestionareActivity.QUESTIONARE_ID, poll.getQuestionareId());
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    mContext.startActivity(intent);
+                    if(poll.hasAnswered()){
+                        Toast.makeText(mContext, mContext.getResources().getString(R.string.has_answered), Toast.LENGTH_SHORT);
+                    }
+                    else{
+                        Intent intent = new Intent(mContext, QuestionareActivity.class);
+                        intent.putExtra(QuestionareActivity.QUESTIONARE_TYPE, POLL);
+                        intent.putExtra(QuestionareActivity.QUESTIONARE_ID, poll.getQuestionareId());
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(intent);
+                    }
                 }
             }
         });
-
-//        ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
-//        // generate color based on a key (same key returns the same color), useful for list/grid views
-//        int color = generator.getColor(poll.getName());
-//
-//        TextDrawable drawable = TextDrawable.builder()
-//                .buildRound(String.valueOf(poll.getName().charAt(0)), color);
-//        holder.pollImage.setImageDrawable(drawable);
 
         switch(poll.getState()){
             case PLAY:

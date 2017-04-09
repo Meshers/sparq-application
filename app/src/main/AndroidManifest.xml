@@ -58,6 +58,15 @@
             android:name=".application.userinterface.Main2Activity"
             android:label="@string/title_activity_main2"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".application.userinterface.PollResultsActivity"
+            android:label="@string/title_activity_poll_results"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".application.userinterface.PollResultsPerQuestionActivity"
+            android:label="@string/title_activity_poll_results_per_question"
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <!-- <provider android:name="application.userinterface.database.ApplicationContentProvider" -->
         <!-- android:authorities="com.sparq.application.userinterface.database.ApplicationContentProvider"/> -->
 
@@ -69,14 +78,6 @@
         <!-- <category android:name="android.intent.category.DEFAULT" /> -->
         <!-- </intent-filter> -->
         <!-- </receiver> -->
-        <activity
-            android:name=".application.userinterface.PollResultsActivity"
-            android:label="@string/title_activity_poll_results"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".application.userinterface.PollResultsPerQuestionActivity"
-            android:label="@string/title_activity_poll_results_per_question"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

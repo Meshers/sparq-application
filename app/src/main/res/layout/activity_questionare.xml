@@ -44,7 +44,7 @@
         app:fab_colorNormal="@color/colorAccent"
         app:fab_colorPressed="@color/colorAccentDark"
         app:layout_anchor="@id/app_bar"
-        android:src="@drawable/ic_play"
+        app:fab_icon="@drawable/ic_submit_arrow"
         app:layout_anchorGravity="bottom|end" />
 
 </android.support.design.widget.CoordinatorLayout>

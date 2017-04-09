@@ -1,40 +1,26 @@
 package com.sparq.application.userinterface.fragment;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
-import android.support.v4.media.MediaBrowserCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
-import com.sparq.application.userinterface.EventActivity;
 import com.sparq.application.userinterface.NotifyPollHandler;
 import com.sparq.application.userinterface.adapter.DialogListAdapter;
 import com.sparq.application.userinterface.adapter.PollListAdapter;
-import com.sparq.application.userinterface.adapter.QuizListAdapter;
-import com.sparq.application.userinterface.adapter.RecyclerItemClickListener;
-import com.sparq.application.userinterface.model.EventItem;
 import com.sparq.application.userinterface.model.PollItem;
-import com.sparq.application.userinterface.model.QuizItem;
-import com.sparq.application.userinterface.model.UserItem;
 
-import java.sql.Date;
 import java.util.ArrayList;
 
 public class PollFragment extends Fragment {
@@ -49,6 +35,8 @@ public class PollFragment extends Fragment {
 
     private ArrayList<PollItem> pollsArrayList = new ArrayList<>();
     private RecyclerView recyclerView;
+    private TextView emptyView;
+
     private PollListAdapter mAdapter;
 
     public PollFragment() {
@@ -92,29 +80,16 @@ public class PollFragment extends Fragment {
 
         pollsArrayList = SPARQApplication.getPolls();
 
-        mAdapter = new PollListAdapter(getActivity(),pollsArrayList);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
+        if(pollsArrayList.size() == 0){
+            recyclerView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+        }
+        else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        }
 
-//        recyclerView.addOnItemTouchListener( new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
-//            @Override public void onItemClick(View view, int position) {
-//
-//                PollItem poll =  pollsArrayList.get(position);
-//
-//                if(poll.getCreator().getUserType() == 0){
-//                    showStateDialog(poll, view);
-//                }
-//                else if(poll.getState() == PollItem.POLL_STATE.PLAY){
-//
-//                    Intent intent = new Intent(getActivity(), EventActivity.class);
-//                    intent.putExtra("type", 1);
-//                    startActivity(intent);
-//                }
-//
-//            }
-//        }));
+        initializePollAdapater();
 
         return view;
     }
@@ -122,31 +97,16 @@ public class PollFragment extends Fragment {
     public void initializeView(View view){
 
         recyclerView = (RecyclerView) view.findViewById(R.id.poll_recycler_view);
+        emptyView = (TextView) view.findViewById(R.id.empty_view);
     }
 
-//    public ArrayList<PollItem> getData(){
-//
-//        ArrayList<PollItem> polls = new ArrayList<PollItem>();
-//
-//        UserItem user = new UserItem();
-//
-//        for(int i = 0; i < 10; i++){
-//
-////            PollItem poll = new PollItem(
-////                    i,
-////                    0,
-////                    "Poll "+i,
-////                    "this is a description",
-////                    new Date(2011,2,3),
-////                    0,
-////                    user);
-////
-////            polls.add(poll);
-//        }
-//
-//        return polls;
-//
-//    }
+    public void initializePollAdapater(){
+        mAdapter = new PollListAdapter(getActivity(),pollsArrayList);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -174,7 +134,7 @@ public class PollFragment extends Fragment {
         DialogListAdapter.ItemCallback itemCallback = new DialogListAdapter.ItemCallback() {
             @Override
             public void onItemClicked(int itemIndex, MaterialDialog dialog) {
-                Toast.makeText(getActivity(), "Item Clicked:"+itemIndex, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Item Clicked: "+ itemIndex, Toast.LENGTH_SHORT).show();
                 poll.setState(PollItem.getStateFromInteger(itemIndex));
                 ImageView pollStatusImage = (ImageView) view.findViewById(R.id.poll_status);
 
@@ -215,16 +175,23 @@ public class PollFragment extends Fragment {
         NotifyPollHandler pollHandler = new NotifyPollHandler() {
             @Override
             public void handlePollQuestions() {
-                mAdapter = new PollListAdapter(getActivity(),pollsArrayList);
-                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-                recyclerView.setLayoutManager(mLayoutManager);
-                recyclerView.setItemAnimator(new DefaultItemAnimator());
-                recyclerView.setAdapter(mAdapter);
+
+                if(pollsArrayList.size() == 0){
+                    recyclerView.setVisibility(View.GONE);
+                    emptyView.setVisibility(View.VISIBLE);
+                }
+                else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    emptyView.setVisibility(View.GONE);
+                }
+
+                initializePollAdapater();
             }
 
             @Override
             public void handlePollAnswers() {
-                // do nothing
+                // if an answer has arrived prevent the user from answering again
+                initializePollAdapater();
             }
         };
     }

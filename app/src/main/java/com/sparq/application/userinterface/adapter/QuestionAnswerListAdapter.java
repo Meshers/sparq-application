@@ -47,6 +47,7 @@ public class QuestionAnswerListAdapter extends RecyclerView.Adapter<QuestionAnsw
             recyclerView = (RecyclerView) view.findViewById(R.id.questionare_recycler_view);
             recyclerView.setVisibility(View.GONE);
             recyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
+
             innerAdapter = new QuestionareAdapter();
             recyclerView.setAdapter(innerAdapter);
 

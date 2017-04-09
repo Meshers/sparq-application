@@ -79,7 +79,7 @@ public class AlPollAnswer extends AlMessage{
         switch(QuestionItem.getFormatFromByte(mFormat)){
             case MCQ_SINGLE:
             case MCQ_MULTIPLE:
-                if(mAnswerData.length <= Constants.MAX_NUMBER_OF_OPTIONS){
+                if(mAnswerData.length <= Constants.MAX_NUMBER_OF_OPTIONS * 2){
                     return new String(mAnswerData, CHARSET);
                 }
         }

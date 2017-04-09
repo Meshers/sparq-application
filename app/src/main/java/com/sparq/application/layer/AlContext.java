@@ -12,6 +12,7 @@ import com.sparq.application.layer.almessage.AlVote;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.layer.pdu.PollPdu;
 import com.sparq.application.layer.pdu.ThreadPdu;
+import com.sparq.application.userinterface.model.QuestionItem;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -88,6 +89,7 @@ public class AlContext {
         for(AlPollQuestion question: questions){
 
             byte[] combinedQuestionId = question.getCombinedQuestionId();
+            Log.i("HERE", question.getQeuestionCreatorId() + ":" + question.getQuestionId());
 
             if(combinedQuestionId[0] == questionCreatorId && combinedQuestionId[1] == questionId){
                 return question;
@@ -234,6 +236,10 @@ public class AlContext {
                     break;
                 case POLL_ANSWER:
 
+                    for(AlPollQuestion q: mSessionPolls.get(pollId)){
+                        Log.i("HERE", q.getQeuestionCreatorId() + ":" + q.getQuestionId());
+                    }
+                    Log.i("HERE", questionCreatorId + ":" + questionId);
                     // check if corresponding question exists
                     if(mSessionPolls.keySet().contains(pollId)){
                         retreivedQuestion = getAlPollQuestion(
@@ -535,7 +541,6 @@ public class AlContext {
                 Log.i(TAG, "POLL QUESTION RECEIVED " +
                         alPollQuestion.getPollId() + ":" +
                         alPollQuestion.getQeuestionCreatorId()+ ":" +
-                        alPollQuestion.getQeuestionCreatorId()+ ":" +
                         alPollQuestion.getQuestionId()+ ":" +
                         alPollQuestion.getQuestionFormat()+ ":" +
                         alPollQuestion.getOptionsAsArray()+ ":" +
@@ -554,6 +559,10 @@ public class AlContext {
                 }
 
                 mSessionPolls.get(pdu.getPollId()).add(alPollQuestion);
+
+                for(AlPollQuestion q: mSessionPolls.get(pdu.getPollId())){
+                    Log.i("HERE on receive", q.getQeuestionCreatorId() + ":" + q.getQuestionId());
+                }
 
                 if(alPollQuestion.isEndOfPoll()){
                     //transmit all the poll questions to the upper layer
@@ -604,7 +613,7 @@ public class AlContext {
                                 throw new IllegalArgumentException("No such type of Poll packet exists");
                             }
                         }else{
-                            throw new IllegalArgumentException("No such type of Thread packet exists");
+                            throw new IllegalArgumentException("No such type of Poll packet exists");
                         }
 
                         break;

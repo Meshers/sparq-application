@@ -22,7 +22,7 @@
             android:layout_weight=".2">
 
             <ImageView
-                android:id="@+id/event_image"
+                android:id="@+id/answer_image"
                 android:layout_width="50dp"
                 android:layout_height="50dp" />
         </LinearLayout>

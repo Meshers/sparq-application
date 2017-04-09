@@ -158,8 +158,6 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
             deactivateVotes(holder);
         }
 
-        Log.i(TAG, "onBindViewHolder: " + mbtnEnable);
-
         if(position % 2 == 0){
             holder.threadImage.setBackgroundColor(mContext.getResources().getColor(colors[0]));
         }

@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
-import com.sparq.application.userinterface.NotifyUIHandler;
+import com.sparq.application.userinterface.NotifyThreadHandler;
 import com.sparq.application.userinterface.adapter.ThreadListAdapter;
 import com.sparq.application.userinterface.model.ConversationThread;
 import com.sparq.application.userinterface.model.UserItem;
@@ -25,8 +25,6 @@ import com.sparq.util.Constants;
 
 import java.sql.Date;
 import java.util.ArrayList;
-
-import static com.sparq.application.SPARQApplication.SPARQInstance;
 
 public class ThreadFragment extends Fragment {
 
@@ -91,10 +89,6 @@ public class ThreadFragment extends Fragment {
 
         threadsArrayList = SPARQApplication.getConversationThreads();
 
-        //TODO: add message to view incase arraylist is empty
-        /*RecyclerView does not have setEmptyView like
-         conventional lists have had to perform some patch work with the help of another textview in place
-        */
         if(threadsArrayList.size() == 0){
             recyclerView.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);
@@ -122,22 +116,7 @@ public class ThreadFragment extends Fragment {
             }
         };
 
-        //Moved the initilization to a function call, since we needed it at many occasions
         initializeThreadAdapter();
-
-//        recyclerView.addOnItemTouchListener( new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
-//            @Override public void onItemClick(View view, int position) {
-//
-//                ConversationThread thread =  threadsArrayList.get(position);
-//
-//                Intent intent = new Intent(getActivity(), ConverstaionThreadActivity.class);
-//                intent.putExtra(ConverstaionThreadActivity.THREAD_ID, thread.getQuestionareId());
-//                intent.putExtra(ConverstaionThreadActivity.CREATOR_ID, thread.getCreator().getUserId());
-//                startActivity(intent);
-//
-//            }
-//        }));
-
 
         return view;
     }
@@ -188,16 +167,9 @@ public class ThreadFragment extends Fragment {
             btnEnable = false;
         }
 
-        // FIXME: 4/6/2017 Should we re-initialize here or UINotifier takes care of it?
-        initializeThreadAdapter();
-
-        NotifyUIHandler uiHandler = new NotifyUIHandler() {
+        NotifyThreadHandler uiHandler = new NotifyThreadHandler() {
             @Override
             public void handleConversationThreadQuestions() {
-
-                Log.i("Size of Array List", String.valueOf(threadsArrayList.size()));
-
-                initializeThreadAdapter();
 
                 if(threadsArrayList.size() == 0){
                     recyclerView.setVisibility(View.GONE);
@@ -207,6 +179,8 @@ public class ThreadFragment extends Fragment {
                     recyclerView.setVisibility(View.VISIBLE);
                     emptyView.setVisibility(View.GONE);
                 }
+
+                initializeThreadAdapter();
             }
 
             @Override
@@ -220,7 +194,7 @@ public class ThreadFragment extends Fragment {
             }
         };
 
-        SPARQApplication.setUINotifier(uiHandler);
+        SPARQApplication.setThreadNotifier(uiHandler);
     }
 
     @Override

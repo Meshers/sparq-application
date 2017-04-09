@@ -29,13 +29,13 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.My
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView answerText;
         public TextView userText;
-        public ImageView userImage;
+        public ImageView answerImage;
 
         public MyViewHolder(View view) {
             super(view);
             answerText = (TextView) view.findViewById(R.id.answer_text);
             userText = (TextView) view.findViewById(R.id.username_text);
-            userImage = (ImageView) view.findViewById(R.id.event_image);
+            answerImage = (ImageView) view.findViewById(R.id.answer_image);
         }
     }
 
@@ -59,6 +59,14 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.My
 //        holder.userText.setText(answer.getUser().getUsername());
         // FIXME: 4/3/2017
         holder.userText.setText("Jane Doe");
+
+//        ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
+//        // generate color based on a key (same key returns the same color), useful for list/grid views
+//        int color = generator.getColor(answer.getAnswer());
+//
+//        TextDrawable drawable = TextDrawable.builder()
+//                .buildRound(String.valueOf(answer.getAnswer().charAt(0)), color);
+//        holder.answerImage.setImageDrawable(drawable);
 
     }
 

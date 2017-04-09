@@ -19,6 +19,8 @@
     <string name="long_question_msg">Only 160 characters allowed</string>
     <string name="ans_recorded">Your answer has been recorded</string>
     <string name="question_recorded">Your question has been recorded</string>
+    <string name="no_answer">No Answer has arrived for the given question</string>
+    <string name="has_answered">This Questionare has already been answered</string>
     <string name="poll_question_prompt">Question Type</string>
 
     <string-array name="poll_question_types">
@@ -29,9 +31,7 @@
 
     <string name="enter_option">Enter an option</string>
     <string name="more_options">Should have more options</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Welcome to SPARQ. Hope you like the ad-hoc response system
+    <string name="about_text">Welcome to SPARQ. Hope you like the ad-hoc response system
         we have built as part of our final semester project.
         We look forward to hearing your feedback.</string>
     <string name="title_activity_event">Event Activity</string>

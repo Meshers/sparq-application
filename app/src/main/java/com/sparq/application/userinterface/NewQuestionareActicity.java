@@ -1,9 +1,7 @@
 package com.sparq.application.userinterface;
 
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -12,10 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -30,17 +25,16 @@ import com.sparq.R;
 import com.sparq.application.SPARQApplication;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.userinterface.adapter.OptionsAdapter;
-import com.sparq.application.userinterface.adapter.PollListAdapter;
 import com.sparq.application.userinterface.adapter.QuestionAdapter;
 import com.sparq.application.userinterface.model.PollItem;
 import com.sparq.application.userinterface.model.QuestionItem;
+import com.sparq.application.userinterface.model.Questionare;
 import com.sparq.application.userinterface.model.UserItem;
 import com.sparq.util.Constants;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class NewQuestionareActicity extends AppCompatActivity {
 
@@ -53,7 +47,8 @@ public class NewQuestionareActicity extends AppCompatActivity {
 
     private QuestionAdapter mQuestionAdapter;
 
-    PollItem newPoll;
+    private Questionare.QUESTIONARE_TYPE type;
+    Questionare questionare;
     private HashMap<Integer, QuestionItem> questionsArray = new HashMap<>(0);
 
     public static final String QUESTIONARE_TYPE = "questionare_type";
@@ -66,14 +61,25 @@ public class NewQuestionareActicity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // get bundle
-        newPoll = new PollItem(
-                SPARQApplication.getPolls().size()+1,
-                SPARQApplication.getSessionId(),
-                null, null,
-                new Date(),
-                PollItem.POLL_STATE.STOP,
-                new UserItem(SPARQApplication.getOwnAddress())
-        );
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null){
+            type = (Questionare.QUESTIONARE_TYPE) bundle.getSerializable(QUESTIONARE_TYPE);
+        }
+
+        switch(type){
+            case QUIZ:
+                break;
+            case POLL:
+                questionare = new PollItem(
+                        SPARQApplication.getPolls().size()+1,
+                        SPARQApplication.getSessionId(),
+                        null, null,
+                        new Date(),
+                        PollItem.POLL_STATE.STOP,
+                        new UserItem(SPARQApplication.getOwnAddress())
+                );
+                break;
+        }
 
         initializeViews();
 
@@ -81,7 +87,14 @@ public class NewQuestionareActicity extends AppCompatActivity {
 
     public void initializeViews(){
 
-        // TODO: in the view, remove the "edit option" over the blue area. Relpace the textview in the collapsable layout with a toolbar as present in activity_questionare.xml_
+        switch(type){
+            case QUIZ:
+                setTitle("Create New Quiz");
+                break;
+            case POLL:
+                setTitle("Create New Poll");
+                break;
+        }
 
         newQuestion = (FloatingActionButton) findViewById(R.id.fab_new_questonare);
         newQuestion.setOnClickListener(new View.OnClickListener() {
@@ -100,12 +113,18 @@ public class NewQuestionareActicity extends AppCompatActivity {
             public void onClick(View v) {
 
                 // add all the questions to the questionare object
-                newPoll.setQuestions(questionsArray);
-                sendPollMessage(
-                        ApplicationLayerPdu.TYPE.POLL_QUESTION,
-                        SPARQApplication.getBdcastAddress(),
-                        newPoll
-                );
+                questionare.setQuestions(questionsArray);
+                switch(type){
+                    case QUIZ:
+                        break;
+                    case POLL:
+                        sendPollMessage(
+                                ApplicationLayerPdu.TYPE.POLL_QUESTION,
+                                SPARQApplication.getBdcastAddress(),
+                                (PollItem) questionare
+                        );
+                        break;
+                }
 
                 finish();
             }
@@ -131,6 +150,9 @@ public class NewQuestionareActicity extends AppCompatActivity {
 
         final QuestionItem.FORMAT format[] = new QuestionItem.FORMAT[1];
         format[0] = QuestionItem.getFormatFromByte((byte) 1);
+
+        final boolean[] disableButton = new boolean[1];
+
         final OptionsAdapter mAdapter = new OptionsAdapter(options);
 
         final MaterialDialog dialog = new MaterialDialog.Builder(NewQuestionareActicity.this)
@@ -146,23 +168,37 @@ public class NewQuestionareActicity extends AppCompatActivity {
                         EditText questionName = (EditText) view.findViewById(R.id.question_text);
                         SwitchCompat mainQuestion = (SwitchCompat) view.findViewById(R.id.switchButton);
 
-                        QuestionItem newQuestion = new QuestionItem(
-                                questionsArray.size()+1,
-                                newPoll.getQuestionareId(),
-                                questionName.getText().toString(),
-                                format[0],
-                                Constants.MIN_QUESTION_MARKS,
-                                mAdapter.getOptions(),
-                                Constants.INITIAL_VOTE_COUNT
-                        );
-                        questionsArray.put(questionsArray.size()+1, newQuestion);
+                        if((format[0] == QuestionItem.FORMAT.MCQ_SINGLE || format[0] == QuestionItem.FORMAT.MCQ_MULTIPLE)
+                                && mAdapter.getItemCount() < 2){
 
-                        //notify dataset changed
-                        mQuestionAdapter.notifyDataSetChanged();
+                            disableButton[0] = true;
+                            // FIXME: 4/7/2017 make the options dialog stay with the toast use disableButton variable
+                            Toast.makeText(NewQuestionareActicity.this, getResources().getString(R.string.more_options),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            disableButton[0] = false;
+                            QuestionItem newQuestion = new QuestionItem(
+                                    questionsArray.size()+1,
+                                    questionare.getQuestionareId(),
+                                    questionName.getText().toString(),
+                                    format[0],
+                                    Constants.MIN_QUESTION_MARKS,
+                                    mAdapter.getOptions(),
+                                    Constants.INITIAL_VOTE_COUNT
+                            );
+                            questionsArray.put(questionsArray.size()+1, newQuestion);
 
-                        if(mainQuestion.isChecked()){
-                            newQuestion.setMainQuestion(true);
-                            newPoll.setName(questionName.getText().toString());
+                            //notify dataset changed
+                            mQuestionAdapter.notifyDataSetChanged();
+
+                            if(mainQuestion.isChecked()){
+                                newQuestion.setMainQuestion(true);
+                                questionare.setName(questionName.getText().toString());
+                            }
+
+                            dialog.dismiss();
+
                         }
 
                         dialog.dismiss();
@@ -204,10 +240,12 @@ public class NewQuestionareActicity extends AppCompatActivity {
                 }else if(item.equalsIgnoreCase(SPINNERLIST[2])){
                     format[0] = QuestionItem.getFormatFromByte((byte) 3);
                     hideLayout.setVisibility(View.GONE);
+                    (dialog).getActionButton(DialogAction.POSITIVE).setEnabled(true);
 
                 } else if(item.equalsIgnoreCase(SPINNERLIST[3])){
                     format[0] = QuestionItem.getFormatFromByte((byte) 4);
                     hideLayout.setVisibility(View.GONE);
+                    (dialog).getActionButton(DialogAction.POSITIVE).setEnabled(true);
                 }
                 Log.i("format", item);
             }
@@ -239,7 +277,8 @@ public class NewQuestionareActicity extends AppCompatActivity {
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialog) {
-                if(mAdapter.getItemCount() < 2){
+                if((format[0] == QuestionItem.FORMAT.MCQ_SINGLE || format[0] == QuestionItem.FORMAT.MCQ_MULTIPLE)
+                        && mAdapter.getItemCount() < 2){
                     ((MaterialDialog)dialog).getActionButton(DialogAction.POSITIVE).setEnabled(false);
                 }
                 else{
@@ -252,41 +291,6 @@ public class NewQuestionareActicity extends AppCompatActivity {
     }
 
     public void sendPollMessage(final ApplicationLayerPdu.TYPE type, final byte toAddr, final PollItem poll){
-
-        /**
-         * TODO: set a timer to call the sendPoll from NewQuestionareActivity for each question. the timer should have a gap of 12s.
-         * alternatively u can change it in SPARQApplication
-         * I really have no clue how to deal with this, I tired handlers and shit, didn't work
-         */
-
-        /*Handler mHandler = new Handler();
-        // FIXME: 4/7/2017 Change this to constants
-        final int delay = 12000;
-
-        final ArrayList<QuestionItem> questions = new ArrayList<>(poll.getQuestions().values());
-        int i = 0;
-        for(; i < questions.size() - 1; i++){
-
-            final QuestionItem question = questions.get(i);
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    SPARQApplication.sendPollMessage(
-                            type,
-                            toAddr,
-                            question.getQuestion(),
-                            poll.getQuestionareId(),
-                            (int) SPARQApplication.getOwnAddress(),
-                            question.getQuestionId(),
-                            question.getFormat(),
-                            question.getOptions(),
-                            0,
-                            true,
-                            false,
-                            question.isMainQuestion()
-                    );
-                }
-            }, delay);*/
 
         final ArrayList<QuestionItem> questions = new ArrayList<>(poll.getQuestions().values());
         int i = 0;
@@ -311,16 +315,6 @@ public class NewQuestionareActicity extends AppCompatActivity {
         }
 
         QuestionItem question = questions.get(i);
-//        Log.i("HERE", "outside loop");
-//        Log.i("HERE",
-//                question.getQuestion() + ":"+
-//                        poll.getQuestionareId() + ":"+
-//                        (int) SPARQApplication.getOwnAddress() + ":"+
-//                        question.getQuestionId() + ":"+
-//                        question.getFormat() + ":"+
-//                        question.getOptions() + ":"+
-//                        question.isMainQuestion()
-//        );
 
         SPARQApplication.sendPollMessage(
                 type,

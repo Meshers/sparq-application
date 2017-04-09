@@ -74,7 +74,6 @@ public class ApplicationLayerManager {
                 }
             }
         };
-
         this.mLinkLayerManager = new LinkLayerManager(
                 mOwnAddr,
                 bluetoothAdapter,
@@ -164,7 +163,7 @@ public class ApplicationLayerManager {
                                 byte questionId, byte questionFormat, byte answerCreatorId, boolean hasMore, boolean endOfPoll, boolean isMainQuestion,
                                 byte[] data, byte[][] options, byte toAddr){
 
-        return mAlContext.sendPollPdu(type, pollId,questionCreatorId, questionId, questionFormat,answerCreatorId,
+        return mAlContext.sendPollPdu(type, pollId, questionCreatorId, questionId, questionFormat,answerCreatorId,
                 hasMore, endOfPoll, isMainQuestion, data, options,toAddr);
 
     }

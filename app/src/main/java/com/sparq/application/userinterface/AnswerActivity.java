@@ -219,7 +219,7 @@ public class AnswerActivity extends AppCompatActivity {
             }
         }
 
-        NotifyUIHandler uiHandler = new NotifyUIHandler() {
+        NotifyThreadHandler uiHandler = new NotifyThreadHandler() {
             @Override
             public void handleConversationThreadQuestions() {
                 // do nothing
@@ -239,7 +239,7 @@ public class AnswerActivity extends AppCompatActivity {
             }
         };
 
-        SPARQApplication.setUINotifier(uiHandler);
+        SPARQApplication.setThreadNotifier(uiHandler);
     }
 
     @Override

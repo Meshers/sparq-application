@@ -9,11 +9,13 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
 import com.sparq.application.userinterface.adapter.AnswerListAdapter;
@@ -36,7 +38,7 @@ public class PollResultsPerQuestionActivity extends AppCompatActivity {
     private Questionare.QUESTIONARE_TYPE type;
 
     private RecyclerView answerRecyclerView;
-    private CardView graphCard;
+    private CardView graphCard, recyclerCard;
     private GraphView graph;
     private ArrayList<AnswerItem> answers;
     private AnswerListAdapter mAdapter;
@@ -64,24 +66,25 @@ public class PollResultsPerQuestionActivity extends AppCompatActivity {
         }
         initializeViews();
 
-
-
     }
 
     public void initializeViews(){
 
         answerRecyclerView = (RecyclerView) findViewById(R.id.answer_recycler_view);
         graphCard = (CardView) findViewById(R.id.card_view1);
+        recyclerCard = (CardView) findViewById(R.id.card_view2);
         graph = (GraphView) findViewById(R.id.graph);
 
         switch(format){
             case MCQ_SINGLE:
             case MCQ_MULTIPLE:
                 graphCard.setVisibility(View.VISIBLE);
+                recyclerCard.setVisibility(View.GONE);
                 initializeGraph();
                 break;
             case ONE_WORD:
             case SHORT:
+                recyclerCard.setVisibility(View.VISIBLE);
                 graphCard.setVisibility(View.GONE);
                 break;
         }
@@ -111,6 +114,8 @@ public class PollResultsPerQuestionActivity extends AppCompatActivity {
 
         }
 
+        Log.i("HERE", data.toString());
+
         DataPoint[] dataPoints = new DataPoint[data.size()];
 
         int i = 0;
@@ -119,7 +124,7 @@ public class PollResultsPerQuestionActivity extends AppCompatActivity {
             i++;
         }
 
-        BarGraphSeries<DataPoint> series = new BarGraphSeries<DataPoint>(dataPoints);
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(dataPoints);
         graph.addSeries(series);
     }
 

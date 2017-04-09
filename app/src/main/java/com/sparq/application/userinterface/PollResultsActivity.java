@@ -53,6 +53,16 @@ public class PollResultsActivity extends AppCompatActivity {
     }
 
     public void initializeViews(){
+
+        switch(type){
+            case QUIZ:
+                setTitle("Quiz Questions");
+                break;
+            case POLL:
+                setTitle("Poll Questions");
+                break;
+        }
+
         questionListView = (RecyclerView) findViewById(R.id.question_recycler_view);
 
         mAdapter = new ArrivedQuestionsAdapter(PollResultsActivity.this, (PollItem) questionare);

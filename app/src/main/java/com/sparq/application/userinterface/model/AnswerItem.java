@@ -167,7 +167,6 @@ public class AnswerItem implements Serializable{
 
     public static AnswerItem getMCQMultipleAnswer(int answerId, UserItem answerCreator, int questionItemId, UserItem questionCreator,
                                                 String answerChoices){
-
         ArrayList<Integer> answer = null;
 
         if(answerChoices != null){

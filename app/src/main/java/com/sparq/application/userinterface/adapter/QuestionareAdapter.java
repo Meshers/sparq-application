@@ -25,9 +25,9 @@ public class QuestionareAdapter extends RecyclerView.Adapter<QuestionareAdapter.
     private ArrayList<String> options;
     private QuestionItem.FORMAT format;
 
-    private static RadioButton lastChecked = null;
-    private int lastCheckedPos = 0;
-    private static ArrayList<Integer> choices = new ArrayList<>();
+    private RadioButton lastChecked = null;
+
+    private ArrayList<Integer> choices = new ArrayList<>();
 
     private int mRowIndex = -1;
 
@@ -60,6 +60,8 @@ public class QuestionareAdapter extends RecyclerView.Adapter<QuestionareAdapter.
     public void setData(ArrayList<String> options, QuestionItem.FORMAT type) {
         this.options = options;
         this.format = type;
+
+        choices = new ArrayList<>();
         notifyDataSetChanged();
     }
 
@@ -118,14 +120,11 @@ public class QuestionareAdapter extends RecyclerView.Adapter<QuestionareAdapter.
                             }
 
                             lastChecked = cb;
+                            choices.clear();
                             choices.add(clickedPos);
-                            Log.i("HERE in func", String.valueOf(lastCheckedPos));
-                        }
-                        else{
-                            lastChecked = null;
-                            choices.remove(Integer.valueOf(clickedPos));
                         }
 
+                        Log.i("HERE", choices.toString());
                     }
                 });
 

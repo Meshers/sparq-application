@@ -8,7 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
@@ -39,7 +41,7 @@ public class ArrivedQuestionsAdapter extends RecyclerView.Adapter<ArrivedQuestio
         public TextView questionName;
         public TextView questionFormat;
         public TextView answerNumber;
-        public ImageView questionImage;
+        public LinearLayout questionImage;
         public CardView cardView;
 
         public MyViewHolder(View view) {
@@ -47,7 +49,7 @@ public class ArrivedQuestionsAdapter extends RecyclerView.Adapter<ArrivedQuestio
             questionName = (TextView) view.findViewById(R.id.question_name);
             questionFormat = (TextView) view.findViewById(R.id.question_format);
             answerNumber = (TextView) view.findViewById(R.id.no_answers);
-            questionImage = (ImageView) view.findViewById(R.id.event_image);
+            questionImage = (LinearLayout) view.findViewById(R.id.question_image);
             cardView = (CardView) view.findViewById(R.id.card_view);
         }
     }
@@ -72,21 +74,38 @@ public class ArrivedQuestionsAdapter extends RecyclerView.Adapter<ArrivedQuestio
         final QuestionItem question = questions.get(position);
         holder.questionName.setText(question.getQuestion());
         holder.questionFormat.setText(QuestionItem.getFormatAsString(question.getFormat()));
-        holder.answerNumber.setText(String.valueOf(poll.getAnswersForQuestion(question.getQuestionId()).size()));
 
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // create intent to go to the next activity
-                Intent intent = new Intent(mContext, PollResultsPerQuestionActivity.class);
-                intent.putExtra(PollResultsPerQuestionActivity.QUESTIONARE_TYPE, POLL);
-                intent.putExtra(PollResultsPerQuestionActivity.QUESTIONARE_ID, question.getQuestionareId());
-                intent.putExtra(PollResultsPerQuestionActivity.QUESTION_FORMAT, question.getFormat());
-                intent.putExtra(PollResultsPerQuestionActivity.QUESTION_ID, question.getQuestionId());
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(intent);
-            }
-        });
+        if(poll.getAnswersForQuestion(question.getQuestionId()) != null){
+            holder.answerNumber.setText(String.valueOf(poll.getAnswersForQuestion(question.getQuestionId()).size()));
+
+            holder.cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // create intent to go to the next activity
+                    Intent intent = new Intent(mContext, PollResultsPerQuestionActivity.class);
+                    intent.putExtra(PollResultsPerQuestionActivity.QUESTIONARE_TYPE, POLL);
+                    intent.putExtra(PollResultsPerQuestionActivity.QUESTIONARE_ID, question.getQuestionareId());
+                    intent.putExtra(PollResultsPerQuestionActivity.QUESTION_FORMAT, question.getFormat());
+                    intent.putExtra(PollResultsPerQuestionActivity.QUESTION_ID, question.getQuestionId());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    mContext.startActivity(intent);
+                }
+            });
+
+        }
+        else{
+            holder.answerNumber.setText(String.valueOf(0));
+
+            holder.cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Toast.makeText(mContext, mContext.getResources().getString(R.string.no_answer), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+
 
         if(position % 2 == 0){
             holder.questionImage.setBackgroundColor(mContext.getResources().getColor(colors[0]));

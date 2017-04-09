@@ -13,7 +13,7 @@ import com.sparq.application.userinterface.model.AnswerItem;
 
 import java.util.ArrayList;
 
-public interface NotifyUIHandler {
+public interface NotifyThreadHandler {
     public void handleConversationThreadQuestions();
     public void handleConversationThreadAnswers();
     public void handleConversationThreadAnswerVotes();

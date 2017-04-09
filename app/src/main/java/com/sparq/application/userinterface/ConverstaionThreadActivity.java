@@ -29,7 +29,6 @@ import com.sparq.util.Constants;
 
 import java.util.ArrayList;
 
-import static com.sparq.application.SPARQApplication.SPARQInstance;
 import static com.sparq.application.SPARQApplication.getInstance;
 
 public class ConverstaionThreadActivity extends AppCompatActivity {
@@ -70,20 +69,6 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
         answersArrayList = mThread.getAnswers();
 
         initializeViews();
-
-        mAdapter = new AnswerListAdapter(answersArrayList);
-
-        //TODO: shift the recyclerview below the edittext
-        //Assuming you meant moving it in the display, it's done, if you had any other interpretation sorry
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int a =  (displaymetrics.heightPixels*45)/100;
-        recyclerView.getLayoutParams().height = a;
-
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
 
         recyclerView.addOnItemTouchListener( new RecyclerItemClickListener(ConverstaionThreadActivity.this, new RecyclerItemClickListener.OnItemClickListener() {
             @Override public void onItemClick(View view, int position) {
@@ -151,6 +136,19 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
                 getInstance().startTimer();
             }
         });
+
+        //TODO: shift the recyclerview below the edittext
+        //Assuming you meant moving it in the display, it's done, if you had any other interpretation sorry
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        int a =  (displaymetrics.heightPixels*45)/100;
+        recyclerView.getLayoutParams().height = a;
+
+        mAdapter = new AnswerListAdapter(answersArrayList);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
     }
 
 //    public ArrayList<AnswerItem> getData(){
@@ -192,7 +190,7 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
             }
         }
 
-        NotifyUIHandler uiHandler = new NotifyUIHandler() {
+        NotifyThreadHandler uiHandler = new NotifyThreadHandler() {
             @Override
             public void handleConversationThreadQuestions() {
                 // do nothing
@@ -209,7 +207,7 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
             }
         };
 
-        SPARQApplication.setUINotifier(uiHandler);
+        SPARQApplication.setThreadNotifier(uiHandler);
     }
 
 
@@ -229,7 +227,7 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
     @Override
     public void onStop(){
         super.onStop();
-//        SPARQApplication.setUINotifier(null);
+//        SPARQApplication.setThreadNotifier(null);
     }
 
 }
