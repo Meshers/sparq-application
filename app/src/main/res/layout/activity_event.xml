@@ -76,15 +76,6 @@
             app:fab_title="Post Question"
             app:fab_colorPressed="@color/colorAccentDark"/>
 
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/join_event"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:fab_colorNormal="@color/colorAccent"
-            app:fab_size="mini"
-            app:fab_title="Join Event"
-            app:fab_colorPressed="@color/colorAccentDark"/>
-
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
 </android.support.design.widget.CoordinatorLayout>

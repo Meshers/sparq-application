@@ -85,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
         final MaterialDialog dialog = new MaterialDialog.Builder(LoginActivity.this)
                 .theme(Theme.LIGHT)
                 .customView(R.layout.dialog_user_identifier, true)
-                .positiveText("Login as Student")
+                .positiveText("Student Login")
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -121,6 +121,7 @@ public class LoginActivity extends AppCompatActivity {
                     SPARQApplication.setUserType(SPARQApplication.USER_TYPE.TEACHER);
 
                 } else {
+                    // FIXME: 4/9/2017 Should be allowed to enter the PIN again
                     Toast.makeText(LoginActivity.this, "Failed to authenticate", Toast.LENGTH_SHORT).show();
                     pinEntry.setText(null);
                     SPARQApplication.setUserType(SPARQApplication.USER_TYPE.STUDENT);
@@ -129,6 +130,9 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         dialog.show();
+        dialog.setCanceledOnTouchOutside(false);
+        //To disable back button on PIN prompt
+//        dialog.setCancelable(false);
     }
 
     public void onNextClick() {

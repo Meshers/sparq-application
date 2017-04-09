@@ -3,12 +3,16 @@ package com.sparq.application.userinterface;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringDef;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -114,6 +118,20 @@ public class NewQuestionareActicity extends AppCompatActivity {
 
                 // add all the questions to the questionare object
                 questionare.setQuestions(questionsArray);
+
+                //Log.i("onClick: ", questionare.getName());
+                //Setting first question as the main question for naming purpose
+                if(questionare.getName() == null){
+                    QuestionItem firstQuestion = questionsArray.get(new Integer(1));
+                    firstQuestion.setMainQuestion(true);
+                    questionare.setName(firstQuestion.getQuestion());
+                    Log.i("onClick: ", questionare.getName());
+                }
+                else{
+                    Log.i("onClick: ", questionare.getName());
+                }
+
+
                 switch(type){
                     case QUIZ:
                         break;
@@ -129,6 +147,13 @@ public class NewQuestionareActicity extends AppCompatActivity {
                 finish();
             }
         });
+
+        if(questionsArray.size() == 0){
+            addQuestionare.setEnabled(false);
+        }
+        else {
+            addQuestionare.setEnabled(true);
+        }
 
         mQuestionAdapter = new QuestionAdapter(NewQuestionareActicity.this,questionsArray);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(NewQuestionareActicity.this);
@@ -151,8 +176,6 @@ public class NewQuestionareActicity extends AppCompatActivity {
         final QuestionItem.FORMAT format[] = new QuestionItem.FORMAT[1];
         format[0] = QuestionItem.getFormatFromByte((byte) 1);
 
-        final boolean[] disableButton = new boolean[1];
-
         final OptionsAdapter mAdapter = new OptionsAdapter(options);
 
         final MaterialDialog dialog = new MaterialDialog.Builder(NewQuestionareActicity.this)
@@ -162,22 +185,27 @@ public class NewQuestionareActicity extends AppCompatActivity {
                 .negativeText("CANCEL")
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                    public void onClick(@NonNull final MaterialDialog dialog, @NonNull DialogAction which) {
 
                         View view = dialog.getCustomView();
-                        EditText questionName = (EditText) view.findViewById(R.id.question_text);
+                        final EditText questionName = (EditText) view.findViewById(R.id.question_text);
                         SwitchCompat mainQuestion = (SwitchCompat) view.findViewById(R.id.switchButton);
 
                         if((format[0] == QuestionItem.FORMAT.MCQ_SINGLE || format[0] == QuestionItem.FORMAT.MCQ_MULTIPLE)
                                 && mAdapter.getItemCount() < 2){
 
-                            disableButton[0] = true;
-                            // FIXME: 4/7/2017 make the options dialog stay with the toast use disableButton variable
                             Toast.makeText(NewQuestionareActicity.this, getResources().getString(R.string.more_options),
+                                    Toast.LENGTH_SHORT).show();
+
+                        }else if(questionName.getText().toString().length() == 0) {
+
+                            Toast.makeText(NewQuestionareActicity.this, getResources().getString(R.string.empty_question_msg),
                                     Toast.LENGTH_SHORT).show();
                         }
                         else{
-                            disableButton[0] = false;
+
+                            Log.i("onClick: ", questionName.getText().toString());
+
                             QuestionItem newQuestion = new QuestionItem(
                                     questionsArray.size()+1,
                                     questionare.getQuestionareId(),
@@ -198,7 +226,8 @@ public class NewQuestionareActicity extends AppCompatActivity {
                             }
 
                             dialog.dismiss();
-
+                            //Enabling the add button when atleast one question is present
+                            addQuestionare.setEnabled(true);
                         }
 
                         dialog.dismiss();
@@ -259,16 +288,27 @@ public class NewQuestionareActicity extends AppCompatActivity {
         addOption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // FIXME: 4/7/2017 Handle same option being added twice
+
                 if(option.getText().toString().compareTo("") != 0 && options.contains(option.getText().toString()) == false){
                     options.add(option.getText().toString());
                     mAdapter.notifyDataSetChanged();
                     option.setText("");
                 }
 
-                if(mAdapter.getItemCount() > 1){
+            }
+        });
+
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                if(options.size() >= 2){
                     (dialog).getActionButton(DialogAction.POSITIVE).setEnabled(true);
                 }
+                else{
+                    (dialog).getActionButton(DialogAction.POSITIVE).setEnabled(false);
+                }
+
             }
         });
 
@@ -278,7 +318,7 @@ public class NewQuestionareActicity extends AppCompatActivity {
             @Override
             public void onShow(DialogInterface dialog) {
                 if((format[0] == QuestionItem.FORMAT.MCQ_SINGLE || format[0] == QuestionItem.FORMAT.MCQ_MULTIPLE)
-                        && mAdapter.getItemCount() < 2){
+                        && options.size() < 2){
                     ((MaterialDialog)dialog).getActionButton(DialogAction.POSITIVE).setEnabled(false);
                 }
                 else{
@@ -287,7 +327,7 @@ public class NewQuestionareActicity extends AppCompatActivity {
             }
         });
 
-
+        dialog.setCanceledOnTouchOutside(false);
     }
 
     public void sendPollMessage(final ApplicationLayerPdu.TYPE type, final byte toAddr, final PollItem poll){

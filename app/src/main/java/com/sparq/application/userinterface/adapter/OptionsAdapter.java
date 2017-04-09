@@ -8,6 +8,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.sparq.R;
 
 import java.util.ArrayList;
@@ -45,28 +46,18 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int position) {
 
+        final String option = options.get(position);
+
         holder.optionName.setText(options.get(position));
 
         holder.deleteOption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // FIXME: 4/8/2017 Handle case when everything is deleted
-                if(options.size() > 1){
-                    options.remove(position);
-                    notifyItemRemoved(position);
-                }
-                else {
-                    options = null;
-                    notifyItemRemoved(position);
-                }
-
+                options.remove(option);
+                notifyDataSetChanged();
             }
         });
 
-        // FIXME: 4/7/2017 We need a better solution than this when the size becomes 0 throws nullpointerexception if everything is deleted
-        /*if(options.size() == 1){
-            holder.deleteOption.setEnabled(false);
-        }*/
 
     }
 

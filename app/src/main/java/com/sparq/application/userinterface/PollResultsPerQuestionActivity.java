@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
@@ -26,16 +27,20 @@ import com.sparq.application.userinterface.model.Questionare;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static com.sparq.R.id.toolbar;
+
 public class PollResultsPerQuestionActivity extends AppCompatActivity {
 
     public static final String QUESTION_FORMAT = "question_format";
     public static final String QUESTIONARE_ID = "questionare_id";
     public static final String QUESTION_ID = "question_id";
     public static final String QUESTIONARE_TYPE = "questionare_type";
+    public static final String POLL_NAME = "poll_name";
 
     private QuestionItem.FORMAT format;
     private int questionareId, questionId;
     private Questionare.QUESTIONARE_TYPE type;
+    private String pollName = "Poll Question";
 
     private RecyclerView answerRecyclerView;
     private CardView graphCard, recyclerCard;
@@ -49,6 +54,7 @@ public class PollResultsPerQuestionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_poll_results_per_question);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         Bundle bundle = getIntent().getExtras();
         if(bundle != null){
@@ -56,6 +62,7 @@ public class PollResultsPerQuestionActivity extends AppCompatActivity {
             format = (QuestionItem.FORMAT) bundle.getSerializable(QUESTION_FORMAT);
             questionareId = bundle.getInt(QUESTIONARE_ID);
             questionId = bundle.getInt(QUESTION_ID);
+            Log.i("onCreate: ", pollName);
         }
 
         switch(type){
@@ -63,6 +70,8 @@ public class PollResultsPerQuestionActivity extends AppCompatActivity {
                 break;
             case POLL:
                 answers = SPARQApplication.getPoll(questionareId).getAnswersForQuestion(questionId);
+                pollName = SPARQApplication.getPoll(questionareId).getName();
+                toolbar.setTitle(pollName);
         }
         initializeViews();
 

@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.sparq.util.Constants.OPTION_HEIGHT;
+
 public class QuestionAnswerListAdapter extends RecyclerView.Adapter<QuestionAnswerListAdapter.MyViewHolder> {
 
     private ArrayList<QuestionItem> questions;
@@ -76,6 +78,7 @@ public class QuestionAnswerListAdapter extends RecyclerView.Adapter<QuestionAnsw
         QuestionItem question = questions.get(position);
         holder.questionText.setText(question.getQuestion());
         AnswerItem questionareAnswer = null;
+        LinearLayout.LayoutParams answerListSize = null;
 
         switch(question.getFormat()){
             case MCQ_SINGLE:
@@ -83,6 +86,13 @@ public class QuestionAnswerListAdapter extends RecyclerView.Adapter<QuestionAnsw
                 Log.i("HERE", question.getOptions().toString());
                 holder.innerAdapter.setData(question.getOptions(), question.getFormat()); // List of Strings
                 holder.innerAdapter.setRowIndex(position);
+
+                int answerListHeight = OPTION_HEIGHT * question.getOptionsCount();
+//                answerListSize = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, answerListHeight);
+                ViewGroup.LayoutParams params= holder.recyclerView.getLayoutParams();
+                params.height += answerListHeight;
+                Log.i("onBindViewHolder: ", String.valueOf(params.height));
+                holder.recyclerView.setLayoutParams(params);
 
                 questionareAnswer = AnswerItem.getMCQSingleAnswer(
                         question.getQuestionId(),
@@ -94,10 +104,18 @@ public class QuestionAnswerListAdapter extends RecyclerView.Adapter<QuestionAnsw
 
                 adapters.put(question.getQuestionId(),holder.innerAdapter);
                 break;
+
             case MCQ_MULTIPLE:
                 holder.recyclerView.setVisibility(View.VISIBLE);
                 holder.innerAdapter.setData(question.getOptions(), question.getFormat()); // List of Strings
                 holder.innerAdapter.setRowIndex(position);
+
+                answerListHeight = OPTION_HEIGHT * question.getOptionsCount();
+//                answerListSize = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, answerListHeight);
+                params = holder.recyclerView.getLayoutParams();
+                Log.i("onBindViewHolder: ", String.valueOf(params.height));
+                params.height = answerListHeight;
+                holder.recyclerView.setLayoutParams(params);
 
                 questionareAnswer = AnswerItem.getMCQMultipleAnswer(
                         question.getQuestionId(),
@@ -109,6 +127,7 @@ public class QuestionAnswerListAdapter extends RecyclerView.Adapter<QuestionAnsw
 
                 adapters.put(question.getQuestionId(),holder.innerAdapter);
                 break;
+
             case ONE_WORD:
                 holder.linearLayout.setVisibility(View.VISIBLE);
 

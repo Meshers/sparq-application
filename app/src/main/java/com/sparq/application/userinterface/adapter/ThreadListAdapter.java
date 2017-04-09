@@ -13,6 +13,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
 import com.sparq.application.layer.almessage.AlVote;
@@ -47,7 +49,7 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
         public TextView threadDate;
         public TextView threadVotes;
         public LinearLayout threadImage;
-        public ImageView likeBtn, unlikeBtn, shareBtn;
+        public ImageView likeBtn, unlikeBtn, answerCount;
         public CardView card;
 
         public MyViewHolder(View view) {
@@ -58,7 +60,7 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
             threadImage = (LinearLayout) view.findViewById(R.id.thread_image);
             likeBtn = (ImageView) view.findViewById(R.id.like_image);
             unlikeBtn = (ImageView) view.findViewById(R.id.unlike_image);
-            shareBtn = (ImageView) view.findViewById(R.id.share_image);
+            answerCount = (ImageView) view.findViewById(R.id.answer_count);
             card = (CardView) view.findViewById(R.id.card_view);
         }
     }
@@ -85,13 +87,14 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
         holder.threadDate.setText(new SimpleDateFormat("yyyy-MM-dd").format(thread.getDate()));
         holder.threadVotes.setText(String.valueOf(thread.getQuestionItem().getVotes()));
 
-//        ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
+        ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
         // generate color based on a key (same key returns the same color), useful for list/grid views
-//        int color = generator.getColor(thread.getQuestionItem().getQuestion());
+        int color = generator.getColor(thread.getAnswers().size());
 
-//        TextDrawable drawable = TextDrawable.builder()
-//                .buildRect(String.valueOf(thread.getQuestionItem().getQuestion().charAt(0)), color);
-//        holder.threadImage.setImageDrawable(drawable);
+        TextDrawable drawable = TextDrawable.builder()
+                .buildRound(String.valueOf(thread.getAnswers().size()), color);
+        holder.answerCount.setImageDrawable(drawable);
+
 
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,13 +144,6 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
                 Toast.makeText(mContext, mContext.getResources().getString(R.string.vote_recorded), Toast.LENGTH_SHORT).show();
                 SPARQInstance.startTimer();
 
-            }
-        });
-
-        holder.shareBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(mContext, mContext.getResources().getString(R.string.func_added_soon), Toast.LENGTH_SHORT).show();
             }
         });
 

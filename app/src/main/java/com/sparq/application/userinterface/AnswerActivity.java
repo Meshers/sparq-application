@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
 import com.sparq.application.layer.almessage.AlVote;
@@ -34,7 +37,7 @@ public class AnswerActivity extends AppCompatActivity {
 
     private TextView questionText;
     private TextView answerText;
-    private TextView usernameText;
+    private TextView userId;
     private TextView answerVotes;
     private ImageView userImage;
     private ImageView like, share, unlike;
@@ -111,10 +114,18 @@ public class AnswerActivity extends AppCompatActivity {
         answerText = (TextView) findViewById(R.id.answer_text);
         answerText.setText(answer.getAnswer());
 
-        usernameText = (TextView) findViewById(R.id.answer_username);
+        userId = (TextView) findViewById(R.id.user_id);
+        userImage = (ImageView) findViewById(R.id.user_image);
 
-        // FIXME: 2/4/17
-        usernameText.setText("Anonymous");
+        ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
+        // generate color based on a key (same key returns the same color), useful for list/grid views
+        int color = generator.getColor(answerCreatorId);
+
+        TextDrawable drawable = TextDrawable.builder()
+                .buildRound(String.valueOf(answerCreatorId), color);
+        userImage.setImageDrawable(drawable);
+
+        userId.setText(String.valueOf(answerCreatorId));
 
         answerVotes = (TextView) findViewById(R.id.answer_votes);
         answerVotes.setText(String.valueOf(answer.getVotes()));
@@ -122,7 +133,6 @@ public class AnswerActivity extends AppCompatActivity {
         userImage = (ImageView) findViewById(R.id.user_image);
 
         like = (ImageView) findViewById(R.id.like);
-        share = (ImageView) findViewById(R.id.share);
         unlike = (ImageView) findViewById(R.id.unlike);
 
         like.setOnClickListener(new View.OnClickListener() {
@@ -142,13 +152,6 @@ public class AnswerActivity extends AppCompatActivity {
                 Toast.makeText(AnswerActivity.this, getResources().getString(R.string.vote_recorded), Toast.LENGTH_SHORT).show();
                 //Re-start the timer to disable buttons
                 SPARQInstance.startTimer();
-            }
-        });
-
-        share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(AnswerActivity.this, getResources().getString(R.string.func_added_soon), Toast.LENGTH_SHORT).show();
             }
         });
 

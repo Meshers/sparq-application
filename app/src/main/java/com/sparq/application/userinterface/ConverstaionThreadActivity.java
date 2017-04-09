@@ -134,6 +134,7 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
                 Toast.makeText(ConverstaionThreadActivity.this, getResources().getString(R.string.ans_recorded), Toast.LENGTH_SHORT).show();
                 //Re-start the timer to disable buttons
                 getInstance().startTimer();
+
             }
         });
 

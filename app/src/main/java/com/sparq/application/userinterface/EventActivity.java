@@ -73,6 +73,7 @@ public class EventActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         int eventId = bundle.getInt("event_id");
 
+        // FIXME: 4/9/2017 
         // add event name here
         setTitle("Event 0");
 
@@ -131,6 +132,11 @@ public class EventActivity extends AppCompatActivity {
 
         SPARQApplication.USER_TYPE userType = getUserType();
 
+        if(userType == null){
+            SPARQApplication.setUserType(SPARQApplication.USER_TYPE.STUDENT);
+            userType = SPARQApplication.USER_TYPE.STUDENT;
+        }
+
         newEvent = (FloatingActionsMenu) findViewById(R.id.fab);
         newPoll = (FloatingActionButton) findViewById(R.id.fab_new_poll);
         newQuiz = (FloatingActionButton) findViewById(R.id.fab_new_quiz);
@@ -152,6 +158,7 @@ public class EventActivity extends AppCompatActivity {
                         Intent intent = new Intent(EventActivity.this, NewQuestionareActicity.class);
                         intent.putExtra(NewQuestionareActicity.QUESTIONARE_TYPE, Questionare.QUESTIONARE_TYPE.POLL);
                         startActivity(intent);
+                        newEvent.collapse();
 
                         // FIXME: 4/6/2017 
 //                ArrayList<String> options = new ArrayList<String>();
@@ -183,6 +190,7 @@ public class EventActivity extends AppCompatActivity {
 //                startActivity(intent);
 
                         // FIXME: 4/6/2017
+/*
                         ArrayList<String> options = new ArrayList<String>();
                         options.add("oneeee");
                         options.add("two");
@@ -199,6 +207,7 @@ public class EventActivity extends AppCompatActivity {
                                 1,
                                 false,false, true
                         );
+*/
 
                         newEvent.collapse();
                     }
@@ -251,8 +260,6 @@ public class EventActivity extends AppCompatActivity {
                             Toast.makeText(EventActivity.this, getResources().getString(R.string.empty_question_msg),
                                     Toast.LENGTH_SHORT).show();
 
-                            //TODO: check question length(<160)
-                            //Hope you meant to toast incase the length was greater than 160 characters
                         }
                         else if(questionText.getText().toString().length() > 160){
                             Toast.makeText(EventActivity.this, getResources().getString(R.string.long_question_msg),

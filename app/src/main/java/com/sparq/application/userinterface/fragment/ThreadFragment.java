@@ -186,6 +186,7 @@ public class ThreadFragment extends Fragment {
             @Override
             public void handleConversationThreadAnswers(){
                 // do nothing
+                initializeThreadAdapter();
             }
 
             @Override

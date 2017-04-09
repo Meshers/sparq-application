@@ -102,6 +102,8 @@ public class PollListAdapter extends RecyclerView.Adapter<PollListAdapter.MyView
                         Intent intent = new Intent(mContext, QuestionareActivity.class);
                         intent.putExtra(QuestionareActivity.QUESTIONARE_TYPE, POLL);
                         intent.putExtra(QuestionareActivity.QUESTIONARE_ID, poll.getQuestionareId());
+                        // FIXME: 4/9/2017 
+//                        intent.putExtra(QuestionareActivity.POLL_NAME, poll.getName());
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         mContext.startActivity(intent);
                     }

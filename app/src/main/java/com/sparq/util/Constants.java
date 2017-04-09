@@ -21,5 +21,6 @@ public class Constants {
 
     public static final String UI_ENABLE_BROADCAST_INTENT = "com.sparq.application.UI_ENABLE_INTENT";
     public static final String UI_DISABLE_BROADCAST_INTENT = "com.sparq.application.UI_DISABLE_INTENT";
+    public static final int OPTION_HEIGHT = 60;
 
 }
