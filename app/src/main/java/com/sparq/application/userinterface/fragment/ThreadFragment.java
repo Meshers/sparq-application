@@ -103,7 +103,6 @@ public class ThreadFragment extends Fragment {
 
                 String action = intent.getAction();
                 if(action.equalsIgnoreCase(Constants.UI_ENABLE_BROADCAST_INTENT)){
-                    Log.i(TAG, "Timer up!");
                     btnEnable = true;
                 }
                 else if(action.equalsIgnoreCase(Constants.UI_DISABLE_BROADCAST_INTENT)){
@@ -111,11 +110,13 @@ public class ThreadFragment extends Fragment {
                 }
 
                 // FIXME: 4/6/2017 I assume this redundancy is required?
+                Log.i(TAG, "onReceive: timerReceiver");
                 initializeThreadAdapter();
 
             }
         };
 
+        Log.i(TAG, "onCreateView: afterTimerReceiver");
         initializeThreadAdapter();
 
         return view;
@@ -127,6 +128,14 @@ public class ThreadFragment extends Fragment {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
+
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                initializeThreadAdapter();
+            }
+        });
     }
 
     public void initializeView(View view){
@@ -167,6 +176,8 @@ public class ThreadFragment extends Fragment {
             btnEnable = false;
         }
 
+        initializeThreadAdapter();
+
         NotifyThreadHandler uiHandler = new NotifyThreadHandler() {
             @Override
             public void handleConversationThreadQuestions() {
@@ -180,13 +191,13 @@ public class ThreadFragment extends Fragment {
                     emptyView.setVisibility(View.GONE);
                 }
 
-                initializeThreadAdapter();
+                mAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void handleConversationThreadAnswers(){
                 // do nothing
-                initializeThreadAdapter();
+                mAdapter.notifyDataSetChanged();
             }
 
             @Override

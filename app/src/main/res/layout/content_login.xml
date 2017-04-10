@@ -65,18 +65,20 @@
                     android:inputType="number"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorPrimaryDark"
-                    android:hint="Own Address" />
+                    android:hint="Personal ID" />
 
             </android.support.design.widget.TextInputLayout>
 
             <Button
                 android:id="@+id/submit"
+                android:drawableRight="@drawable/ic_submit_arrow"
                 android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:elevation="10dp"
                 android:gravity="center"
                 android:textAlignment="gravity"
-                android:text="SUBMIT"
+                android:text="ENTER"
                 android:theme="@style/AppButton"
                 style="@style/Widget.AppCompat.Button.Colored"/>
         </LinearLayout>

@@ -15,7 +15,8 @@ public class Constants {
     public static final int MIN_QUESTION_MARKS = 0;
     public static final byte DEFAULT_ADDRESS = (byte) 0;
     public static final byte TEACHER_ADDRESS = (byte) 1;
-    public static final int MAX_NUMBER_OF_OPTIONS = 4;
+    public static final int MAX_NUMBER_OF_OPTIONS = 5;
+    public static final int MAX_NUMBER_OF_QUESIONS = 7;
     public static final long QUIZ_DURATION = 10 * 60 * 1000; // 10 minutes
 
     public static final byte CONSTANT_DELIMITER = '#';

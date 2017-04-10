@@ -75,7 +75,7 @@ public class EventActivity extends AppCompatActivity {
 
         // FIXME: 4/9/2017 
         // add event name here
-        setTitle("Event 0");
+        setTitle("SPARQ");
 
         initializeViews();
 
@@ -303,16 +303,6 @@ public class EventActivity extends AppCompatActivity {
             isReceiverRegistered = false;
         }
     }
-
-//    public class UIReceiver extends BroadcastReceiver
-//    {
-//
-//        @Override
-//        public void onReceive(Context context, Intent intent)
-//        {
-//
-//        }
-//    }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event){

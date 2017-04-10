@@ -130,8 +130,6 @@ public class AnswerActivity extends AppCompatActivity {
         answerVotes = (TextView) findViewById(R.id.answer_votes);
         answerVotes.setText(String.valueOf(answer.getVotes()));
 
-        userImage = (ImageView) findViewById(R.id.user_image);
-
         like = (ImageView) findViewById(R.id.like);
         unlike = (ImageView) findViewById(R.id.unlike);
 

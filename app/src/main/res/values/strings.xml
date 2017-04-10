@@ -15,13 +15,16 @@
     <string name="func_added_soon">Functionality will be added soon</string>
     <string name="message_send">Message Sent</string>
     <string name="new_question">Post Question</string>
-    <string name="empty_question_msg">Please enter a valid Question</string>
+    <string name="empty_question_msg">Please enter a valid question</string>
+    <string name="empty_field_msg">Field cannot be empty</string>
     <string name="long_question_msg">Only 160 characters allowed</string>
-    <string name="ans_recorded">Your answer has been recorded</string>
+    <string name="ans_recorded">Answer recorded</string>
     <string name="question_recorded">Your question has been recorded</string>
     <string name="no_answer">No Answer has arrived for the given question</string>
     <string name="has_answered">This Questionare has already been answered</string>
     <string name="poll_question_prompt">Question Type</string>
+    <string name="invalid_code">Invalid code</string>
+    <string name="invalid_address">Invalid address</string>
 
     <string-array name="poll_question_types">
         <item>MCQ</item>

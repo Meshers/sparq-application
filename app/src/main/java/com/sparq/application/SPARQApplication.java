@@ -152,7 +152,6 @@ public class SPARQApplication extends MultiDexApplication {
                 intent.setAction(Constants.UI_ENABLE_BROADCAST_INTENT);
                 getApplicationContext().sendBroadcast(intent);
                 isTimerElapsed = true;
-                Log.i(TAG, "Timer finished");
             }
         };
 
@@ -166,7 +165,6 @@ public class SPARQApplication extends MultiDexApplication {
 
         isTimerElapsed = false;
         getInstance().uiTimer.start();
-        Log.i(TAG, "Timer started");
     }
 
     public static void setQuizNotifier(NotifyQuizHandler handler){

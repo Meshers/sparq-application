@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ public class PollFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String TAG = "PollFragment";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -101,12 +103,23 @@ public class PollFragment extends Fragment {
     }
 
     public void initializePollAdapater(){
-        mAdapter = new PollListAdapter(getActivity(),pollsArrayList);
+        mAdapter = new PollListAdapter(getActivity().getApplicationContext(),pollsArrayList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
+
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                Log.i("onChanged: PollFragment", String.valueOf(pollsArrayList.size()));
+                initializePollAdapater();
+            }
+        });
     }
+
+
 
     @Override
     public void onAttach(Context context) {
@@ -175,6 +188,7 @@ public class PollFragment extends Fragment {
         NotifyPollHandler pollHandler = new NotifyPollHandler() {
             @Override
             public void handlePollQuestions() {
+                Log.i(TAG, "handlePollQuestions: ");
 
                 if(pollsArrayList.size() == 0){
                     recyclerView.setVisibility(View.GONE);
@@ -190,6 +204,16 @@ public class PollFragment extends Fragment {
 
             @Override
             public void handlePollAnswers() {
+                Log.i(TAG, "handlePollQuestions: ");
+
+                if(pollsArrayList.size() == 0){
+                    recyclerView.setVisibility(View.GONE);
+                    emptyView.setVisibility(View.VISIBLE);
+                }
+                else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    emptyView.setVisibility(View.GONE);
+                }
                 // if an answer has arrived prevent the user from answering again
                 initializePollAdapater();
             }

@@ -9,10 +9,12 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.sparq.R;
+import com.sparq.application.userinterface.ConverstaionThreadActivity;
 import com.sparq.application.userinterface.model.AnswerItem;
 
 import java.util.ArrayList;
@@ -29,13 +31,13 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.My
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView answerText;
         public TextView userText;
-        public ImageView answerImage;
+        public ImageView userImage;
 
         public MyViewHolder(View view) {
             super(view);
             answerText = (TextView) view.findViewById(R.id.answer_text);
             userText = (TextView) view.findViewById(R.id.username_text);
-            answerImage = (ImageView) view.findViewById(R.id.answer_image);
+            userImage = (ImageView) view.findViewById(R.id.user_image);
         }
     }
 
@@ -56,17 +58,16 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.My
     public void onBindViewHolder(MyViewHolder holder, int position) {
         AnswerItem answer = answers.get(position);
         holder.answerText.setText(answer.getAnswer());
-//        holder.userText.setText(answer.getUser().getUsername());
-        // FIXME: 4/3/2017
-        holder.userText.setText("Jane Doe");
 
-//        ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
-//        // generate color based on a key (same key returns the same color), useful for list/grid views
-//        int color = generator.getColor(answer.getAnswer());
-//
-//        TextDrawable drawable = TextDrawable.builder()
-//                .buildRound(String.valueOf(answer.getAnswer().charAt(0)), color);
-//        holder.answerImage.setImageDrawable(drawable);
+        //holder.userText.setText(answer.getUser().getUsername());
+
+        ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
+        // generate color based on a key (same key returns the same color), useful for list/grid views
+        int color = generator.getColor(answer.getCreator().getUserId());
+
+        TextDrawable drawable = TextDrawable.builder()
+                .buildRound(String.valueOf(answer.getCreator().getUserId()), color);
+        holder.userImage.setImageDrawable(drawable);
 
     }
 

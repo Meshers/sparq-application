@@ -22,7 +22,7 @@
             android:layout_height="wrap_content" />
 
         <TextView
-            android:text="If so, Please enter in your PIN"
+            android:text="Please key in your PIN"
             android:gravity="center"
             android:textColor="@color/secondaryText"
             android:layout_marginTop="2dp"

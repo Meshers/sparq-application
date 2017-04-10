@@ -15,6 +15,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -73,6 +74,8 @@ public class NewQuestionareActicity extends AppCompatActivity {
         if(bundle != null){
             type = (Questionare.QUESTIONARE_TYPE) bundle.getSerializable(QUESTIONARE_TYPE);
         }
+
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
         switch(type){
             case QUIZ:
@@ -188,6 +191,19 @@ public class NewQuestionareActicity extends AppCompatActivity {
         questionsRecyclerView.setLayoutManager(mLayoutManager);
         questionsRecyclerView.setItemAnimator(new DefaultItemAnimator());
         questionsRecyclerView.setAdapter(mQuestionAdapter);
+
+        mQuestionAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                if(mQuestionAdapter.getItemCount() == Constants.MAX_NUMBER_OF_QUESIONS){
+                    newQuestion.setEnabled(false);
+                }
+                else{
+                    newQuestion.setEnabled(true);
+                }
+            }
+        });
     }
 
     public void openNewQuizQuestionDialog(){
@@ -201,8 +217,6 @@ public class NewQuestionareActicity extends AppCompatActivity {
 
         final QuestionItem.FORMAT format[] = new QuestionItem.FORMAT[1];
         format[0] = QuestionItem.getFormatFromByte((byte) 1);
-
-        final boolean[] disableButton = new boolean[1];
 
         final OptionsAdapter mAdapter = new OptionsAdapter(options);
 
@@ -218,13 +232,10 @@ public class NewQuestionareActicity extends AppCompatActivity {
                         if((format[0] == QuestionItem.FORMAT.MCQ_SINGLE || format[0] == QuestionItem.FORMAT.MCQ_MULTIPLE)
                                 && mAdapter.getItemCount() < 2){
 
-                            disableButton[0] = true;
-                            // FIXME: 4/7/2017 make the options dialog stay with the toast use disableButton variable
                             Toast.makeText(NewQuestionareActicity.this, getResources().getString(R.string.more_options),
                                     Toast.LENGTH_SHORT).show();
                         }
                         else{
-                            disableButton[0] = false;
                             QuestionItem newQuestion = new QuestionItem(
                                     questionsArray.size()+1,
                                     questionare.getQuestionareId(),
@@ -294,21 +305,38 @@ public class NewQuestionareActicity extends AppCompatActivity {
 
 
         final EditText option = (EditText) view.findViewById(R.id.option_text);
-        ImageView addOption = (ImageView) view.findViewById(R.id.add_option);
+        final ImageView addOption = (ImageView) view.findViewById(R.id.add_option);
 
         addOption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // FIXME: 4/7/2017 Handle same option being added twice
                 if(option.getText().toString().compareTo("") != 0 && options.contains(option.getText().toString()) == false){
                     options.add(option.getText().toString());
                     mAdapter.notifyDataSetChanged();
                     option.setText("");
                 }
 
-                if(mAdapter.getItemCount() > 1){
+            }
+        });
+
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                if(mAdapter.getItemCount() >= 2){
                     (dialog).getActionButton(DialogAction.POSITIVE).setEnabled(true);
                 }
+                else{
+                    (dialog).getActionButton(DialogAction.POSITIVE).setEnabled(false);
+                }
+
+                if(mAdapter.getItemCount() == Constants.MAX_NUMBER_OF_OPTIONS){
+                    addOption.setEnabled(false);
+                }
+                else{
+                    addOption.setEnabled(true);
+                }
+
             }
         });
 
@@ -371,8 +399,6 @@ public class NewQuestionareActicity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
                         }
                         else{
-
-                            Log.i("onClick: ", questionName.getText().toString());
 
                             QuestionItem newQuestion = new QuestionItem(
                                     questionsArray.size()+1,
@@ -444,14 +470,13 @@ public class NewQuestionareActicity extends AppCompatActivity {
                     hideLayout.setVisibility(View.GONE);
                     (dialog).getActionButton(DialogAction.POSITIVE).setEnabled(true);
                 }
-                Log.i("format", item);
             }
 
         });
 
 
         final EditText option = (EditText) view.findViewById(R.id.option_text);
-        ImageView addOption = (ImageView) view.findViewById(R.id.add_option);
+        final ImageView addOption = (ImageView) view.findViewById(R.id.add_option);
 
         addOption.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -470,11 +495,18 @@ public class NewQuestionareActicity extends AppCompatActivity {
             @Override
             public void onChanged() {
                 super.onChanged();
-                if(options.size() >= 2){
+                if(mAdapter.getItemCount() >= 2){
                     (dialog).getActionButton(DialogAction.POSITIVE).setEnabled(true);
                 }
                 else{
                     (dialog).getActionButton(DialogAction.POSITIVE).setEnabled(false);
+                }
+
+                if(mAdapter.getItemCount() == Constants.MAX_NUMBER_OF_OPTIONS){
+                    addOption.setEnabled(false);
+                }
+                else{
+                    addOption.setEnabled(true);
                 }
 
             }

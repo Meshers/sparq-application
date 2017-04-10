@@ -57,8 +57,6 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
                 notifyDataSetChanged();
             }
         });
-
-
     }
 
     @Override

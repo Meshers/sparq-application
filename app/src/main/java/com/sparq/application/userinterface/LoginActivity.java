@@ -10,7 +10,9 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -36,19 +38,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//
-//        FloatingActionButton newQuestion = (FloatingActionButton) findViewById(R.id.newQuestion);
-//        newQuestion.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
         initializeViews();
-
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         makePermissionsRequest();
 
         openDialog();
@@ -139,40 +130,38 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(this, EventActivity.class);
         String eventCode = mEventCode.getText().toString();
         String ownAddress = mOwnAddr.getText().toString();
+        Log.i("Login Activity:"," onNextClick: ");
 
         if(eventCode.equals("")){
-            Toast.makeText(LoginActivity.this, "Fields cannot be empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LoginActivity.this, getResources().getString(R.string.empty_field_msg), Toast.LENGTH_SHORT).show();
             return;
         }
 
         if(Integer.valueOf(eventCode) > 127 || Integer.valueOf(eventCode) < 1){
-            Toast.makeText(LoginActivity.this, "Invalid Event Code", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LoginActivity.this, getResources().getString(R.string.invalid_code), Toast.LENGTH_SHORT).show();
             return;
         }
 
-        SPARQApplication.setSessionId(Byte.parseByte(eventCode));
+        if(SPARQInstance.getUserType() == SPARQApplication.USER_TYPE.STUDENT){
 
-        if(SPARQApplication.getUserType() == SPARQApplication.USER_TYPE.STUDENT){
-
-            String addrStr = mOwnAddr.getText().toString();
-            if(addrStr.equals("")){
-                Toast.makeText(LoginActivity.this, "Fields cannot be empty", Toast.LENGTH_SHORT).show();
+            if(ownAddress.equals("")){
+                Toast.makeText(LoginActivity.this, getResources().getString(R.string.empty_field_msg), Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if(Integer.valueOf(addrStr) > MAX_USERS
+            if(Integer.valueOf(ownAddress) > MAX_USERS
                     || Integer.valueOf(eventCode) < 1){
-                Toast.makeText(LoginActivity.this, "Invalid address", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, getResources().getString(R.string.invalid_address), Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            SPARQApplication.setOwnAddr(Byte.parseByte(addrStr));
-
-
+            SPARQInstance.setOwnAddr(Byte.parseByte(ownAddress));
         }
 
-        intent.putExtra(Main2Activity.EXTRA_EVENT_CODE, SPARQApplication.getOwnAddress());
-        SPARQApplication.getInstance().initializeObjects(LoginActivity.this);
+        SPARQInstance.setSessionId(Byte.parseByte(eventCode));
+
+        intent.putExtra(Main2Activity.EXTRA_EVENT_CODE, SPARQInstance.getSessionId());
+        SPARQInstance.getInstance().initializeObjects(LoginActivity.this);
 
         startActivity(intent);
     }
@@ -187,7 +176,6 @@ public class LoginActivity extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 onNextClick();
             }
         });

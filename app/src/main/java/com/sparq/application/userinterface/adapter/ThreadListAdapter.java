@@ -123,7 +123,7 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
                         AlVote.VOTE_TYPE.UPVOTE);
 
                 Toast.makeText(mContext, mContext.getResources().getString(R.string.vote_recorded), Toast.LENGTH_SHORT).show();
-                SPARQInstance.startTimer();
+                SPARQApplication.getInstance().startTimer();
 
             }
         });
@@ -142,7 +142,7 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
                         AlVote.VOTE_TYPE.DOWNVOTE);
 
                 Toast.makeText(mContext, mContext.getResources().getString(R.string.vote_recorded), Toast.LENGTH_SHORT).show();
-                SPARQInstance.startTimer();
+                SPARQApplication.getInstance().startTimer();
 
             }
         });

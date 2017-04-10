@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -57,6 +58,8 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
         Bundle extras = getIntent().getExtras();
 
         if(extras != null){
@@ -97,7 +100,6 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
 
                 String action = intent.getAction();
                 if(action.equalsIgnoreCase(Constants.UI_ENABLE_BROADCAST_INTENT)){
-                    Log.i(TAG, "Timer up!");
                     postAnswer.setEnabled(true);
                 }
                 else if(action.equalsIgnoreCase(Constants.UI_DISABLE_BROADCAST_INTENT)){
@@ -120,20 +122,31 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
         postAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(answerText.getText().toString().length() == 0){
+                    Toast.makeText(ConverstaionThreadActivity.this, getResources().getString(R.string.empty_field_msg), Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    SPARQApplication.sendThreadMessage(
+                            ApplicationLayerPdu.TYPE.ANSWER,
+                            SPARQApplication.getBdcastAddress(),
+                            answerText.getText().toString(),
+                            creatorId,
+                            threadId,
+                            SPARQApplication.getOwnAddress(),
+                            SPARQApplication.getCurrentAnswerId(),
+                            null
+                    );
+                    Toast.makeText(ConverstaionThreadActivity.this, getResources().getString(R.string.ans_recorded), Toast.LENGTH_SHORT).show();
+                    //Re-start the timer to disable buttons
+                    getInstance().startTimer();
+                    answerText.setText("");
 
-                SPARQApplication.sendThreadMessage(
-                        ApplicationLayerPdu.TYPE.ANSWER,
-                        SPARQApplication.getBdcastAddress(),
-                        answerText.getText().toString(),
-                        creatorId,
-                        threadId,
-                        SPARQApplication.getOwnAddress(),
-                        SPARQApplication.getCurrentAnswerId(),
-                        null
-                );
-                Toast.makeText(ConverstaionThreadActivity.this, getResources().getString(R.string.ans_recorded), Toast.LENGTH_SHORT).show();
-                //Re-start the timer to disable buttons
-                getInstance().startTimer();
+                    if(mAdapter != null){
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                Log.i(TAG, "OnResume: " + SPARQApplication.getSessionId());
 
             }
         });
@@ -181,7 +194,6 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
 
         //Checks if the timer has elapsed, if it has the buttons can be active again
         if(SPARQApplication.isTimerElapsed()){
-            Log.i(TAG, "OnResume: " + SPARQApplication.isTimerElapsed());
             postAnswer.setEnabled(true);
         }
         else {
@@ -192,6 +204,7 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
             @Override
             public void handleConversationThreadQuestions() {
                 // do nothing
+                mAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -212,9 +225,6 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
     @Override
     public void onPause(){
         super.onPause();
-
-        Log.i(TAG, "onPause");
-
         if (isReceiverRegistered) {
             unregisterReceiver(timerReceiver);
             isReceiverRegistered = false;

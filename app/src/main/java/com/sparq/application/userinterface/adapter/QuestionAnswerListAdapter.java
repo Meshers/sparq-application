@@ -88,10 +88,8 @@ public class QuestionAnswerListAdapter extends RecyclerView.Adapter<QuestionAnsw
                 holder.innerAdapter.setRowIndex(position);
 
                 int answerListHeight = OPTION_HEIGHT * question.getOptionsCount();
-//                answerListSize = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, answerListHeight);
                 ViewGroup.LayoutParams params= holder.recyclerView.getLayoutParams();
                 params.height += answerListHeight;
-                Log.i("onBindViewHolder: ", String.valueOf(params.height));
                 holder.recyclerView.setLayoutParams(params);
 
                 questionareAnswer = AnswerItem.getMCQSingleAnswer(
@@ -115,9 +113,8 @@ public class QuestionAnswerListAdapter extends RecyclerView.Adapter<QuestionAnsw
                 recyclerView.getLayoutParams().height = (int)((displaymetrics.heightPixels*45)/100);*/
 
                 answerListHeight = OPTION_HEIGHT * question.getOptionsCount();
-                params = holder.recyclerView.getLayoutParams();
-                Log.i("onBindViewHolder: ", String.valueOf(params.height));
-                params.height = answerListHeight;
+                params= holder.recyclerView.getLayoutParams();
+                params.height += answerListHeight;
                 holder.recyclerView.setLayoutParams(params);
 
                 questionareAnswer = AnswerItem.getMCQMultipleAnswer(
