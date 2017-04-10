@@ -194,6 +194,8 @@ public class PollFragment extends Fragment {
                 initializePollAdapater();
             }
         };
+
+        SPARQApplication.setPollNotifier(pollHandler);
     }
 
 }

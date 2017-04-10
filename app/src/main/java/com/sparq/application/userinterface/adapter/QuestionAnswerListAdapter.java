@@ -3,6 +3,7 @@ package com.sparq.application.userinterface.adapter;
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -110,8 +111,11 @@ public class QuestionAnswerListAdapter extends RecyclerView.Adapter<QuestionAnsw
                 holder.innerAdapter.setData(question.getOptions(), question.getFormat()); // List of Strings
                 holder.innerAdapter.setRowIndex(position);
 
+                /*DisplayMetrics displaymetrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+                recyclerView.getLayoutParams().height = (int)((displaymetrics.heightPixels*45)/100);*/
+
                 answerListHeight = OPTION_HEIGHT * question.getOptionsCount();
-//                answerListSize = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, answerListHeight);
                 params = holder.recyclerView.getLayoutParams();
                 Log.i("onBindViewHolder: ", String.valueOf(params.height));
                 params.height = answerListHeight;

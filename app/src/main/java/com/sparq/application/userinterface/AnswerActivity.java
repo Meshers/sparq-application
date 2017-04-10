@@ -210,16 +210,16 @@ public class AnswerActivity extends AppCompatActivity {
             filter.addCategory(Intent.CATEGORY_DEFAULT);
             registerReceiver(timerReceiver,filter);
             isReceiverRegistered = true;
+        }
 
-            //Checks if the timer has elapsed, if it has the buttons can be active again
-            if(SPARQApplication.isTimerElapsed()){
-                Log.i(TAG, "OnResume: " + SPARQApplication.isTimerElapsed());
-                activateVote();
-            }
-            else {
-                Log.i(TAG, "OnResume: " + SPARQApplication.isTimerElapsed());
-                deactivateVote();
-            }
+        //Checks if the timer has elapsed, if it has the buttons can be active again
+        if(SPARQApplication.isTimerElapsed()){
+            Log.i(TAG, "OnResume: " + SPARQApplication.isTimerElapsed());
+            activateVote();
+        }
+        else {
+            Log.i(TAG, "OnResume: " + SPARQApplication.isTimerElapsed());
+            deactivateVote();
         }
 
         NotifyThreadHandler uiHandler = new NotifyThreadHandler() {

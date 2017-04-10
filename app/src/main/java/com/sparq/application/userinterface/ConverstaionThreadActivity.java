@@ -138,12 +138,9 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
             }
         });
 
-        //TODO: shift the recyclerview below the edittext
-        //Assuming you meant moving it in the display, it's done, if you had any other interpretation sorry
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int a =  (displaymetrics.heightPixels*45)/100;
-        recyclerView.getLayoutParams().height = a;
+        recyclerView.getLayoutParams().height = (int)((displaymetrics.heightPixels*45)/100);
 
         mAdapter = new AnswerListAdapter(answersArrayList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -180,15 +177,15 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
             filter.addCategory(Intent.CATEGORY_DEFAULT);
             registerReceiver(timerReceiver,filter);
             isReceiverRegistered = true;
+        }
 
-            //Checks if the timer has elapsed, if it has the buttons can be active again
-            if(SPARQApplication.isTimerElapsed()){
-                Log.i(TAG, "OnResume: " + SPARQApplication.isTimerElapsed());
-                postAnswer.setEnabled(true);
-            }
-            else {
-                postAnswer.setEnabled(false);
-            }
+        //Checks if the timer has elapsed, if it has the buttons can be active again
+        if(SPARQApplication.isTimerElapsed()){
+            Log.i(TAG, "OnResume: " + SPARQApplication.isTimerElapsed());
+            postAnswer.setEnabled(true);
+        }
+        else {
+            postAnswer.setEnabled(false);
         }
 
         NotifyThreadHandler uiHandler = new NotifyThreadHandler() {

@@ -323,14 +323,14 @@ public class EventActivity extends AppCompatActivity {
             filter.addCategory(Intent.CATEGORY_DEFAULT);
             registerReceiver(timerReceiver,filter);
             isReceiverRegistered = true;
+        }
 
-            //Checks if the timer has elapsed, if it has the buttons can be active again
-            if(SPARQApplication.isTimerElapsed()){
-                newEvent.setEnabled(true);
-            }
-            else {
-                newEvent.setEnabled(false);
-            }
+        //Checks if the timer has elapsed, if it has the buttons can be active again
+        if(SPARQApplication.isTimerElapsed()){
+            newEvent.setEnabled(true);
+        }
+        else {
+            newEvent.setEnabled(false);
         }
     }
 
