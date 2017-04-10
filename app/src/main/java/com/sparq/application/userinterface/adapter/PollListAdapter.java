@@ -2,7 +2,6 @@ package com.sparq.application.userinterface.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,16 +12,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amulyakhare.textdrawable.TextDrawable;
-import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
-import com.sparq.application.userinterface.ConverstaionThreadActivity;
-import com.sparq.application.userinterface.PollResultsActivity;
+import com.sparq.application.userinterface.QuestionareResultsActivity;
 import com.sparq.application.userinterface.QuestionareActivity;
-import com.sparq.application.userinterface.model.ConversationThread;
 import com.sparq.application.userinterface.model.PollItem;
-import com.sparq.application.userinterface.model.Questionare;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -89,9 +83,9 @@ public class PollListAdapter extends RecyclerView.Adapter<PollListAdapter.MyView
             public void onClick(View v) {
 
                 if(SPARQApplication.getUserType() == TEACHER){
-                    Intent intent = new Intent(mContext, PollResultsActivity.class);
-                    intent.putExtra(PollResultsActivity.QUESTIONARE_TYPE, POLL);
-                    intent.putExtra(PollResultsActivity.QUESTIONARE_ID, poll.getQuestionareId());
+                    Intent intent = new Intent(mContext, QuestionareResultsActivity.class);
+                    intent.putExtra(QuestionareResultsActivity.QUESTIONARE_TYPE, POLL);
+                    intent.putExtra(QuestionareResultsActivity.QUESTIONARE_ID, poll.getQuestionareId());
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     mContext.startActivity(intent);
                 }else{

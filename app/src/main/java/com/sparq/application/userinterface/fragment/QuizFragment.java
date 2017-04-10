@@ -17,8 +17,12 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.sparq.R;
+import com.sparq.application.SPARQApplication;
 import com.sparq.application.userinterface.EventActivity;
+import com.sparq.application.userinterface.NotifyPollHandler;
+import com.sparq.application.userinterface.NotifyQuizHandler;
 import com.sparq.application.userinterface.adapter.EventListAdapter;
+import com.sparq.application.userinterface.adapter.PollListAdapter;
 import com.sparq.application.userinterface.adapter.QuizListAdapter;
 import com.sparq.application.userinterface.adapter.RecyclerItemClickListener;
 import com.sparq.application.userinterface.model.EventItem;
@@ -41,6 +45,8 @@ public class QuizFragment extends Fragment {
 
     private ArrayList<QuizItem> quizzesArrayList = new ArrayList<>();
     private RecyclerView recyclerView;
+    private TextView emptyView;
+
     private QuizListAdapter mAdapter;
 
     public QuizFragment() {
@@ -82,28 +88,18 @@ public class QuizFragment extends Fragment {
 
         initializeView(view);
 
-        quizzesArrayList = getData();
+        quizzesArrayList = SPARQApplication.getQuizzes();
 
-        mAdapter = new QuizListAdapter(quizzesArrayList);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
+        if(quizzesArrayList.size() == 0){
+            recyclerView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+        }
+        else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        }
 
-        recyclerView.addOnItemTouchListener( new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
-            @Override public void onItemClick(View view, int position) {
-
-                QuizItem quiz =  quizzesArrayList.get(position);
-
-                if(quiz.getState() == 0){
-                    showStartDialog(quiz);
-                }
-                else{
-                    showFinishDialog(quiz);
-                }
-
-            }
-        }));
+        initializeQuizAdapater();
 
         return view;
     }
@@ -111,32 +107,15 @@ public class QuizFragment extends Fragment {
     public void initializeView(View view){
 
         recyclerView = (RecyclerView) view.findViewById(R.id.quiz_recycler_view);
+        emptyView = (TextView) view.findViewById(R.id.empty_view);
     }
 
-    public ArrayList<QuizItem> getData(){
-
-        ArrayList<QuizItem> quizzes = new ArrayList<QuizItem>();
-
-        UserItem user = new UserItem();
-
-        for(int i = 0; i < 10; i++){
-
-            QuizItem quiz = new QuizItem(
-                    i,
-                    1,
-                    "Quiz "+i,
-                    "this is a description",
-                    new Date(2011,2,3),
-                    1,
-                    1,
-                    50,
-                    user);
-
-            quizzes.add(quiz);
-        }
-
-        return quizzes;
-
+    public void initializeQuizAdapater(){
+        mAdapter = new QuizListAdapter(getActivity(),quizzesArrayList);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
     }
 
 
@@ -148,6 +127,36 @@ public class QuizFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        NotifyQuizHandler quizHandler = new NotifyQuizHandler() {
+            @Override
+            public void handleQuizQuestions() {
+
+                if(quizzesArrayList.size() == 0){
+                    recyclerView.setVisibility(View.GONE);
+                    emptyView.setVisibility(View.VISIBLE);
+                }
+                else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    emptyView.setVisibility(View.GONE);
+                }
+
+                initializeQuizAdapater();
+            }
+
+            @Override
+            public void handleQuizAnswers() {
+                // if an answer has arrived prevent the user from answering again
+                initializeQuizAdapater();
+            }
+        };
+
+        SPARQApplication.setQuizNotifier(quizHandler);
     }
 
     public void showStartDialog(QuizItem quiz){

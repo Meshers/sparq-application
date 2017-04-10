@@ -6,6 +6,6 @@ package com.sparq.application.userinterface;
 
 public interface NotifyPollHandler {
 
-    public void handlePollQuestions();
-    public void handlePollAnswers();
+    void handlePollQuestions();
+    void handlePollAnswers();
 }

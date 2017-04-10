@@ -34,7 +34,8 @@ public abstract class ApplicationLayerPdu {
 
     }
 
-    public final static int TOT_SIZE = 200;
+    public static final int TOT_SIZE_BT = 200;
+    public static final int TOT_SIZE_WIFI = 10;
     public final static int TYPE_BYTES = 1;
 
     private final TYPE mType;

@@ -10,39 +10,34 @@ public class WifiBTQuizPdu extends ApplicationLayerPdu{
 
     private final static int QUIZ_ID_BYTES = 1;
     private final static int QUESTION_FORMAT_BYTES = 1;
-    private final static int QUESTION_CREATOR_ID_BYTES = 1;
     public final static int ANSWER_CREATOR_ID_BYTES = 1;
     public final static int NUMBER_OF_QUESTIONS_BYTES = 1;
 
-    private final static int PDU_QUIZ_QUESTION_HEADER_BYTES = TYPE_BYTES + QUIZ_ID_BYTES + QUESTION_CREATOR_ID_BYTES + QUESTION_FORMAT_BYTES + NUMBER_OF_QUESTIONS_BYTES;
-    private final static int PAYLOAD_QUIZ_QUESTION_BYTES = TOT_SIZE - PDU_QUIZ_QUESTION_HEADER_BYTES;
+    private final static int PDU_QUIZ_QUESTION_HEADER_BYTES = TYPE_BYTES + QUIZ_ID_BYTES + QUESTION_FORMAT_BYTES + NUMBER_OF_QUESTIONS_BYTES;
+    private final static int PAYLOAD_QUIZ_QUESTION_BYTES = TOT_SIZE_WIFI - PDU_QUIZ_QUESTION_HEADER_BYTES;
 
 
-    public final static int PDU_QUIZ_ANSWER_HEADER_BYTES = TYPE_BYTES + QUIZ_ID_BYTES + QUESTION_CREATOR_ID_BYTES + QUESTION_FORMAT_BYTES + NUMBER_OF_QUESTIONS_BYTES + ANSWER_CREATOR_ID_BYTES;
-    private final static int PAYLOAD_QUIZ_ANSWER_BYTES = TOT_SIZE - PDU_QUIZ_ANSWER_HEADER_BYTES;
+    public final static int PDU_QUIZ_ANSWER_HEADER_BYTES = TYPE_BYTES + QUIZ_ID_BYTES + QUESTION_FORMAT_BYTES + NUMBER_OF_QUESTIONS_BYTES + ANSWER_CREATOR_ID_BYTES;
+    private final static int PAYLOAD_QUIZ_ANSWER_BYTES = TOT_SIZE_BT - PDU_QUIZ_ANSWER_HEADER_BYTES;
 
     private final static int PAYLOAD_QUIZ_MAX_BYTES = Math.max(
             PAYLOAD_QUIZ_QUESTION_BYTES, PDU_QUIZ_ANSWER_HEADER_BYTES
     );
 
     public final static int HEADER_QUIZ_MAX_BYTES = Math.max(
-            PAYLOAD_QUIZ_QUESTION_BYTES, PAYLOAD_QUIZ_ANSWER_BYTES
+            PDU_QUIZ_QUESTION_HEADER_BYTES, PDU_QUIZ_ANSWER_HEADER_BYTES
     );
 
-    private TYPE mType;
     private byte mQuizId;
-    private byte mCreatorId;
     private byte mQuestionFormat;
     private byte mNumberOfQuestions;
     private byte mAnswerCreatorId;
     private byte[] mData;
 
-    private WifiBTQuizPdu(TYPE type, byte quizId, byte creatorId, byte questionFormat, byte numberOfQuestions, byte answerCreatorId, byte[] data) {
+    private WifiBTQuizPdu(TYPE type, byte quizId, byte questionFormat, byte numberOfQuestions, byte answerCreatorId, byte[] data) {
         super(type);
 
-        this.mType = type;
         this.mQuizId = quizId;
-        this.mCreatorId = creatorId;
         this.mQuestionFormat = questionFormat;
         this.mAnswerCreatorId = answerCreatorId;
         this.mNumberOfQuestions = numberOfQuestions;
@@ -58,10 +53,6 @@ public class WifiBTQuizPdu extends ApplicationLayerPdu{
 
     public byte getQuizId() {
         return mQuizId;
-    }
-
-    public byte getQuizCreatorId() {
-        return mCreatorId;
     }
 
     public byte getQuestionFormat() {
@@ -94,10 +85,10 @@ public class WifiBTQuizPdu extends ApplicationLayerPdu{
         int headerSize = 0;
 
         switch (getType()) {
-            case POLL_QUESTION:
+            case QUIZ_QUESTION:
                 headerSize = PDU_QUIZ_QUESTION_HEADER_BYTES;
                 break;
-            case POLL_ANSWER:
+            case QUIZ_ANSWER:
                 headerSize = PDU_QUIZ_ANSWER_HEADER_BYTES;
                 break;
         }
@@ -106,16 +97,12 @@ public class WifiBTQuizPdu extends ApplicationLayerPdu{
         int nextFieldIndex = 0;
 
         // add Type
-        encoded[nextFieldIndex] = getTypeEncoded(mType);
+        encoded[nextFieldIndex] = getTypeEncoded(getType());
         nextFieldIndex += TYPE_BYTES;
 
         //add quiz id
         encoded[nextFieldIndex] = getQuizId();
         nextFieldIndex += QUIZ_ID_BYTES;
-
-        //add question creator Id
-        encoded[nextFieldIndex] = getQuizCreatorId();
-        nextFieldIndex += QUESTION_CREATOR_ID_BYTES;
 
         //add the question format
         encoded[nextFieldIndex] = getQuestionFormat();
@@ -143,7 +130,6 @@ public class WifiBTQuizPdu extends ApplicationLayerPdu{
 
         int nextFieldIndex = 0;
         byte quizId = (byte) 1;
-        byte questionCreatorId = (byte) 1;
         byte questionFormat = (byte) 1;
         byte numberOfQuestion = (byte) 1;
         byte answerCreatorId = (byte) 0;
@@ -160,10 +146,6 @@ public class WifiBTQuizPdu extends ApplicationLayerPdu{
             //get poll id
             quizId = encoded[nextFieldIndex];
             nextFieldIndex += QUIZ_ID_BYTES;
-
-            //get question creator id
-            questionCreatorId = encoded[nextFieldIndex];
-            nextFieldIndex += QUESTION_CREATOR_ID_BYTES;
 
             // get format
             questionFormat = encoded[nextFieldIndex];
@@ -186,19 +168,19 @@ public class WifiBTQuizPdu extends ApplicationLayerPdu{
             byte[] data = new byte[encoded.length - nextFieldIndex];
             System.arraycopy(encoded, nextFieldIndex, data, 0, data.length);
 
-            return new WifiBTQuizPdu(type, quizId, questionCreatorId, questionFormat,numberOfQuestion, answerCreatorId, data);
+            return new WifiBTQuizPdu(type, quizId, questionFormat,numberOfQuestion, answerCreatorId, data);
         }
 
         return null;
     }
 
-    public static WifiBTQuizPdu getQuestionPdu(byte quizId, byte questionCreatorId, byte questionFormat, byte numberOfQuestions, byte[] data){
-        return new WifiBTQuizPdu(TYPE.QUIZ_QUESTION, quizId, questionCreatorId, questionFormat, numberOfQuestions, (byte) 0, data);
+    public static WifiBTQuizPdu getQuestionPdu(byte quizId, byte questionFormat, byte numberOfQuestions, byte[] data){
+        return new WifiBTQuizPdu(TYPE.QUIZ_QUESTION, quizId, questionFormat, numberOfQuestions, (byte) 0, data);
 
     }
 
-    public static WifiBTQuizPdu getAnswerPdu(byte quizId, byte questionCreatorId, byte questionFormat, byte numberOfQuestions, byte answerCreatorId, byte[] data){
-        return new WifiBTQuizPdu(TYPE.QUIZ_ANSWER, quizId, questionCreatorId, questionFormat, numberOfQuestions, answerCreatorId, data);
+    public static WifiBTQuizPdu getAnswerPdu(byte quizId, byte questionFormat, byte numberOfQuestions, byte answerCreatorId, byte[] data){
+        return new WifiBTQuizPdu(TYPE.QUIZ_ANSWER, quizId, questionFormat, numberOfQuestions, answerCreatorId, data);
     }
 
     public static ApplicationLayerPdu from(LlMessage llmessage) {

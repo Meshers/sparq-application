@@ -1,8 +1,6 @@
 package com.sparq.application.userinterface;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -14,7 +12,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.sparq.R;
@@ -27,9 +24,7 @@ import com.sparq.application.userinterface.model.Questionare;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static com.sparq.R.id.toolbar;
-
-public class PollResultsPerQuestionActivity extends AppCompatActivity {
+public class QuestionareResultsPerQuestionActivity extends AppCompatActivity {
 
     public static final String QUESTION_FORMAT = "question_format";
     public static final String QUESTIONARE_ID = "questionare_id";
@@ -40,11 +35,14 @@ public class PollResultsPerQuestionActivity extends AppCompatActivity {
     private QuestionItem.FORMAT format;
     private int questionareId, questionId;
     private Questionare.QUESTIONARE_TYPE type;
-    private String pollName = "Poll Question";
+    private String questionareName = "Questions";
 
+    private TextView questionText;
     private RecyclerView answerRecyclerView;
     private CardView graphCard, recyclerCard;
     private GraphView graph;
+
+    private QuestionItem question;
     private ArrayList<AnswerItem> answers;
     private AnswerListAdapter mAdapter;
 
@@ -62,22 +60,32 @@ public class PollResultsPerQuestionActivity extends AppCompatActivity {
             format = (QuestionItem.FORMAT) bundle.getSerializable(QUESTION_FORMAT);
             questionareId = bundle.getInt(QUESTIONARE_ID);
             questionId = bundle.getInt(QUESTION_ID);
-            Log.i("onCreate: ", pollName);
+            Log.i("onCreate: ", questionareName);
         }
+
+
 
         switch(type){
             case QUIZ:
+                question = SPARQApplication.getQuiz(questionareId).getQuestionWithKey(questionId);
+                answers = SPARQApplication.getQuiz(questionareId).getAnswersForQuestion(questionId);
+                questionareName = SPARQApplication.getQuiz(questionareId).getName();
+                toolbar.setTitle(questionareName);
                 break;
             case POLL:
+                question = SPARQApplication.getPoll(questionareId).getQuestionWithKey(questionId);
                 answers = SPARQApplication.getPoll(questionareId).getAnswersForQuestion(questionId);
-                pollName = SPARQApplication.getPoll(questionareId).getName();
-                toolbar.setTitle(pollName);
+                questionareName = SPARQApplication.getPoll(questionareId).getName();
+                toolbar.setTitle(questionareName);
         }
         initializeViews();
 
     }
 
     public void initializeViews(){
+
+        questionText = (TextView) findViewById(R.id.question_text);
+        questionText.setText(question.getQuestion());
 
         answerRecyclerView = (RecyclerView) findViewById(R.id.answer_recycler_view);
         graphCard = (CardView) findViewById(R.id.card_view1);

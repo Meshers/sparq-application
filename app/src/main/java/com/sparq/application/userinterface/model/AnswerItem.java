@@ -101,7 +101,7 @@ public class AnswerItem implements Serializable{
 
         String answers = "";
         for(Integer answer: answerChoices){
-            answers += String.valueOf(answer) + "#";
+            answers += String.valueOf(answer);
         }
 
         return answers;
@@ -148,7 +148,7 @@ public class AnswerItem implements Serializable{
 
         ArrayList<Integer> answer = null;
         if(answerChoice != null){
-            answerChoice = answerChoice.substring(0, answerChoice.length()-1);
+//            answerChoice = answerChoice.substring(0, answerChoice.length()-1);
             answer = new ArrayList<>();
             answer.add(Integer.parseInt(answerChoice));
         }
@@ -170,12 +170,12 @@ public class AnswerItem implements Serializable{
         ArrayList<Integer> answer = null;
 
         if(answerChoices != null){
-            answerChoices = answerChoices.substring(0, answerChoices.length()-1);
-            String[] splitChoices = answerChoices.split("#");
+//            answerChoices = answerChoices.substring(0, answerChoices.length()-1);
+            byte[] splitChoices = answerChoices.getBytes(Constants.CHARSET);
             answer = new ArrayList<>();
 
-            for(String splitChoice: splitChoices){
-                answer.add(Integer.parseInt(splitChoice));
+            for(byte splitChoice: splitChoices){
+                answer.add(Integer.valueOf(splitChoice));
             }
         }
 

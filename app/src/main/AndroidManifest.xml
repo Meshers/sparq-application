@@ -59,11 +59,11 @@
             android:label="@string/title_activity_main2"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".application.userinterface.PollResultsActivity"
+            android:name=".application.userinterface.QuestionareResultsActivity"
             android:label="@string/title_activity_poll_results"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".application.userinterface.PollResultsPerQuestionActivity"
+            android:name=".application.userinterface.QuestionareResultsPerQuestionActivity"
             android:label="@string/title_activity_poll_results_per_question"
             android:theme="@style/AppTheme.NoActionBar" />
 

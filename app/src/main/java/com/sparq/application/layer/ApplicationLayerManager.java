@@ -11,8 +11,11 @@ import com.sparq.application.layer.almessage.AlMessage;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.layer.pdu.PollPdu;
 import com.sparq.application.layer.pdu.ThreadPdu;
+import com.sparq.application.layer.pdu.WifiBTQuizPdu;
+import com.sparq.util.Constants;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
 
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
@@ -58,6 +61,10 @@ public class ApplicationLayerManager {
                 }
 
                 switch(ApplicationLayerPdu.getTypeDecoded(llMessage.getData()[0])){
+                    case QUIZ_QUESTION:
+                    case QUIZ_ANSWER:
+                        pdu = WifiBTQuizPdu.from(llMessage);
+                        break;
                     case POLL_QUESTION:
                     case POLL_ANSWER:
                         pdu = PollPdu.from(llMessage);
@@ -99,7 +106,19 @@ public class ApplicationLayerManager {
 
     public boolean sendData(ApplicationLayerPdu.TYPE type, byte[] data, byte[][] options,byte toAddr , List<Byte> headers, List<Boolean> flags) {
 
+        Log.i("HERE", "send data");
         switch(type){
+            case QUIZ_QUESTION:
+            case QUIZ_ANSWER:
+                if(headers.size() + 1 <= WifiBTQuizPdu.HEADER_QUIZ_MAX_BYTES){
+                    Log.i("HERE", "checked headers");
+                    return sendQuizData(type, headers.get(0), headers.get(1), headers.get(2), headers.get(3), data, toAddr);
+                }
+                else{
+                    throw new IllegalArgumentException("Illegal number of header values (Found: " +
+                            headers.size() + " but expected " + WifiBTQuizPdu.HEADER_QUIZ_MAX_BYTES + ")");
+                }
+
             case POLL_QUESTION:
                 if(headers.size() + TYPE_BYTES + PollPdu.FLAG_BYTES + PollPdu.HEADER_SIZE_BYTES - PollPdu.ANSWER_CREATOR_ID_BYTES == PollPdu.PDU_POLL_QUESTION_HEADER_MIN_BYTES
                         && flags.size() == PollPdu.FLAGS_POLL_MAX_BITS){
@@ -168,6 +187,15 @@ public class ApplicationLayerManager {
 
     }
 
+    public boolean sendQuizData(ApplicationLayerPdu.TYPE type, byte quizId,
+                                byte questionFormat, byte numberOfQuestios, byte answerCreatorId,
+                                byte[] data, byte toAddr){
+
+        Log.i("HERE", "send Quiz Data");
+        return mAlContext.sendQuizPdu(type, quizId, questionFormat, numberOfQuestios,answerCreatorId, data, toAddr);
+
+    }
+
     /**
      * called from the USER interface when data is to be sent to the application layer
      * @param type type of data to be sent
@@ -186,6 +214,25 @@ public class ApplicationLayerManager {
             }
 
             return sendData(type, msg.getBytes("UTF-8"),optionsArray, toAddr, headers, flags);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean sendBundledData(ApplicationLayerPdu.TYPE type, HashMap<Integer, String> msg, byte toAddr, List<Byte> headers, List<Boolean> flags) {
+        try {
+
+            Log.i("HERE", "send bundle message");
+            String bundledMessage = "";
+
+            for(int questionNumber: msg.keySet()){
+                bundledMessage += msg.get(questionNumber);
+            }
+
+            Log.i("HERE", "bundle message" + bundledMessage);
+
+            return sendData(type, bundledMessage.getBytes("UTF-8"), null, toAddr, headers, flags);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return false;

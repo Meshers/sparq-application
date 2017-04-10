@@ -1,15 +1,11 @@
 package com.sparq.application.userinterface;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -18,20 +14,13 @@ import android.widget.TextView;
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
-import com.sparq.application.userinterface.adapter.AnswerListAdapter;
 import com.sparq.application.userinterface.adapter.QuestionAnswerListAdapter;
-import com.sparq.application.userinterface.adapter.QuestionareAdapter;
-import com.sparq.application.userinterface.adapter.RecyclerItemClickListener;
 import com.sparq.application.userinterface.model.AnswerItem;
-import com.sparq.application.userinterface.model.PollItem;
 import com.sparq.application.userinterface.model.QuestionItem;
 import com.sparq.application.userinterface.model.Questionare;
-import com.sparq.application.userinterface.model.QuizItem;
 import com.sparq.application.userinterface.model.UserItem;
-import com.sparq.util.Constants;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 public class QuestionareActivity extends AppCompatActivity {
@@ -47,6 +36,9 @@ public class QuestionareActivity extends AppCompatActivity {
     private int questionareId;
     private int questionCreatorId;
     private Questionare.QUESTIONARE_TYPE type;
+
+    private HashMap<Integer, String> bundledMessage = new HashMap<>(0);
+    private QuestionItem.FORMAT quizFormat;
 
     public static final String QUESTIONARE_TYPE = "questionare_type";
     public static final String QUESTIONARE_ID = "questionare_id";
@@ -80,19 +72,17 @@ public class QuestionareActivity extends AppCompatActivity {
         switch(questionare.getType()){
             case QUIZ:
                 // QUIZ
-                callTimer();
-                break;
+//                callTimer();
+//                break;
             case POLL:
                 // POLL
                 ((LinearLayout)timer.getParent()).removeView(timer);
                 break;
         }
 
-
     }
 
     public void initializeViews(){
-
 
         questionView = (RecyclerView) findViewById(R.id.question_recycler_view);
         submitAnswers = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.submit_answers);
@@ -108,7 +98,14 @@ public class QuestionareActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                sendPollMessage( mAdapter.getAnswerForQuestion());
+                switch(type){
+                    case QUIZ:
+                        sendQuizMessage( mAdapter.getAnswerForQuestion());
+                        break;
+                    case POLL:
+                        sendPollMessage( mAdapter.getAnswerForQuestion());
+                        break;
+                }
                 finish();
             }
         });
@@ -117,20 +114,10 @@ public class QuestionareActivity extends AppCompatActivity {
 
     public Questionare getData(Questionare.QUESTIONARE_TYPE type){
 
-
-        UserItem user = new UserItem();
-
         switch (type){
             case QUIZ:
-//                QuizItem quiz = new QuizItem(1,1,"Quiz 0", "blah blah", new Date(11,12,2011), 2, 1, 50, user);
-//                HashMap<Integer, String> options1 = new HashMap<Integer, String>();
-//                options1.put(0, "YES");
-//                options1.put(1, "NO");
-//                quiz.addQuestionToList(
-//                        new QuestionItem(0, 1, "Do you like the app?", 1, , options1, Constants.INITIAL_VOTE_COUNT)
-//                );
-//
-                return null;
+
+                return SPARQApplication.getQuiz(questionareId);
             case POLL:
 
                 return SPARQApplication.getPoll(questionareId);
@@ -141,6 +128,48 @@ public class QuestionareActivity extends AppCompatActivity {
 
     public void callTimer(){
         //set a timer here
+
+    }
+
+    public void bundleAnswers(AnswerItem answer){
+
+        quizFormat = answer.getFormat();
+
+        String answerMessage = "";
+        switch(answer.getFormat()){
+            case MCQ_SINGLE:
+            case MCQ_MULTIPLE:
+                answerMessage = answer.getAnswerChoicesAsString();
+                answerMessage += "#";
+                break;
+            case ONE_WORD:
+            case SHORT:
+                answerMessage= answer.getAnswer();
+                break;
+        }
+        Log.i("HERE", answerMessage);
+        bundledMessage.put(answer.getAnswerId(), answerMessage);
+    }
+
+    public void sendQuizMessage(ArrayList<AnswerItem> answers){
+
+        for(AnswerItem answer: answers){
+            bundleAnswers(answer);
+        }
+
+        Log.i("HERE", bundledMessage.toString());
+
+        SPARQApplication.sendQuizMessage(
+                ApplicationLayerPdu.TYPE.QUIZ_ANSWER,
+                SPARQApplication.getBdcastAddress(),
+                bundledMessage,
+                questionare.getQuestionareId(),
+                questionCreatorId,
+                quizFormat,
+                bundledMessage.size(),
+                null,
+                SPARQApplication.getOwnAddress()
+        );
 
     }
 

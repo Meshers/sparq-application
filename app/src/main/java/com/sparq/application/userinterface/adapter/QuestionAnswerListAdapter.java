@@ -84,7 +84,6 @@ public class QuestionAnswerListAdapter extends RecyclerView.Adapter<QuestionAnsw
         switch(question.getFormat()){
             case MCQ_SINGLE:
                 holder.recyclerView.setVisibility(View.VISIBLE);
-                Log.i("HERE", question.getOptions().toString());
                 holder.innerAdapter.setData(question.getOptions(), question.getFormat()); // List of Strings
                 holder.innerAdapter.setRowIndex(position);
 

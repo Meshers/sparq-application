@@ -33,12 +33,15 @@ import com.sparq.application.userinterface.adapter.QuestionAdapter;
 import com.sparq.application.userinterface.model.PollItem;
 import com.sparq.application.userinterface.model.QuestionItem;
 import com.sparq.application.userinterface.model.Questionare;
+import com.sparq.application.userinterface.model.QuizItem;
 import com.sparq.application.userinterface.model.UserItem;
 import com.sparq.util.Constants;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+
+import static com.sparq.application.userinterface.model.QuizItem.QUIZ_STATE.INACTIVE;
 
 public class NewQuestionareActicity extends AppCompatActivity {
 
@@ -52,6 +55,7 @@ public class NewQuestionareActicity extends AppCompatActivity {
     private QuestionAdapter mQuestionAdapter;
 
     private Questionare.QUESTIONARE_TYPE type;
+    private QuestionItem.FORMAT quizFormat;
     Questionare questionare;
     private HashMap<Integer, QuestionItem> questionsArray = new HashMap<>(0);
 
@@ -72,6 +76,18 @@ public class NewQuestionareActicity extends AppCompatActivity {
 
         switch(type){
             case QUIZ:
+                questionare = new QuizItem(
+                        SPARQApplication.getQuizzes().size()+1,
+                        SPARQApplication.getSessionId(),
+                        null, null,
+                        new Date(),
+                        Constants.QUIZ_DURATION,
+                        INACTIVE,
+                        Constants.MIN_QUESTION_MARKS,
+                        new UserItem(SPARQApplication.getOwnAddress())
+                );
+
+                questionare.setName("Quiz " + questionare.getQuestionareId());
                 break;
             case POLL:
                 questionare = new PollItem(
@@ -82,8 +98,12 @@ public class NewQuestionareActicity extends AppCompatActivity {
                         PollItem.POLL_STATE.STOP,
                         new UserItem(SPARQApplication.getOwnAddress())
                 );
+
+                questionare.setName("Poll " + questionare.getQuestionareId());
                 break;
         }
+
+
 
         initializeViews();
 
@@ -104,13 +124,23 @@ public class NewQuestionareActicity extends AppCompatActivity {
         newQuestion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openNewQuestionDalog();
+
+                switch(type){
+                    case QUIZ:
+                        openNewQuizQuestionDialog();
+                        break;
+                    case POLL:
+                        openNewPollQuestionDialog();
+                        break;
+                }
+
             }
         });
 
         durationText = (EditText) findViewById(R.id.duration_text);
         questionsRecyclerView = (RecyclerView) findViewById(R.id.questionare_recycler_view);
         addQuestionare = (FloatingActionButton) findViewById(R.id.add_questionare);
+        addQuestionare.setEnabled(false);
 
         addQuestionare.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,19 +151,24 @@ public class NewQuestionareActicity extends AppCompatActivity {
 
                 //Log.i("onClick: ", questionare.getName());
                 //Setting first question as the main question for naming purpose
-                if(questionare.getName() == null){
-                    QuestionItem firstQuestion = questionsArray.get(new Integer(1));
-                    firstQuestion.setMainQuestion(true);
-                    questionare.setName(firstQuestion.getQuestion());
-                    Log.i("onClick: ", questionare.getName());
-                }
-                else{
-                    Log.i("onClick: ", questionare.getName());
-                }
+//                if(questionare.getName() == null){
+//                    QuestionItem firstQuestion = questionsArray.get(new Integer(1));
+//                    firstQuestion.setMainQuestion(true);
+//                    questionare.setName(firstQuestion.getQuestion());
+//                    Log.i("onClick: ", questionare.getName());
+//                }
+//                else{
+//                    Log.i("onClick: ", questionare.getName());
+//                }
 
 
                 switch(type){
                     case QUIZ:
+                        sendQuizMessage(
+                                ApplicationLayerPdu.TYPE.QUIZ_QUESTION,
+                                SPARQApplication.getBdcastAddress(),
+                                (QuizItem) questionare
+                        );
                         break;
                     case POLL:
                         sendPollMessage(
@@ -148,13 +183,6 @@ public class NewQuestionareActicity extends AppCompatActivity {
             }
         });
 
-        if(questionsArray.size() == 0){
-            addQuestionare.setEnabled(false);
-        }
-        else {
-            addQuestionare.setEnabled(true);
-        }
-
         mQuestionAdapter = new QuestionAdapter(NewQuestionareActicity.this,questionsArray);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(NewQuestionareActicity.this);
         questionsRecyclerView.setLayoutManager(mLayoutManager);
@@ -162,7 +190,147 @@ public class NewQuestionareActicity extends AppCompatActivity {
         questionsRecyclerView.setAdapter(mQuestionAdapter);
     }
 
-    public void openNewQuestionDalog(){
+    public void openNewQuizQuestionDialog(){
+
+        final String[] SPINNERLIST = {
+                "Single Choice MCQ",
+                "Multiple Choice MCQ",
+        };
+
+        final ArrayList<String> options = new ArrayList<>();
+
+        final QuestionItem.FORMAT format[] = new QuestionItem.FORMAT[1];
+        format[0] = QuestionItem.getFormatFromByte((byte) 1);
+
+        final boolean[] disableButton = new boolean[1];
+
+        final OptionsAdapter mAdapter = new OptionsAdapter(options);
+
+        final MaterialDialog dialog = new MaterialDialog.Builder(NewQuestionareActicity.this)
+                .title("Add a New Question")
+                .customView(R.layout.dialog_new_question, true)
+                .positiveText("ADD")
+                .negativeText("CANCEL")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+
+                        if((format[0] == QuestionItem.FORMAT.MCQ_SINGLE || format[0] == QuestionItem.FORMAT.MCQ_MULTIPLE)
+                                && mAdapter.getItemCount() < 2){
+
+                            disableButton[0] = true;
+                            // FIXME: 4/7/2017 make the options dialog stay with the toast use disableButton variable
+                            Toast.makeText(NewQuestionareActicity.this, getResources().getString(R.string.more_options),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            disableButton[0] = false;
+                            QuestionItem newQuestion = new QuestionItem(
+                                    questionsArray.size()+1,
+                                    questionare.getQuestionareId(),
+                                    "Question " + (questionsArray.size()+1),
+                                    format[0],
+                                    Constants.MIN_QUESTION_MARKS,
+                                    mAdapter.getOptions(),
+                                    Constants.INITIAL_VOTE_COUNT
+                            );
+                            questionsArray.put(questionsArray.size()+1, newQuestion);
+
+                            //notify dataset changed
+                            mQuestionAdapter.notifyDataSetChanged();
+
+                            dialog.dismiss();
+                            addQuestionare.setEnabled(true);
+
+                        }
+
+                        quizFormat = format[0];
+                        dialog.dismiss();
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                }).build();
+
+        View view = dialog.getCustomView();
+
+        final LinearLayout hideLayout = (LinearLayout) view.findViewById(R.id.hideable_layout);
+
+        EditText questionName = (EditText) view.findViewById(R.id.question_text);
+        questionName.setVisibility(View.GONE);
+
+        SwitchCompat mainQuestion = (SwitchCompat) view.findViewById(R.id.switchButton);
+        mainQuestion.setVisibility(View.GONE);
+
+        final RecyclerView optionsListView = (RecyclerView) view.findViewById(R.id.options_recycler_view);
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(NewQuestionareActicity.this);
+        optionsListView.setLayoutManager(mLayoutManager);
+        optionsListView.setItemAnimator(new DefaultItemAnimator());
+        optionsListView.setAdapter(mAdapter);
+
+        final MaterialSpinner formatSpinner = (MaterialSpinner) view.findViewById(R.id.format_spinner);
+        formatSpinner.setItems(SPINNERLIST);
+
+        formatSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+            @Override
+            public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+
+                if(item.equalsIgnoreCase(SPINNERLIST[0])){
+                    format[0] = QuestionItem.getFormatFromByte((byte) 1);
+                    hideLayout.setVisibility(View.VISIBLE);
+
+                } else if(item.equalsIgnoreCase(SPINNERLIST[1])){
+                    format[0] = QuestionItem.getFormatFromByte((byte) 2);
+                    hideLayout.setVisibility(View.VISIBLE);
+
+                }
+            }
+
+        });
+
+
+        final EditText option = (EditText) view.findViewById(R.id.option_text);
+        ImageView addOption = (ImageView) view.findViewById(R.id.add_option);
+
+        addOption.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // FIXME: 4/7/2017 Handle same option being added twice
+                if(option.getText().toString().compareTo("") != 0 && options.contains(option.getText().toString()) == false){
+                    options.add(option.getText().toString());
+                    mAdapter.notifyDataSetChanged();
+                    option.setText("");
+                }
+
+                if(mAdapter.getItemCount() > 1){
+                    (dialog).getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                }
+            }
+        });
+
+        dialog.show();
+
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                if((format[0] == QuestionItem.FORMAT.MCQ_SINGLE || format[0] == QuestionItem.FORMAT.MCQ_MULTIPLE)
+                        && mAdapter.getItemCount() < 2){
+                    ((MaterialDialog)dialog).getActionButton(DialogAction.POSITIVE).setEnabled(false);
+                }
+                else{
+                    ((MaterialDialog)dialog).getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                }
+            }
+        });
+
+
+    }
+
+    public void openNewPollQuestionDialog(){
 
         final String[] SPINNERLIST = {
                 "Single Choice MCQ",
@@ -328,6 +496,34 @@ public class NewQuestionareActicity extends AppCompatActivity {
         });
 
         dialog.setCanceledOnTouchOutside(false);
+    }
+
+    public void sendQuizMessage(final ApplicationLayerPdu.TYPE type, final byte toAddr, final QuizItem quiz){
+
+        Log.i("HERE", "send quiz Message");
+        final ArrayList<QuestionItem> questions = new ArrayList<>(quiz.getQuestions().values());
+
+        HashMap<Integer, ArrayList<String>> bundledOptions = new HashMap<>(0);
+        HashMap<Integer, String> bundledMessage = new HashMap<>(0);
+
+        for(int i = 0; i < questions.size(); i++){
+            QuestionItem question = questions.get(i);
+            bundledOptions.put(question.getQuestionId(), question.getOptions());
+            bundledMessage.put(question.getQuestionId(), String.valueOf(question.getOptions().size()));
+        }
+
+        SPARQApplication.sendQuizMessage(
+                type,
+                toAddr,
+                bundledMessage,
+                quiz.getQuestionareId(),
+                (int) SPARQApplication.getOwnAddress(),
+                quizFormat,
+                questions.size(),
+                bundledOptions,
+                0
+        );
+        Log.i("HERE", "exiting send quiz Message");
     }
 
     public void sendPollMessage(final ApplicationLayerPdu.TYPE type, final byte toAddr, final PollItem poll){

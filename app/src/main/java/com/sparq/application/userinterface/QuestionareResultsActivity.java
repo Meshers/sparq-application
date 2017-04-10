@@ -1,23 +1,20 @@
 package com.sparq.application.userinterface;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
 import com.sparq.application.userinterface.adapter.ArrivedQuestionsAdapter;
-import com.sparq.application.userinterface.adapter.QuestionAnswerListAdapter;
 import com.sparq.application.userinterface.model.PollItem;
 import com.sparq.application.userinterface.model.Questionare;
+import com.sparq.application.userinterface.model.QuizItem;
 
-public class PollResultsActivity extends AppCompatActivity {
+public class QuestionareResultsActivity extends AppCompatActivity {
 
     public static final String QUESTIONARE_ID = "questionare_id";
     public static final String QUESTIONARE_TYPE = "questionare_type";
@@ -43,6 +40,7 @@ public class PollResultsActivity extends AppCompatActivity {
 
         switch(type){
             case QUIZ:
+                questionare = SPARQApplication.getQuiz(questionareId);
                 break;
             case POLL:
                 questionare = SPARQApplication.getPoll(questionareId);
@@ -54,19 +52,22 @@ public class PollResultsActivity extends AppCompatActivity {
 
     public void initializeViews(){
 
+        questionListView = (RecyclerView) findViewById(R.id.question_recycler_view);
+
         switch(type){
             case QUIZ:
                 setTitle("Quiz Questions");
+                mAdapter = new ArrivedQuestionsAdapter(QuestionareResultsActivity.this, Questionare.QUESTIONARE_TYPE.QUIZ, questionare);
+
                 break;
             case POLL:
                 setTitle("Poll Questions");
+                mAdapter = new ArrivedQuestionsAdapter(QuestionareResultsActivity.this, Questionare.QUESTIONARE_TYPE.POLL, questionare);
+
                 break;
         }
 
-        questionListView = (RecyclerView) findViewById(R.id.question_recycler_view);
-
-        mAdapter = new ArrivedQuestionsAdapter(PollResultsActivity.this, (PollItem) questionare);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(PollResultsActivity.this);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(QuestionareResultsActivity.this);
         questionListView.setLayoutManager(mLayoutManager);
         questionListView.setItemAnimator(new DefaultItemAnimator());
         questionListView.setAdapter(mAdapter);

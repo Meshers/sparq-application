@@ -1,17 +1,12 @@
 package com.sparq.application.layer.pdu;
 
-import com.sparq.application.userinterface.model.QuestionItem;
-
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
-import android.os.Build;
 
 import java.util.BitSet;
 
 import test.com.blootoothtester.network.linklayer.LlMessage;
-import test.com.blootoothtester.util.Constants;
 
 import static com.sparq.util.Constants.CONSTANT_DELIMITER;
 
@@ -36,12 +31,12 @@ public class PollPdu extends ApplicationLayerPdu {
     private final static int PDU_POLL_QUESTION_HEADER_MAX_BYTES = TYPE_BYTES + POLL_ID_BYTES + QUESTION_CREATOR_ID_BYTES + QUESTION_ID_BYTES + QUESTION_FORMAT_BYTES + HEADER_SIZE_BYTES +FLAG_BYTES + MAX_OPTION_BYTES;
     public final static int PDU_POLL_QUESTION_HEADER_MIN_BYTES = TYPE_BYTES + POLL_ID_BYTES + QUESTION_CREATOR_ID_BYTES + QUESTION_ID_BYTES + QUESTION_FORMAT_BYTES + HEADER_SIZE_BYTES + FLAG_BYTES + MIN_OPTION_BYTES;
 
-    private final static int PAYLOAD_POLL_QUESTION_MAX_BYTES = TOT_SIZE - PDU_POLL_QUESTION_HEADER_MIN_BYTES;
-    private final static int PAYLOAD_POLL_QUESTION_MIN_BYTES = TOT_SIZE - PDU_POLL_QUESTION_HEADER_MAX_BYTES;
+    private final static int PAYLOAD_POLL_QUESTION_MAX_BYTES = TOT_SIZE_BT - PDU_POLL_QUESTION_HEADER_MIN_BYTES;
+    private final static int PAYLOAD_POLL_QUESTION_MIN_BYTES = TOT_SIZE_BT - PDU_POLL_QUESTION_HEADER_MAX_BYTES;
 
 
     public final static int PDU_POLL_ANSWER_HEADER_BYTES = TYPE_BYTES + POLL_ID_BYTES + QUESTION_CREATOR_ID_BYTES + QUESTION_ID_BYTES + QUESTION_FORMAT_BYTES + ANSWER_CREATOR_ID_BYTES ;
-    private final static int PAYLOAD_POLL_ANSWER_BYTES = TOT_SIZE - PDU_POLL_ANSWER_HEADER_BYTES;
+    private final static int PAYLOAD_POLL_ANSWER_BYTES = TOT_SIZE_BT - PDU_POLL_ANSWER_HEADER_BYTES;
 
 
     private final static int PAYLOAD_POLL_MAX_BYTES = Math.max(
@@ -54,7 +49,6 @@ public class PollPdu extends ApplicationLayerPdu {
 
     public final static int FLAGS_POLL_MAX_BITS = 3;
 
-    private TYPE mType;
     private byte mPollId;
     private byte mCreatorId;
     private byte mQuestionId;
@@ -69,7 +63,6 @@ public class PollPdu extends ApplicationLayerPdu {
                     boolean hasMore, boolean endOfPoll, boolean isMainQuestion, byte[] data, byte[]... options) {
         super(type);
 
-        this.mType = type;
         this.mPollId = pollId;
         this.mCreatorId = creatorId;
         this.mQuestionId = questionId;
@@ -85,7 +78,7 @@ public class PollPdu extends ApplicationLayerPdu {
 
         int headerSize = 0;
 
-        switch(mType){
+        switch(type){
             case POLL_QUESTION:
 
                 headerSize = PDU_POLL_QUESTION_HEADER_MIN_BYTES;
@@ -218,7 +211,7 @@ public class PollPdu extends ApplicationLayerPdu {
         int nextFieldIndex = 0;
 
         // add Type
-        encoded[nextFieldIndex] = getTypeEncoded(mType);
+        encoded[nextFieldIndex] = getTypeEncoded(getType());
         nextFieldIndex += TYPE_BYTES;
 
         //add poll id

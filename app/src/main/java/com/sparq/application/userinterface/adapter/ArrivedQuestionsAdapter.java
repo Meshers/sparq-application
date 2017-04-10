@@ -7,30 +7,28 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amulyakhare.textdrawable.TextDrawable;
-import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.sparq.R;
-import com.sparq.application.userinterface.PollResultsPerQuestionActivity;
-import com.sparq.application.userinterface.model.EventItem;
+import com.sparq.application.userinterface.QuestionareResultsPerQuestionActivity;
 import com.sparq.application.userinterface.model.PollItem;
 import com.sparq.application.userinterface.model.QuestionItem;
+import com.sparq.application.userinterface.model.Questionare;
+import com.sparq.application.userinterface.model.QuizItem;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import static com.sparq.R.string.events;
 import static com.sparq.application.userinterface.model.Questionare.QUESTIONARE_TYPE.POLL;
+import static com.sparq.application.userinterface.model.Questionare.QUESTIONARE_TYPE.QUIZ;
 
 public class ArrivedQuestionsAdapter extends RecyclerView.Adapter<ArrivedQuestionsAdapter.MyViewHolder> {
 
-    private PollItem poll;
+    private Questionare questionare;
     private ArrayList<QuestionItem> questions;
     private Context mContext;
+    private Questionare.QUESTIONARE_TYPE type;
 
     private static int colors[] = {
             R.color.orange,
@@ -55,10 +53,11 @@ public class ArrivedQuestionsAdapter extends RecyclerView.Adapter<ArrivedQuestio
     }
 
 
-    public ArrivedQuestionsAdapter(Context context, PollItem poll) {
+    public ArrivedQuestionsAdapter(Context context, Questionare.QUESTIONARE_TYPE type, Questionare questionare) {
         this.mContext = context;
-        this.poll = poll;
-        this.questions = new ArrayList<>(poll.getQuestions().values());
+        this.questionare = questionare;
+        this.type = type;
+        this.questions = new ArrayList<>(questionare.getQuestions().values());
     }
 
     @Override
@@ -75,34 +74,73 @@ public class ArrivedQuestionsAdapter extends RecyclerView.Adapter<ArrivedQuestio
         holder.questionName.setText(question.getQuestion());
         holder.questionFormat.setText(QuestionItem.getFormatAsString(question.getFormat()));
 
-        if(poll.getAnswersForQuestion(question.getQuestionId()) != null){
-            holder.answerNumber.setText(String.valueOf(poll.getAnswersForQuestion(question.getQuestionId()).size()));
+        switch(type){
+            case QUIZ:
 
-            holder.cardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // create intent to go to the next activity
-                    Intent intent = new Intent(mContext, PollResultsPerQuestionActivity.class);
-                    intent.putExtra(PollResultsPerQuestionActivity.QUESTIONARE_TYPE, POLL);
-                    intent.putExtra(PollResultsPerQuestionActivity.QUESTIONARE_ID, question.getQuestionareId());
-                    intent.putExtra(PollResultsPerQuestionActivity.QUESTION_FORMAT, question.getFormat());
-                    intent.putExtra(PollResultsPerQuestionActivity.QUESTION_ID, question.getQuestionId());
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    mContext.startActivity(intent);
+                if(((QuizItem)questionare).getAnswersForQuestion(question.getQuestionId()) != null){
+                    holder.answerNumber.setText(String.valueOf(((QuizItem)questionare).getAnswersForQuestion(question.getQuestionId()).size()));
+
+                    holder.cardView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // create intent to go to the next activity
+                            Intent intent = new Intent(mContext, QuestionareResultsPerQuestionActivity.class);
+                            intent.putExtra(QuestionareResultsPerQuestionActivity.QUESTIONARE_TYPE, QUIZ);
+                            intent.putExtra(QuestionareResultsPerQuestionActivity.QUESTIONARE_ID, question.getQuestionareId());
+                            intent.putExtra(QuestionareResultsPerQuestionActivity.QUESTION_FORMAT, question.getFormat());
+                            intent.putExtra(QuestionareResultsPerQuestionActivity.QUESTION_ID, question.getQuestionId());
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            mContext.startActivity(intent);
+                        }
+                    });
+
                 }
-            });
+                else{
+                    holder.answerNumber.setText(String.valueOf(0));
 
-        }
-        else{
-            holder.answerNumber.setText(String.valueOf(0));
+                    holder.cardView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
 
-            holder.cardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    Toast.makeText(mContext, mContext.getResources().getString(R.string.no_answer), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, mContext.getResources().getString(R.string.no_answer), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
-            });
+
+                break;
+            case POLL:
+
+                if(((PollItem)questionare).getAnswersForQuestion(question.getQuestionId()) != null){
+                    holder.answerNumber.setText(String.valueOf(((PollItem)questionare).getAnswersForQuestion(question.getQuestionId()).size()));
+
+                    holder.cardView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // create intent to go to the next activity
+                            Intent intent = new Intent(mContext, QuestionareResultsPerQuestionActivity.class);
+                            intent.putExtra(QuestionareResultsPerQuestionActivity.QUESTIONARE_TYPE, POLL);
+                            intent.putExtra(QuestionareResultsPerQuestionActivity.QUESTIONARE_ID, question.getQuestionareId());
+                            intent.putExtra(QuestionareResultsPerQuestionActivity.QUESTION_FORMAT, question.getFormat());
+                            intent.putExtra(QuestionareResultsPerQuestionActivity.QUESTION_ID, question.getQuestionId());
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            mContext.startActivity(intent);
+                        }
+                    });
+
+                }
+                else{
+                    holder.answerNumber.setText(String.valueOf(0));
+
+                    holder.cardView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Toast.makeText(mContext, mContext.getResources().getString(R.string.no_answer), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                break;
         }
 
 
