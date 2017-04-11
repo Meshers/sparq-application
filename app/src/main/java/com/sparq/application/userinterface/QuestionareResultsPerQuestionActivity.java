@@ -1,5 +1,6 @@
 package com.sparq.application.userinterface;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -12,6 +13,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.ValueDependentColor;
+import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.sparq.R;
@@ -23,6 +26,7 @@ import com.sparq.application.userinterface.model.Questionare;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 public class QuestionareResultsPerQuestionActivity extends AppCompatActivity {
 
@@ -116,10 +120,11 @@ public class QuestionareResultsPerQuestionActivity extends AppCompatActivity {
 
     public void initializeGraph(){
 
-        HashMap<Integer, Integer> data = new HashMap<>();
+        TreeMap<Integer, Integer> data = new TreeMap<>();
         for(AnswerItem answer: answers){
             ArrayList<Integer> answerChoices = answer.getAnswerChoices();
 
+            Log.i("HEREeeee", answerChoices.toString());
             for(int answerChoice: answerChoices){
                 if(data.containsKey(answerChoice)){
                     data.put(answerChoice, data.get(answerChoice)+ 1);
@@ -133,16 +138,29 @@ public class QuestionareResultsPerQuestionActivity extends AppCompatActivity {
 
         Log.i("HERE", data.toString());
 
-        DataPoint[] dataPoints = new DataPoint[data.size()];
+        DataPoint[] dataPoints = new DataPoint[data.size()+1];
+        dataPoints[0] = new DataPoint(0,0);
 
-        int i = 0;
+        int i = 1;
         for(int key: data.keySet()){
             dataPoints[i] = new DataPoint(key, data.get(key));
             i++;
         }
 
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(dataPoints);
+        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(dataPoints);
         graph.addSeries(series);
+
+        series.setValueDependentColor(new ValueDependentColor<DataPoint>() {
+            @Override
+            public int get(DataPoint data) {
+                return Color.rgb((int) data.getX()*255/4, (int) Math.abs(data.getY()*255/6), 100);
+            }
+        });
+
+        series.setSpacing(1);
+
+        series.setDrawValuesOnTop(true);
+        series.setValuesOnTopColor(Color.GRAY);
     }
 
 }

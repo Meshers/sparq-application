@@ -359,6 +359,8 @@ public class AlContext {
                         }
 
                         pdu = WifiBTQuestionarePdu.getQuizAnswerPdu(quizId, questionFormat, numberOfQuestions, answerCreatorId, data);
+                        ((WifiBTQuestionarePdu) pdu).setToAddr(retreivedQuestion.getToAddr());
+                        ((WifiBTQuestionarePdu) pdu).setLinkId(retreivedQuestion.getLinkId());
                     }else{
                         throw new IllegalArgumentException("No such type of Quiz packet exists");
                     }
@@ -449,17 +451,23 @@ public class AlContext {
         byte format =  pdu.getQuestionFormat();
         byte numberOfQuestions = pdu.getNumberOfQuestions();
         byte answerCreatorId = pdu.getAnswerCreatorId();
+        byte toAddr = pdu.getToAddr();
+        byte linkId = pdu.getLinkId();
         byte[] data = pdu.getData();
 
         switch(pdu.getType()){
             case QUIZ_QUESTION:
                 message = new AlBundledQuestionareQuestion(questionareId, format, numberOfQuestions, data);
+                ((AlBundledQuestionareQuestion)message).setToAddr(toAddr);
+                ((AlBundledQuestionareQuestion)message).setLinkId(linkId);
                 break;
             case QUIZ_ANSWER:
                 message = new AlBundledQuestionareAnswer(questionareId, format, numberOfQuestions, answerCreatorId, data);
                 break;
             case POLL_QUESTION:
                 message = new AlBundledQuestionareQuestion(questionareId, format, numberOfQuestions, data);
+                ((AlBundledQuestionareQuestion)message).setToAddr(toAddr);
+                ((AlBundledQuestionareQuestion)message).setLinkId(linkId);
                 break;
             case POLL_ANSWER:
                 message = new AlBundledQuestionareAnswer(questionareId, format, numberOfQuestions, answerCreatorId, data);

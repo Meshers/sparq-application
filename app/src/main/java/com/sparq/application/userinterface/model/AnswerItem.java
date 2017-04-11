@@ -151,6 +151,7 @@ public class AnswerItem implements Serializable{
             answerChoice = answerChoice.substring(0, answerChoice.length()-1);
             answer = new ArrayList<>();
             answer.add(Integer.parseInt(answerChoice));
+            Log.i("HEREeeee", answer.toString());
         }
 
         return new AnswerItem(
@@ -175,9 +176,11 @@ public class AnswerItem implements Serializable{
             answer = new ArrayList<>();
 
             for(byte splitChoice: splitChoices){
-                answer.add(Integer.valueOf(splitChoice));
+                answer.add(Integer.valueOf(new String(new byte[]{splitChoice}, Constants.CHARSET)));
             }
         }
+
+        Log.i("HEREeee", answer.toString());
 
         return new AnswerItem(
                 answerId,

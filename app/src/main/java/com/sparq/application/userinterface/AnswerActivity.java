@@ -235,8 +235,6 @@ public class AnswerActivity extends AppCompatActivity {
             public void handleConversationThreadAnswerVotes(){
                 answerVotes.setText(String.valueOf(answer.getVotes()));
 
-                // deactivate the vote buttons
-                deactivateVote();
             }
         };
 

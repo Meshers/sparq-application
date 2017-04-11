@@ -124,7 +124,7 @@ public class Main2Activity extends AppCompatActivity {
             }
         };
 
-        mApplicationLayerManager = new ApplicationLayerManager(mOwnAddr, mBluetoothAdapter, mHandler, SPARQApplication.getSessionId());
+        mApplicationLayerManager = new ApplicationLayerManager(Main2Activity.this,mOwnAddr, mBluetoothAdapter, mHandler, SPARQApplication.getSessionId());
 
         if (!mBluetoothAdapter.isSupported()) {
             mQuestionBtn.setEnabled(false);

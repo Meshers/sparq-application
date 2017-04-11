@@ -36,6 +36,8 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
 
     private static final String TAG = "CTActivity";
     private TextView questionText;
+    private TextView answerCount;
+    private TextView emptyView;
     private EditText answerText;
     private Button postAnswer;
     private RecyclerView recyclerView;
@@ -115,9 +117,22 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
         questionText = (TextView) findViewById(R.id.question_text);
         questionText.setText(mThread.getQuestionItem().getQuestion());
 
+        answerCount = (TextView) findViewById(R.id.answer_count);
+        answerCount.setText(String.valueOf(mThread.getAnswers().size()));
+
         answerText = (EditText) findViewById(R.id.answer_text);
         postAnswer = (Button) findViewById(R.id.post_ans);
         recyclerView = (RecyclerView)  findViewById(R.id.answer_recycler_view);
+
+        emptyView = (TextView) findViewById(R.id.empty_view);
+        if(mThread.getAnswers().size() == 0){
+            recyclerView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+        }
+        else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        }
 
         postAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,11 +158,17 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
 
                     if(mAdapter != null){
                         mAdapter.notifyDataSetChanged();
+
+                        if(mThread.getAnswers().size() == 0){
+                            recyclerView.setVisibility(View.GONE);
+                            emptyView.setVisibility(View.VISIBLE);
+                        }
+                        else {
+                            recyclerView.setVisibility(View.VISIBLE);
+                            emptyView.setVisibility(View.GONE);
+                        }
                     }
                 }
-
-                Log.i(TAG, "OnResume: " + SPARQApplication.getSessionId());
-
             }
         });
 
@@ -210,6 +231,7 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
             @Override
             public void handleConversationThreadAnswers(){
                 mAdapter.notifyDataSetChanged();
+                answerCount.setText(String.valueOf(mThread.getAnswers().size()));
             }
 
             @Override

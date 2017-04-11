@@ -1,24 +1,34 @@
 package com.sparq.application.layer;
 
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.util.Log;
 
+import com.sparq.application.SPARQApplication;
 import com.sparq.application.layer.almessage.AlMessage;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
-import com.sparq.application.layer.pdu.PollPdu;
 import com.sparq.application.layer.pdu.ThreadPdu;
 import com.sparq.application.layer.pdu.WifiBTQuestionarePdu;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
-import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
-import test.com.blootoothtester.network.linklayer.DeviceDiscoveryHandler;
-import test.com.blootoothtester.network.linklayer.LinkLayerManager;
-import test.com.blootoothtester.network.linklayer.LlMessage;
 
-import static com.sparq.application.layer.pdu.ApplicationLayerPdu.TYPE_BYTES;
+import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
+import test.com.blootoothtester.network.linklayer.bt.DeviceDiscoveryHandler;
+import test.com.blootoothtester.network.linklayer.bt.LinkLayerManager;
+import test.com.blootoothtester.network.linklayer.bt.LlMessage;
+import test.com.blootoothtester.network.linklayer.wifi.BtMessage;
+import test.com.blootoothtester.network.linklayer.wifi.WifiLlManager;
+import test.com.blootoothtester.network.linklayer.wifi.WifiMessage;
+import test.com.blootoothtester.util.Constants;
+
+import static com.sparq.application.layer.pdu.ApplicationLayerPdu.TYPE.POLL_ANSWER;
+import static com.sparq.application.layer.pdu.ApplicationLayerPdu.TYPE.POLL_QUESTION;
+import static com.sparq.application.layer.pdu.ApplicationLayerPdu.TYPE.QUIZ_ANSWER;
+import static com.sparq.application.layer.pdu.ApplicationLayerPdu.TYPE.QUIZ_QUESTION;
 
 /**
  * This class contains information about the current context in which the ApplicatonLayer is running
@@ -28,63 +38,55 @@ public class ApplicationLayerManager {
 
     private byte mSessionId = (byte) 1;
 
+    Context mContext;
+
     private BroadcastReceiver mBroadcastReceiver;
     private ApplicationPacketDiscoveryHandler mApplicationPacketDiscoveryHandler;
     private AlContext mAlContext;
     private byte mOwnAddr;
     private LinkLayerManager mLinkLayerManager;
+    private WifiLlManager mWifiLlManager;
 
-    public ApplicationLayerManager(byte ownAddr, MyBluetoothAdapter bluetoothAdapter,
+    public ApplicationLayerManager(Context context, byte ownAddr, MyBluetoothAdapter bluetoothAdapter,
                                    final ApplicationPacketDiscoveryHandler applicationPacketDiscoveryHandler, byte sessionId){
+
+        this.mContext = context;
 
         this.mApplicationPacketDiscoveryHandler = applicationPacketDiscoveryHandler;
         this.mOwnAddr = ownAddr;
         this.mSessionId = sessionId;
 
-        DeviceDiscoveryHandler discoveryHandler = new DeviceDiscoveryHandler() {
-
-            @Override
-            public void handleDiscovery(LlMessage llMessage) {
-                Log.i("LLMSSG","Message Received from linklayer: "+ llMessage.getDataAsString());
-
-                ApplicationLayerPdu pdu = null;
-
-                if(llMessage.getDataAsString().equalsIgnoreCase("init")){
-                    return;
-                }
-
-                switch(ApplicationLayerPdu.getTypeDecoded(llMessage.getData()[0])){
-                    case QUIZ_QUESTION:
-                    case QUIZ_ANSWER:
-                        pdu = WifiBTQuestionarePdu.from(llMessage);
-                        break;
-                    case POLL_QUESTION:
-                    case POLL_ANSWER:
-//                        pdu = PollPdu.from(llMessage);
-                        pdu = WifiBTQuestionarePdu.from(llMessage);
-                        break;
-                    case QUESTION:
-                    case ANSWER:
-                    case QUESTION_VOTE:
-                    case ANSWER_VOTE:
-                        pdu = ThreadPdu.from(llMessage);
-                        break;
-                }
-                if(pdu != null){
-                    mAlContext.receivePdu(pdu);
-                }
-            }
-        };
-        this.mLinkLayerManager = new LinkLayerManager(
-                mOwnAddr,
-                bluetoothAdapter,
-                discoveryHandler
-        );
+        initializeArchitectureOne(bluetoothAdapter);
+        initializeArchitectureTwo(bluetoothAdapter);
 
         AlContext.Callback callback = new AlContext.Callback() {
             @Override
             public void transmitPdu(ApplicationLayerPdu pdu, byte toAddr) {
-                mLinkLayerManager.sendData(pdu.encode(), toAddr);
+
+                switch(pdu.getType()){
+                    case QUIZ_QUESTION:
+                    case POLL_QUESTION:
+                        mWifiLlManager.sendWifiMessage(pdu.encode());
+                        break;
+                    case QUIZ_ANSWER:
+                    case POLL_ANSWER:
+                        mWifiLlManager.sendBtMessage(
+                                ((WifiBTQuestionarePdu) pdu).getToAddr(),
+                                ((WifiBTQuestionarePdu) pdu).getToAddr(),
+                                pdu.encode()
+                        );
+                        break;
+                    case QUESTION:
+                    case ANSWER:
+                    case ANSWER_VOTE:
+                    case QUESTION_VOTE:
+                        mLinkLayerManager.sendData(
+                                new String(pdu.encode(), Charset.forName("UTF-8")),
+                                toAddr
+                        );
+                        break;
+
+                }
             }
 
             @Override
@@ -94,18 +96,127 @@ public class ApplicationLayerManager {
         };
 
         this.mAlContext = new AlContext(mSessionId, callback);
-        mLinkLayerManager.startReceiving();
+//        mLinkLayerManager.startReceiving();
 
+        mWifiLlManager.startReceivingWifiMessages();
+
+    }
+
+    public void initializeArchitectureOne(MyBluetoothAdapter bluetoothAdapter){
+
+        return;
+//
+//        DeviceDiscoveryHandler discoveryHandler = new DeviceDiscoveryHandler() {
+//
+//            @Override
+//            public void handleDiscovery(LlMessage llMessage) {
+//                Log.i("LLMSSG","Message Received from linklayer: "+ llMessage.getDataAsString());
+//
+//                ApplicationLayerPdu pdu = null;
+//
+//                if(llMessage.getDataAsString().equalsIgnoreCase("init")){
+//                    return;
+//                }
+//
+//                switch(ApplicationLayerPdu.getTypeDecoded(llMessage.getData()[0])){
+//                    // this callback is used only for application layer thread PDUs
+//                    case QUESTION:
+//                    case ANSWER:
+//                    case QUESTION_VOTE:
+//                    case ANSWER_VOTE:
+//                        pdu = ThreadPdu.from(llMessage);
+//                        break;
+//                }
+//                if(pdu != null){
+//                    mAlContext.receivePdu(pdu);
+//                }
+//            }
+//        };
+//        this.mLinkLayerManager = new LinkLayerManager(
+//                mOwnAddr,
+//                SPARQApplication.getSessionId(),
+//                bluetoothAdapter,
+//                discoveryHandler
+//        );
+    }
+
+    public void initializeArchitectureTwo(MyBluetoothAdapter bluetoothAdapter){
+
+        mWifiLlManager = new WifiLlManager(
+                mContext,
+                SPARQApplication.getOwnAddress(),
+                mSessionId,
+                new WifiLlManager.MessageCallback() {
+
+                    ApplicationLayerPdu pdu = null;
+
+                    @Override
+                    public void onReceiveWifiMessage(WifiMessage wifiMessage) {
+                        // teacher -> student
+                        // poll questions and quiz questions
+                        switch(ApplicationLayerPdu.getTypeDecoded(wifiMessage.getBody()[0])) {
+                            case QUIZ_QUESTION:
+                                pdu = WifiBTQuestionarePdu.from(wifiMessage);
+                                break;
+                            case POLL_QUESTION:
+//                              pdu = PollPdu.from(llMessage);
+                                pdu = WifiBTQuestionarePdu.from(wifiMessage);
+                                break;
+                            default:
+                                throw new IllegalArgumentException(
+                                        "Invalid Packet type. Found " +
+                                        ApplicationLayerPdu.getTypeDecoded(wifiMessage.getBody()[0]) +
+                                        " but expected " + QUIZ_QUESTION +
+                                        " or " + POLL_QUESTION
+                                );
+                        }
+
+                        if(pdu != null){
+                            mAlContext.receivePdu(pdu);
+                        }
+                    }
+
+                    @Override
+                    public void onReceiveBtMessage(BtMessage btMessage) {
+                        // student -> teacher
+                        // poll answers and quiz answers
+                        switch(ApplicationLayerPdu.getTypeDecoded(btMessage.getBody()[0])) {
+                            case QUIZ_ANSWER:
+                                pdu = WifiBTQuestionarePdu.from(btMessage);
+                                break;
+                            case POLL_ANSWER:
+//                              pdu = PollPdu.from(llMessage);
+                                pdu = WifiBTQuestionarePdu.from(btMessage);
+                                break;
+                            default:
+                                throw new IllegalArgumentException(
+                                        "Invalid Packet type. Found " +
+                                                ApplicationLayerPdu.getTypeDecoded(btMessage.getBody()[0]) +
+                                                " but expected " + QUIZ_ANSWER +
+                                                " or " + POLL_ANSWER
+                                );
+                        }
+
+                        if(pdu != null){
+                            mAlContext.receivePdu(pdu);
+                        }
+                    }
+
+                    @Override
+                    public void onAckedByWifi() {
+                        // do nothing on reception of ack
+                    }
+                },
+                bluetoothAdapter
+        );
     }
 
     public boolean sendData(ApplicationLayerPdu.TYPE type, byte[] data, byte[][] options,byte toAddr , List<Byte> headers, List<Boolean> flags) {
 
-        Log.i("HERE", "send data");
         switch(type){
             case QUIZ_QUESTION:
             case QUIZ_ANSWER:
                 if(headers.size() + 1 <= WifiBTQuestionarePdu.HEADER_QUIZ_MAX_BYTES){
-                    Log.i("HERE", "checked headers");
                     return sendQuizData(type, headers.get(0), headers.get(1), headers.get(2), headers.get(3), data, toAddr);
                 }
                 else{
@@ -150,7 +261,6 @@ public class ApplicationLayerManager {
 //                }
 
                 if(headers.size() + 1 <= WifiBTQuestionarePdu.HEADER_QUIZ_MAX_BYTES){
-                    Log.i("HERE", "checked headers");
                     return sendPollData(type, headers.get(0), headers.get(1), headers.get(2), headers.get(3), data, toAddr);
                 }
                 else{
@@ -193,7 +303,6 @@ public class ApplicationLayerManager {
                                 byte questionFormat, byte numberOfQuestios, byte answerCreatorId,
                                 byte[] data, byte toAddr){
 
-        Log.i("HERE", "send Poll Data");
         return mAlContext.sendPollPdu(type, pollId, questionFormat, numberOfQuestios,answerCreatorId, data, toAddr);
 
     }
@@ -202,7 +311,6 @@ public class ApplicationLayerManager {
                                 byte questionFormat, byte numberOfQuestios, byte answerCreatorId,
                                 byte[] data, byte toAddr){
 
-        Log.i("HERE", "send Quiz Data");
         return mAlContext.sendQuizPdu(type, quizId, questionFormat, numberOfQuestios,answerCreatorId, data, toAddr);
 
     }
@@ -234,14 +342,11 @@ public class ApplicationLayerManager {
     public boolean sendBundledData(ApplicationLayerPdu.TYPE type, HashMap<Integer, String> msg, byte toAddr, List<Byte> headers, List<Boolean> flags) {
         try {
 
-            Log.i("HERE", "send bundle message");
             String bundledMessage = "";
 
             for(int questionNumber: msg.keySet()){
                 bundledMessage += msg.get(questionNumber);
             }
-
-            Log.i("HERE", "bundle message" + bundledMessage);
 
             return sendData(type, bundledMessage.getBytes("UTF-8"), null, toAddr, headers, flags);
         } catch (UnsupportedEncodingException e) {

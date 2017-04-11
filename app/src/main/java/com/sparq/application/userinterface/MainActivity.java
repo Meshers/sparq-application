@@ -28,8 +28,6 @@ import com.sparq.application.userinterface.fragment.AboutUsFragment;
 import com.sparq.application.userinterface.fragment.EventFragment;
 import com.sparq.application.userinterface.model.QuizItem;
 
-import test.com.blootoothtester.network.linklayer.LinkLayerManager;
-
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {

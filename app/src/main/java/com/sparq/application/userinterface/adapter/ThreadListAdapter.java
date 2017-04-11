@@ -47,20 +47,20 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView threadName;
         public TextView threadDate;
-        public TextView threadVotes;
+        public TextView answerCount;
         public LinearLayout threadImage;
-        public ImageView likeBtn, unlikeBtn, answerCount;
+        public ImageView likeBtn, unlikeBtn, threadVotes;
         public CardView card;
 
         public MyViewHolder(View view) {
             super(view);
             threadName = (TextView) view.findViewById(R.id.thread_name);
             threadDate = (TextView) view.findViewById(R.id.thread_date);
-            threadVotes = (TextView) view.findViewById(R.id.thread_votes);
+            answerCount = (TextView) view.findViewById(R.id.answer_count);
             threadImage = (LinearLayout) view.findViewById(R.id.thread_image);
             likeBtn = (ImageView) view.findViewById(R.id.like_image);
             unlikeBtn = (ImageView) view.findViewById(R.id.unlike_image);
-            answerCount = (ImageView) view.findViewById(R.id.answer_count);
+            threadVotes = (ImageView) view.findViewById(R.id.thread_votes);
             card = (CardView) view.findViewById(R.id.card_view);
         }
     }
@@ -85,15 +85,15 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.My
         final ConversationThread thread = threads.get(position);
         holder.threadName.setText(thread.getQuestionItem().getQuestion());
         holder.threadDate.setText(new SimpleDateFormat("yyyy-MM-dd").format(thread.getDate()));
-        holder.threadVotes.setText(String.valueOf(thread.getQuestionItem().getVotes()));
+        holder.answerCount.setText(String.valueOf(thread.getAnswers().size()));
 
-        ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
-        // generate color based on a key (same key returns the same color), useful for list/grid views
-        int color = generator.getColor(thread.getAnswers().size());
+//        ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
+//        int color = generator.getColor(thread.getQuestionItem().getVotes());
+        int color = mContext.getResources().getColor(R.color.warning);
 
         TextDrawable drawable = TextDrawable.builder()
-                .buildRound(String.valueOf(thread.getAnswers().size()), color);
-        holder.answerCount.setImageDrawable(drawable);
+                .buildRound(String.valueOf(thread.getQuestionItem().getVotes()), color);
+        holder.threadVotes.setImageDrawable(drawable);
 
 
         holder.card.setOnClickListener(new View.OnClickListener() {

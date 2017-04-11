@@ -14,6 +14,8 @@ public class AlBundledQuestionareQuestion extends AlMessage {
     private byte mQuestionareId;
     private byte mQuestionFormat;
     private byte mNumberOfQuestions;
+    private byte mToAddr;
+    private byte mLinkId;
     private byte[] mQuestionData;
 
     private final static Charset CHARSET = Charset.forName("UTF-8");
@@ -46,6 +48,22 @@ public class AlBundledQuestionareQuestion extends AlMessage {
 
     public byte getQuestionareId() {
         return mQuestionareId;
+    }
+
+    public byte getToAddr() {
+        return mToAddr;
+    }
+
+    public void setToAddr(byte mToAddr) {
+        this.mToAddr = mToAddr;
+    }
+
+    public byte getLinkId() {
+        return mLinkId;
+    }
+
+    public void setLinkId(byte mLinkId) {
+        this.mLinkId = mLinkId;
     }
 
     public static int getQuestionIdFromNumber(int questionNumber){

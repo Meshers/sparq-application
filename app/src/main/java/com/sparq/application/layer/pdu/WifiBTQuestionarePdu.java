@@ -1,6 +1,9 @@
 package com.sparq.application.layer.pdu;
 
-import test.com.blootoothtester.network.linklayer.LlMessage;
+import test.com.blootoothtester.network.linklayer.bt.LlMessage;
+import test.com.blootoothtester.network.linklayer.wifi.BtMessage;
+import test.com.blootoothtester.network.linklayer.wifi.WifiLlManager;
+import test.com.blootoothtester.network.linklayer.wifi.WifiMessage;
 
 /**
  * Created by sarahcs on 4/9/2017.
@@ -32,6 +35,10 @@ public class WifiBTQuestionarePdu extends ApplicationLayerPdu{
     private byte mQuestionFormat;
     private byte mNumberOfQuestions;
     private byte mAnswerCreatorId;
+
+    private byte mToAddr;
+    private byte mLinkId;
+
     private byte[] mData;
 
     private WifiBTQuestionarePdu(TYPE type, byte quizId, byte questionFormat, byte numberOfQuestions, byte answerCreatorId, byte[] data) {
@@ -77,6 +84,22 @@ public class WifiBTQuestionarePdu extends ApplicationLayerPdu{
 
     public String getAsString() {
         return new String(encode(), CHARSET);
+    }
+
+    public byte getToAddr() {
+        return mToAddr;
+    }
+
+    public void setToAddr(byte mToAddr) {
+        this.mToAddr = mToAddr;
+    }
+
+    public byte getLinkId() {
+        return mLinkId;
+    }
+
+    public void setLinkId(byte mLinkId) {
+        this.mLinkId = mLinkId;
     }
 
     @Override
@@ -200,6 +223,21 @@ public class WifiBTQuestionarePdu extends ApplicationLayerPdu{
 
     public static ApplicationLayerPdu from(LlMessage llmessage) {
         return decode(llmessage.getData());
+
+    }
+
+
+    public static ApplicationLayerPdu from(BtMessage btMessage) {
+        return decode(btMessage.getBody());
+
+    }
+
+    public static ApplicationLayerPdu from(WifiMessage wifiMessage) {
+
+        WifiBTQuestionarePdu pdu = decode(wifiMessage.getBody());
+        pdu.setToAddr(wifiMessage.getFromAddress());
+        pdu.setLinkId(wifiMessage.getMsgId());
+        return pdu;
 
     }
 

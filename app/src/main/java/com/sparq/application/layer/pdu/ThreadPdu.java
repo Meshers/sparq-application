@@ -1,6 +1,6 @@
 package com.sparq.application.layer.pdu;
 
-import test.com.blootoothtester.network.linklayer.LlMessage;
+import test.com.blootoothtester.network.linklayer.bt.LlMessage;
 
 /**
  * Created by sarahcs on 3/20/2017.

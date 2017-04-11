@@ -6,11 +6,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.EventLog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,8 +52,9 @@ import static com.sparq.application.userinterface.model.QuestionItem.FORMAT.SHOR
 public class EventActivity extends AppCompatActivity {
 
     private static final String TAG = "EventActivity";
-
     public final static String EXTRA_EVENT_CODE = "EVENT_CODE";
+
+    boolean doubleBackToExitPressedOnce = false;
 
     TabLayout tabLayout;
     public FloatingActionsMenu newEvent;
@@ -85,7 +88,7 @@ public class EventActivity extends AppCompatActivity {
 
         initializeLowerLayer();
 
-        tabLayout.addTab(tabLayout.newTab().setText("About"));
+//        tabLayout.addTab(tabLayout.newTab().setText("About"));
         tabLayout.addTab(tabLayout.newTab().setText("Quiz"));
         tabLayout.addTab(tabLayout.newTab().setText("Poll"));
         tabLayout.addTab(tabLayout.newTab().setText("Thread"));
@@ -198,7 +201,7 @@ public class EventActivity extends AppCompatActivity {
             }
         };
 
-        mManager = new ApplicationLayerManager(SPARQApplication.getOwnAddress(), mBluetoothAdapter, mHandler,SPARQApplication.getSessionId());
+        mManager = new ApplicationLayerManager(EventActivity.this, SPARQApplication.getOwnAddress(), mBluetoothAdapter, mHandler,SPARQApplication.getSessionId());
 
         SPARQApplication.setApplicationLayerManager(mManager);
     }
@@ -321,6 +324,25 @@ public class EventActivity extends AppCompatActivity {
         }
 
         return super.dispatchTouchEvent(event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Press BACK again to leave", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce=false;
+            }
+        }, 2000);
     }
 
 

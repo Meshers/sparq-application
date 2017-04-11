@@ -29,16 +29,16 @@ public class EventPagerAdapter extends FragmentStatePagerAdapter{
         Fragment fragment = null;
 
         switch (position) {
+//            case 0:
+//                fragment = new EventDetailsFragment();
+//                break;
             case 0:
-                fragment = new EventDetailsFragment();
-                break;
-            case 1:
                 fragment = new QuizFragment();
                 break;
-            case 2:
+            case 1:
                 fragment = new PollFragment();
                 break;
-            case 3:
+            case 2:
                 fragment = new ThreadFragment();
                 break;
         }

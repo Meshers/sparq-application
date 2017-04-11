@@ -1,1 +1,1 @@
-include ':app', ':network-library', ':material-spinner-1.1.0', ':graphview-4.2.1'
+include ':app', ':material-spinner-1.1.0', ':graphview-4.2.1', ':app-arch-2'

@@ -24,6 +24,8 @@ import com.alimuzaffar.lib.pin.PinEntryEditText;
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
 
+import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
+
 import static com.sparq.application.SPARQApplication.SPARQInstance;
 import static test.com.blootoothtester.util.Constants.MAX_USERS;
 
@@ -34,6 +36,8 @@ public class LoginActivity extends AppCompatActivity {
     private Button submit;
     private TextInputLayout layout;
 
+    private MyBluetoothAdapter checkBluetoothOnAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +45,9 @@ public class LoginActivity extends AppCompatActivity {
         initializeViews();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         makePermissionsRequest();
+
+        checkBluetoothOnAdapter = new MyBluetoothAdapter(LoginActivity.this);
+        checkBluetoothOnAdapter.on("bubballoo");
 
         openDialog();
     }
@@ -68,6 +75,15 @@ public class LoginActivity extends AppCompatActivity {
             if (grantResult != PackageManager.PERMISSION_GRANTED) {
                 makePermissionsRequest();
                 break;
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == MyBluetoothAdapter.REQUEST_ENABLE_BT) {
+            if (resultCode != RESULT_OK) {
+                checkBluetoothOnAdapter.on("bubballoo");
             }
         }
     }
@@ -127,6 +143,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onNextClick() {
+
         Intent intent = new Intent(this, EventActivity.class);
         String eventCode = mEventCode.getText().toString();
         String ownAddress = mOwnAddr.getText().toString();
