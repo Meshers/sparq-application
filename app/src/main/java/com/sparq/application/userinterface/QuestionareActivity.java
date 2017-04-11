@@ -110,6 +110,14 @@ public class QuestionareActivity extends AppCompatActivity {
             }
         });
 
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                initializeViews();
+            }
+        });
+
     }
 
     public Questionare getData(Questionare.QUESTIONARE_TYPE type){

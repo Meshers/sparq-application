@@ -72,6 +72,14 @@ public class QuestionareResultsActivity extends AppCompatActivity {
         questionListView.setItemAnimator(new DefaultItemAnimator());
         questionListView.setAdapter(mAdapter);
 
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                initializeViews();
+            }
+        });
+
     }
 
 }
