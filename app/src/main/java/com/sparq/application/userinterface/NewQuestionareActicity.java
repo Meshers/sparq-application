@@ -3,16 +3,12 @@ package com.sparq.application.userinterface;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringDef;
-import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -56,7 +52,7 @@ public class NewQuestionareActicity extends AppCompatActivity {
     private QuestionAdapter mQuestionAdapter;
 
     private Questionare.QUESTIONARE_TYPE type;
-    private QuestionItem.FORMAT quizFormat;
+    private QuestionItem.FORMAT questionareFormat;
     Questionare questionare;
     private HashMap<Integer, QuestionItem> questionsArray = new HashMap<>(0);
 
@@ -255,7 +251,7 @@ public class NewQuestionareActicity extends AppCompatActivity {
 
                         }
 
-                        quizFormat = format[0];
+                        questionareFormat = format[0];
                         dialog.dismiss();
                     }
                 })
@@ -424,6 +420,7 @@ public class NewQuestionareActicity extends AppCompatActivity {
                             addQuestionare.setEnabled(true);
                         }
 
+                        questionareFormat = format[0];
                         dialog.dismiss();
                     }
                 })
@@ -550,7 +547,7 @@ public class NewQuestionareActicity extends AppCompatActivity {
                 bundledMessage,
                 quiz.getQuestionareId(),
                 (int) SPARQApplication.getOwnAddress(),
-                quizFormat,
+                questionareFormat,
                 questions.size(),
                 bundledOptions,
                 0
@@ -558,46 +555,74 @@ public class NewQuestionareActicity extends AppCompatActivity {
         Log.i("HERE", "exiting send quiz Message");
     }
 
+//    public void sendPollMessage(final ApplicationLayerPdu.TYPE type, final byte toAddr, final PollItem poll){
+//
+//        final ArrayList<QuestionItem> questions = new ArrayList<>(poll.getQuestions().values());
+//        int i = 0;
+//        for(; i < questions.size() - 1; i++) {
+//
+//            QuestionItem question = questions.get(i);
+//            SPARQApplication.sendPollMessage(
+//                    type,
+//                    toAddr,
+//                    question.getQuestion(),
+//                    poll.getQuestionareId(),
+//                    (int) SPARQApplication.getOwnAddress(),
+//                    question.getQuestionId(),
+//                    question.getFormat(),
+//                    question.getOptions(),
+//                    0,
+//                    true,
+//                    false,
+//                    question.isMainQuestion()
+//            );
+//
+//        }
+//
+//        QuestionItem question = questions.get(i);
+//
+//        SPARQApplication.sendPollMessage(
+//                type,
+//                toAddr,
+//                question.getQuestion(),
+//                poll.getQuestionareId(),
+//                (int) SPARQApplication.getOwnAddress(),
+//                question.getQuestionId(),
+//                question.getFormat(),
+//                question.getOptions(),
+//                0,
+//                false,
+//                true,
+//                question.isMainQuestion()
+//        );
+//    }
+
     public void sendPollMessage(final ApplicationLayerPdu.TYPE type, final byte toAddr, final PollItem poll){
 
+        Log.i("HERE", "send poll Message");
         final ArrayList<QuestionItem> questions = new ArrayList<>(poll.getQuestions().values());
-        int i = 0;
-        for(; i < questions.size() - 1; i++) {
 
+        HashMap<Integer, ArrayList<String>> bundledOptions = new HashMap<>(0);
+        HashMap<Integer, String> bundledMessage = new HashMap<>(0);
+
+        for(int i = 0; i < questions.size(); i++){
             QuestionItem question = questions.get(i);
-            SPARQApplication.sendPollMessage(
-                    type,
-                    toAddr,
-                    question.getQuestion(),
-                    poll.getQuestionareId(),
-                    (int) SPARQApplication.getOwnAddress(),
-                    question.getQuestionId(),
-                    question.getFormat(),
-                    question.getOptions(),
-                    0,
-                    true,
-                    false,
-                    question.isMainQuestion()
-            );
-
+            bundledOptions.put(question.getQuestionId(), question.getOptions());
+            bundledMessage.put(question.getQuestionId(), String.valueOf(question.getOptions().size()));
         }
-
-        QuestionItem question = questions.get(i);
 
         SPARQApplication.sendPollMessage(
                 type,
                 toAddr,
-                question.getQuestion(),
+                bundledMessage,
                 poll.getQuestionareId(),
                 (int) SPARQApplication.getOwnAddress(),
-                question.getQuestionId(),
-                question.getFormat(),
-                question.getOptions(),
-                0,
-                false,
-                true,
-                question.isMainQuestion()
+                questionareFormat,
+                questions.size(),
+                bundledOptions,
+                0
         );
     }
+
 
 }

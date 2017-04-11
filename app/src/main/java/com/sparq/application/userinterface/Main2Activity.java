@@ -50,8 +50,6 @@ public class Main2Activity extends AppCompatActivity {
     private MyBluetoothAdapter mBluetoothAdapter;
     ApplicationLayerManager mApplicationLayerManager;
 
-    public final static String EXTRA_EVENT_CODE = "EVENT_CODE";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +59,7 @@ public class Main2Activity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         mOwnAddr = SPARQApplication.getOwnAddress();
-        mEventCode = getIntent().getByteExtra(EXTRA_EVENT_CODE, (byte) -1);
+//        mEventCode = getIntent().getByteExtra(EXTRA_EVENT_CODE, (byte) -1);
 
         initialize();
 

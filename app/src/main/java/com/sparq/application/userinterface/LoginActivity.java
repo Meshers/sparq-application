@@ -160,7 +160,7 @@ public class LoginActivity extends AppCompatActivity {
 
         SPARQInstance.setSessionId(Byte.parseByte(eventCode));
 
-        intent.putExtra(Main2Activity.EXTRA_EVENT_CODE, SPARQInstance.getSessionId());
+        intent.putExtra(EventActivity.EXTRA_EVENT_CODE, SPARQInstance.getSessionId());
         SPARQInstance.getInstance().initializeObjects(LoginActivity.this);
 
         startActivity(intent);

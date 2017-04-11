@@ -1,18 +1,13 @@
 package com.sparq.application.layer;
 
-import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
 import com.sparq.application.layer.almessage.AlMessage;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.layer.pdu.PollPdu;
 import com.sparq.application.layer.pdu.ThreadPdu;
-import com.sparq.application.layer.pdu.WifiBTQuizPdu;
-import com.sparq.util.Constants;
+import com.sparq.application.layer.pdu.WifiBTQuestionarePdu;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -21,9 +16,7 @@ import java.util.List;
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
 import test.com.blootoothtester.network.linklayer.DeviceDiscoveryHandler;
 import test.com.blootoothtester.network.linklayer.LinkLayerManager;
-import test.com.blootoothtester.network.linklayer.LlContext;
 import test.com.blootoothtester.network.linklayer.LlMessage;
-import test.com.blootoothtester.util.Logger;
 
 import static com.sparq.application.layer.pdu.ApplicationLayerPdu.TYPE_BYTES;
 
@@ -63,11 +56,12 @@ public class ApplicationLayerManager {
                 switch(ApplicationLayerPdu.getTypeDecoded(llMessage.getData()[0])){
                     case QUIZ_QUESTION:
                     case QUIZ_ANSWER:
-                        pdu = WifiBTQuizPdu.from(llMessage);
+                        pdu = WifiBTQuestionarePdu.from(llMessage);
                         break;
                     case POLL_QUESTION:
                     case POLL_ANSWER:
-                        pdu = PollPdu.from(llMessage);
+//                        pdu = PollPdu.from(llMessage);
+                        pdu = WifiBTQuestionarePdu.from(llMessage);
                         break;
                     case QUESTION:
                     case ANSWER:
@@ -110,51 +104,59 @@ public class ApplicationLayerManager {
         switch(type){
             case QUIZ_QUESTION:
             case QUIZ_ANSWER:
-                if(headers.size() + 1 <= WifiBTQuizPdu.HEADER_QUIZ_MAX_BYTES){
+                if(headers.size() + 1 <= WifiBTQuestionarePdu.HEADER_QUIZ_MAX_BYTES){
                     Log.i("HERE", "checked headers");
                     return sendQuizData(type, headers.get(0), headers.get(1), headers.get(2), headers.get(3), data, toAddr);
                 }
                 else{
                     throw new IllegalArgumentException("Illegal number of header values (Found: " +
-                            headers.size() + " but expected " + WifiBTQuizPdu.HEADER_QUIZ_MAX_BYTES + ")");
+                            headers.size() + " but expected " + WifiBTQuestionarePdu.HEADER_QUIZ_MAX_BYTES + ")");
                 }
 
             case POLL_QUESTION:
-                if(headers.size() + TYPE_BYTES + PollPdu.FLAG_BYTES + PollPdu.HEADER_SIZE_BYTES - PollPdu.ANSWER_CREATOR_ID_BYTES == PollPdu.PDU_POLL_QUESTION_HEADER_MIN_BYTES
-                        && flags.size() == PollPdu.FLAGS_POLL_MAX_BITS){
-                    return sendPollData(
-                            type,
-                            headers.get(0), headers.get(1), headers.get(2), headers.get(3), headers.get(4),
-                            flags.get(0), flags.get(1), flags.get(2),
-                            data,
-                            options,
-                            toAddr
-                    );
-                }
-                else{
-                    throw new IllegalArgumentException("Illegal number of header/flag values (Found: " +
-                            (headers.size() + TYPE_BYTES + PollPdu.FLAG_BYTES + PollPdu.HEADER_SIZE_BYTES - PollPdu.ANSWER_CREATOR_ID_BYTES)
-                            + " and flags " + flags.size() + " but expected " + PollPdu.PDU_POLL_QUESTION_HEADER_MIN_BYTES + " of header and " +
-                            PollPdu.FLAG_BYTES + " of flags)");
-                }
+//                if(headers.size() + TYPE_BYTES + PollPdu.FLAG_BYTES + PollPdu.HEADER_SIZE_BYTES - PollPdu.ANSWER_CREATOR_ID_BYTES == PollPdu.PDU_POLL_QUESTION_HEADER_MIN_BYTES
+//                        && flags.size() == PollPdu.FLAGS_POLL_MAX_BITS){
+//                    return sendPollData(
+//                            type,
+//                            headers.get(0), headers.get(1), headers.get(2), headers.get(3), headers.get(4),
+//                            flags.get(0), flags.get(1), flags.get(2),
+//                            data,
+//                            options,
+//                            toAddr
+//                    );
+//                }
+//                else{
+//                    throw new IllegalArgumentException("Illegal number of header/flag values (Found: " +
+//                            (headers.size() + TYPE_BYTES + PollPdu.FLAG_BYTES + PollPdu.HEADER_SIZE_BYTES - PollPdu.ANSWER_CREATOR_ID_BYTES)
+//                            + " and flags " + flags.size() + " but expected " + PollPdu.PDU_POLL_QUESTION_HEADER_MIN_BYTES + " of header and " +
+//                            PollPdu.FLAG_BYTES + " of flags)");
+//                }
 
             case POLL_ANSWER:
-                if(headers.size() + TYPE_BYTES == PollPdu.PDU_POLL_ANSWER_HEADER_BYTES
-                        && flags.size() == PollPdu.FLAGS_POLL_MAX_BITS){
-                    return sendPollData(
-                            type,
-                            headers.get(0), headers.get(1), headers.get(2), headers.get(3), headers.get(4),
-                            flags.get(0), flags.get(1), flags.get(2),
-                            data,
-                            options,
-                            toAddr
-                    );
+//                if(headers.size() + TYPE_BYTES == PollPdu.PDU_POLL_ANSWER_HEADER_BYTES
+//                        && flags.size() == PollPdu.FLAGS_POLL_MAX_BITS){
+//                    return sendPollData(
+//                            type,
+//                            headers.get(0), headers.get(1), headers.get(2), headers.get(3), headers.get(4),
+//                            flags.get(0), flags.get(1), flags.get(2),
+//                            data,
+//                            options,
+//                            toAddr
+//                    );
+//                }
+//                else{
+//                    throw new IllegalArgumentException("Illegal number of header values (Found: " +
+//                            (headers.size() + TYPE_BYTES) + " and flags " + flags.size() + " but expected " + PollPdu.PDU_POLL_ANSWER_HEADER_BYTES + " of headers)");
+//                }
+
+                if(headers.size() + 1 <= WifiBTQuestionarePdu.HEADER_QUIZ_MAX_BYTES){
+                    Log.i("HERE", "checked headers");
+                    return sendPollData(type, headers.get(0), headers.get(1), headers.get(2), headers.get(3), data, toAddr);
                 }
                 else{
                     throw new IllegalArgumentException("Illegal number of header values (Found: " +
-                            (headers.size() + TYPE_BYTES) + " and flags " + flags.size() + " but expected " + PollPdu.PDU_POLL_ANSWER_HEADER_BYTES + " of headers)");
+                            headers.size() + " but expected " + WifiBTQuestionarePdu.HEADER_QUIZ_MAX_BYTES + ")");
                 }
-
             case QUESTION:
             case ANSWER:
             case QUESTION_VOTE:
@@ -178,12 +180,21 @@ public class ApplicationLayerManager {
         return mAlContext.sendThreadPdu(type, threadCreatorId, threadId, subThreadCreatorId, subThreadId, data, toAddr);
     }
 
-    public boolean sendPollData(ApplicationLayerPdu.TYPE type, byte pollId,byte questionCreatorId,
-                                byte questionId, byte questionFormat, byte answerCreatorId, boolean hasMore, boolean endOfPoll, boolean isMainQuestion,
-                                byte[] data, byte[][] options, byte toAddr){
+//    public boolean sendPollData(ApplicationLayerPdu.TYPE type, byte pollId,byte questionCreatorId,
+//                                byte questionId, byte questionFormat, byte answerCreatorId, boolean hasMore, boolean endOfPoll, boolean isMainQuestion,
+//                                byte[] data, byte[][] options, byte toAddr){
+//
+//        return mAlContext.sendPollPdu(type, pollId, questionCreatorId, questionId, questionFormat,answerCreatorId,
+//                hasMore, endOfPoll, isMainQuestion, data, options,toAddr);
+//
+//    }
 
-        return mAlContext.sendPollPdu(type, pollId, questionCreatorId, questionId, questionFormat,answerCreatorId,
-                hasMore, endOfPoll, isMainQuestion, data, options,toAddr);
+    public boolean sendPollData(ApplicationLayerPdu.TYPE type, byte pollId,
+                                byte questionFormat, byte numberOfQuestios, byte answerCreatorId,
+                                byte[] data, byte toAddr){
+
+        Log.i("HERE", "send Poll Data");
+        return mAlContext.sendPollPdu(type, pollId, questionFormat, numberOfQuestios,answerCreatorId, data, toAddr);
 
     }
 

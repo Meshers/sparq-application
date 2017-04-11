@@ -1,7 +1,5 @@
 package com.sparq.application.layer.almessage;
 
-import android.util.Log;
-
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 
 import java.nio.charset.Charset;
@@ -11,20 +9,20 @@ import java.util.ArrayList;
  * Created by sarahcs on 4/9/2017.
  */
 
-public class AlQuizQuestion extends AlMessage {
+public class AlBundledQuestionareQuestion extends AlMessage {
 
-    private byte mQuizId;
+    private byte mQuestionareId;
     private byte mQuestionFormat;
     private byte mNumberOfQuestions;
     private byte[] mQuestionData;
 
     private final static Charset CHARSET = Charset.forName("UTF-8");
 
-    public AlQuizQuestion(byte quizId,  byte questionFormat, byte numberOfQuestions,
-                          byte[] data){
+    public AlBundledQuestionareQuestion(byte quizId, byte questionFormat, byte numberOfQuestions,
+                                        byte[] data){
         super(ApplicationLayerPdu.TYPE.POLL_QUESTION);
 
-        this.mQuizId = quizId;
+        this.mQuestionareId = quizId;
         this.mQuestionFormat = questionFormat;
         this.mNumberOfQuestions = numberOfQuestions;
         this.mQuestionData = data;
@@ -46,8 +44,8 @@ public class AlQuizQuestion extends AlMessage {
         return mQuestionFormat;
     }
 
-    public byte getQuizId() {
-        return mQuizId;
+    public byte getQuestionareId() {
+        return mQuestionareId;
     }
 
     public static int getQuestionIdFromNumber(int questionNumber){

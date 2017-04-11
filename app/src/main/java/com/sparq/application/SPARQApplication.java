@@ -10,11 +10,9 @@ import com.sparq.application.layer.ApplicationLayerManager;
 import com.sparq.application.layer.ApplicationPacketDiscoveryHandler;
 import com.sparq.application.layer.almessage.AlAnswer;
 import com.sparq.application.layer.almessage.AlMessage;
-import com.sparq.application.layer.almessage.AlPollAnswer;
-import com.sparq.application.layer.almessage.AlPollQuestion;
 import com.sparq.application.layer.almessage.AlQuestion;
-import com.sparq.application.layer.almessage.AlQuizAnswer;
-import com.sparq.application.layer.almessage.AlQuizQuestion;
+import com.sparq.application.layer.almessage.AlBundledQuestionareAnswer;
+import com.sparq.application.layer.almessage.AlBundledQuestionareQuestion;
 import com.sparq.application.layer.almessage.AlVote;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.userinterface.NotifyPollHandler;
@@ -238,70 +236,69 @@ public class SPARQApplication extends MultiDexApplication {
         }
     }
 
+    public static void handleQuiz(ApplicationLayerPdu.TYPE type, AlMessage alMessage){
 
-    public static void handlePackets(ApplicationLayerPdu.TYPE type, AlMessage alMessage){
-
-        QuizItem quiz;
-        PollItem poll;
+        QuizItem quiz = null;
 
         switch(type){
             case QUIZ_QUESTION:
 
-                AlQuizQuestion alQuizQuestion = (AlQuizQuestion) alMessage;
+                AlBundledQuestionareQuestion alBundledQuestionareQuestion = (AlBundledQuestionareQuestion) alMessage;
+
                 Log.i(TAG,"RECEIVED MESSAGE: "
-                        + alQuizQuestion.getQuizId() + ":"
-                        + alQuizQuestion.getQuestionFormat() + ":"
-                        + alQuizQuestion.getNumberOfQuestions()
+                        + alBundledQuestionareQuestion.getQuestionareId() + ":"
+                        + alBundledQuestionareQuestion.getQuestionFormat() + ":"
+                        + alBundledQuestionareQuestion.getNumberOfQuestions()
                 );
 
-                quiz = getQuiz(alQuizQuestion.getQuizId());
+                quiz = getQuiz(alBundledQuestionareQuestion.getQuestionareId());
 
                 if (quiz == null) {
                     quiz = new QuizItem(
-                            alQuizQuestion.getQuizId(), getSessionId(), "Quiz "+ alQuizQuestion.getQuizId(), null,
+                            alBundledQuestionareQuestion.getQuestionareId(), getSessionId(), "Quiz "+ alBundledQuestionareQuestion.getQuestionareId(), null,
                             new Date(),
                             Constants.QUIZ_DURATION,
                             QuizItem.QUIZ_STATE.ACTIVE,
-                            alQuizQuestion.getNumberOfQuestions(),
+                            alBundledQuestionareQuestion.getNumberOfQuestions(),
                             new UserItem((byte)1)
                     );
                     quizzes.add(quiz);
                 }
 
-                for(int questionNumber = 1; questionNumber <= alQuizQuestion.getNumberOfQuestions(); questionNumber++){
+                for(int questionNumber = 1; questionNumber <= alBundledQuestionareQuestion.getNumberOfQuestions(); questionNumber++){
 
                     QuestionItem question = null;
-                    switch(QuestionItem.getFormatFromByte(alQuizQuestion.getQuestionFormat())){
+                    switch(QuestionItem.getFormatFromByte(alBundledQuestionareQuestion.getQuestionFormat())){
                         case MCQ_SINGLE:
                             question = QuestionItem.getMCQSingleQuestion(
                                     questionNumber,
-                                    alQuizQuestion.getQuizId(),
+                                    alBundledQuestionareQuestion.getQuestionareId(),
                                     "Question "+ questionNumber,
-                                    alQuizQuestion.getOptionsForQuestionAsString(questionNumber),
+                                    alBundledQuestionareQuestion.getOptionsForQuestionAsString(questionNumber),
                                     Constants.MIN_QUESTION_MARKS
                             );
                             break;
                         case MCQ_MULTIPLE:
                             question = QuestionItem.getMCQMultipleQuestion(
                                     questionNumber,
-                                    alQuizQuestion.getQuizId(),
+                                    alBundledQuestionareQuestion.getQuestionareId(),
                                     "Question "+ questionNumber,
-                                    alQuizQuestion.getOptionsForQuestionAsString(questionNumber),
+                                    alBundledQuestionareQuestion.getOptionsForQuestionAsString(questionNumber),
                                     Constants.MIN_QUESTION_MARKS
                             );
                             break;
                         case ONE_WORD:
                             question = QuestionItem.getOneWordQuestion(
                                     questionNumber,
-                                    alQuizQuestion.getQuizId(),
-                                    alQuizQuestion.getQuestionDataAsString(),
+                                    alBundledQuestionareQuestion.getQuestionareId(),
+                                    alBundledQuestionareQuestion.getQuestionDataAsString(),
                                     Constants.MIN_QUESTION_MARKS);
                             break;
                         case SHORT:
                             question = QuestionItem.getShortQuestion(
                                     questionNumber,
-                                    alQuizQuestion.getQuizId(),
-                                    alQuizQuestion.getQuestionDataAsString(),
+                                    alBundledQuestionareQuestion.getQuestionareId(),
+                                    alBundledQuestionareQuestion.getQuestionDataAsString(),
                                     Constants.MIN_QUESTION_MARKS);
                             break;
                     }
@@ -309,19 +306,17 @@ public class SPARQApplication extends MultiDexApplication {
                     quiz.addQuestionToList(questionNumber, question);
                 }
 
-                notifyQuiz();
-
                 break;
             case QUIZ_ANSWER:
 
-                AlQuizAnswer alQuizAnswer = (AlQuizAnswer) alMessage;
+                AlBundledQuestionareAnswer alQuizAnswer = (AlBundledQuestionareAnswer) alMessage;
                 Log.i(TAG,"RECEIVED MESSAGE: "
-                        + alQuizAnswer.getQuizId() + ":"
+                        + alQuizAnswer.getQuestionareId() + ":"
                         + alQuizAnswer.getAnswerCreatorId() + ":"
                         + alQuizAnswer.getQuestionFormat()
                 );
 
-                quiz = getQuiz(alQuizAnswer.getQuizId());
+                quiz = getQuiz(alQuizAnswer.getQuestionareId());
 
                 if(quiz == null){
                     return;
@@ -373,142 +368,297 @@ public class SPARQApplication extends MultiDexApplication {
                     quiz.addAnswerToQuestion(questionNumber, quizAnswer);
                 }
 
-                notifyPoll();
-
                 break;
+        }
+
+        notifyQuiz();
+    }
+
+    public static void handlePoll(ApplicationLayerPdu.TYPE type, AlMessage alMessage){
+
+        PollItem poll = null;
+
+        switch(type){
             case POLL_QUESTION:
 
-                AlPollQuestion alPollQuestion = (AlPollQuestion) alMessage;
+                AlBundledQuestionareQuestion alPollQuestion = (AlBundledQuestionareQuestion) alMessage;
+
                 Log.i(TAG,"RECEIVED MESSAGE: "
-                        + alPollQuestion.getPollId() + ":"
-                        + alPollQuestion.getQeuestionCreatorId() + ":"
-                        + alPollQuestion.getQuestionId() + ":"
-                        + alPollQuestion.getQuestionFormat()
+                        + alPollQuestion.getQuestionareId() + ":"
+                        + alPollQuestion.getQuestionFormat() + ":"
+                        + alPollQuestion.getNumberOfQuestions()
                 );
 
-                //add to poll or create poll
-                poll = getPoll(alPollQuestion.getPollId());
+                poll = getPoll(alPollQuestion.getQuestionareId());
 
-                if(poll == null){
+                if (poll == null) {
                     poll = new PollItem(
-                            alPollQuestion.getPollId(), getSessionId(), "Poll "+ alPollQuestion.getPollId(), null,
+                            alPollQuestion.getQuestionareId(), getSessionId(), "Poll "+ alPollQuestion.getQuestionareId(), null,
                             new Date(),
                             PollItem.POLL_STATE.PLAY,
-                            new UserItem(alPollQuestion.getQeuestionCreatorId())
+                            new UserItem((byte) 1)
                     );
-
                     polls.add(poll);
                 }
 
-                QuestionItem question = null;
-                switch(QuestionItem.getFormatFromByte(alPollQuestion.getQuestionFormat())){
-                    case MCQ_SINGLE:
-                        question = QuestionItem.getMCQSingleQuestion(
-                                alPollQuestion.getQuestionId(),
-                                alPollQuestion.getPollId(),
-                                alPollQuestion.getQuestionDataAsString(),
-                                alPollQuestion.getOptionsAsArray(),
-                                Constants.MIN_QUESTION_MARKS);
-                        break;
-                    case MCQ_MULTIPLE:
-                        question = QuestionItem.getMCQMultipleQuestion(
-                                alPollQuestion.getQuestionId(),
-                                alPollQuestion.getPollId(),
-                                alPollQuestion.getQuestionDataAsString(),
-                                alPollQuestion.getOptionsAsArray(),
-                                Constants.MIN_QUESTION_MARKS
-                        );
-                        break;
-                    case ONE_WORD:
-                        question = QuestionItem.getOneWordQuestion(alPollQuestion.getQuestionId(),
-                                alPollQuestion.getPollId(),
-                                alPollQuestion.getQuestionDataAsString(),
-                                Constants.MIN_QUESTION_MARKS);
-                        break;
-                    case SHORT:
-                        question = QuestionItem.getShortQuestion(alPollQuestion.getQuestionId(),
-                                alPollQuestion.getPollId(),
-                                alPollQuestion.getQuestionDataAsString(),
-                                Constants.MIN_QUESTION_MARKS);
-                        break;
-                }
+                for(int questionNumber = 1; questionNumber <= alPollQuestion.getNumberOfQuestions(); questionNumber++){
 
-                poll.addQuestionToList(alPollQuestion.getQuestionId(), question);
+                    QuestionItem question = null;
+                    switch(QuestionItem.getFormatFromByte(alPollQuestion.getQuestionFormat())){
+                        case MCQ_SINGLE:
+                            question = QuestionItem.getMCQSingleQuestion(
+                                    questionNumber,
+                                    alPollQuestion.getQuestionareId(),
+                                    "Question "+ questionNumber,
+                                    alPollQuestion.getOptionsForQuestionAsString(questionNumber),
+                                    Constants.MIN_QUESTION_MARKS
+                            );
+                            break;
+                        case MCQ_MULTIPLE:
+                            question = QuestionItem.getMCQMultipleQuestion(
+                                    questionNumber,
+                                    alPollQuestion.getQuestionareId(),
+                                    "Question "+ questionNumber,
+                                    alPollQuestion.getOptionsForQuestionAsString(questionNumber),
+                                    Constants.MIN_QUESTION_MARKS
+                            );
+                            break;
+                        case ONE_WORD:
+                            question = QuestionItem.getOneWordQuestion(
+                                    questionNumber,
+                                    alPollQuestion.getQuestionareId(),
+                                    alPollQuestion.getQuestionDataAsString(),
+                                    Constants.MIN_QUESTION_MARKS);
+                            break;
+                        case SHORT:
+                            question = QuestionItem.getShortQuestion(
+                                    questionNumber,
+                                    alPollQuestion.getQuestionareId(),
+                                    alPollQuestion.getQuestionDataAsString(),
+                                    Constants.MIN_QUESTION_MARKS);
+                            break;
+                    }
 
-                if(alPollQuestion.isMainQuestion()){
-                    poll.setName(alPollQuestion.getQuestionDataAsString());
-                }
-
-                if(alPollQuestion.isEndOfPoll()){
-                    //notify the handler
-                    notifyPoll();
+                    poll.addQuestionToList(questionNumber, question);
                 }
 
                 break;
             case POLL_ANSWER:
 
-                AlPollAnswer alPollAnswer = (AlPollAnswer) alMessage;
+                AlBundledQuestionareAnswer alPollAnswer = (AlBundledQuestionareAnswer) alMessage;
                 Log.i(TAG,"RECEIVED MESSAGE: "
-                        + alPollAnswer.getPollId() + ":"
-                        + alPollAnswer.getQuestionCreatorId() + ":"
-                        + alPollAnswer.getQuestionId() + ":"
+                        + alPollAnswer.getQuestionareId() + ":"
                         + alPollAnswer.getAnswerCreatorId() + ":"
-                        + alPollAnswer.getFormat()
+                        + alPollAnswer.getQuestionFormat()
                 );
 
-                poll = getPoll(alPollAnswer.getPollId());
+                poll = getPoll(alPollAnswer.getQuestionareId());
 
                 if(poll == null){
                     return;
                 }
 
-                AnswerItem pollAnswer = null;
-                switch(QuestionItem.getFormatFromByte(alPollAnswer.getFormat())){
-                    case MCQ_SINGLE:
-                        pollAnswer = AnswerItem.getMCQSingleAnswer(
-                                alPollAnswer.getQuestionId(),
-                                new UserItem(alPollAnswer.getAnswerCreatorId()),
-                                alPollAnswer.getQuestionId(),
-                                new UserItem(alPollAnswer.getQuestionCreatorId()),
-                                alPollAnswer.getAnswerChoicesAsString()
-                        );
+                for(int questionNumber = 1; questionNumber <= alPollAnswer.getNumberOfQuestions(); questionNumber++){
+                    AnswerItem quizAnswer = null;
+                    switch(QuestionItem.getFormatFromByte(alPollAnswer.getQuestionFormat())){
+                        case MCQ_SINGLE:
+                            quizAnswer = AnswerItem.getMCQSingleAnswer(
+                                    questionNumber,
+                                    new UserItem(alPollAnswer.getAnswerCreatorId()),
+                                    questionNumber,
+                                    new UserItem((byte) 1),
+                                    alPollAnswer.getAnswerChoicesAsString(questionNumber)
+                            );
 
-                        break;
-                    case MCQ_MULTIPLE:
-                        pollAnswer = AnswerItem.getMCQMultipleAnswer(
-                                alPollAnswer.getQuestionId(),
-                                new UserItem(alPollAnswer.getAnswerCreatorId()),
-                                alPollAnswer.getQuestionId(),
-                                new UserItem(alPollAnswer.getQuestionCreatorId()),
-                                alPollAnswer.getAnswerChoicesAsString()
-                        );
+                            break;
+                        case MCQ_MULTIPLE:
+                            quizAnswer = AnswerItem.getMCQMultipleAnswer(
+                                    questionNumber,
+                                    new UserItem(alPollAnswer.getAnswerCreatorId()),
+                                    questionNumber,
+                                    new UserItem((byte) 1),
+                                    alPollAnswer.getAnswerChoicesAsString(questionNumber)
+                            );
 
-                        break;
-                    case ONE_WORD:
-                        pollAnswer = AnswerItem.getMCQOneWordAnswer(
-                                alPollAnswer.getQuestionId(),
-                                new UserItem(alPollAnswer.getAnswerCreatorId()),
-                                alPollAnswer.getQuestionId(),
-                                new UserItem(alPollAnswer.getQuestionCreatorId()),
-                                alPollAnswer.getAnswerDataAsString()
-                        );
-                        break;
-                    case SHORT:
-                        pollAnswer = AnswerItem.getShortAnswer(
-                                alPollAnswer.getQuestionId(),
-                                new UserItem(alPollAnswer.getAnswerCreatorId()),
-                                alPollAnswer.getQuestionId(),
-                                new UserItem(alPollAnswer.getQuestionCreatorId()),
-                                alPollAnswer.getAnswerDataAsString()
-                        );
-                        break;
+                            break;
+                        case ONE_WORD:
+                            quizAnswer = AnswerItem.getMCQOneWordAnswer(
+                                    questionNumber,
+                                    new UserItem(alPollAnswer.getAnswerCreatorId()),
+                                    questionNumber,
+                                    new UserItem((byte) 1),
+                                    alPollAnswer.getAnswerDataAsString()
+                            );
+                            break;
+                        case SHORT:
+                            quizAnswer = AnswerItem.getShortAnswer(
+                                    questionNumber,
+                                    new UserItem(alPollAnswer.getAnswerCreatorId()),
+                                    questionNumber,
+                                    new UserItem((byte) 1),
+                                    alPollAnswer.getAnswerDataAsString()
+                            );
+                            break;
+                    }
+
+                    poll.addAnswerToQuestion(questionNumber, quizAnswer);
                 }
 
-                poll.addAnswerToQuestion(alPollAnswer.getQuestionId(), pollAnswer);
-
-                notifyPoll();
-
                 break;
+        }
+
+        notifyPoll();
+    }
+
+
+//    public static void handlePoll(ApplicationLayerPdu.TYPE type, AlMessage alMessage){
+//
+//        PollItem poll = null;
+//
+//        switch(type){
+//            case POLL_QUESTION:
+//
+//                AlPollQuestion alPollQuestion = (AlPollQuestion) alMessage;
+//                Log.i(TAG,"RECEIVED MESSAGE: "
+//                        + alPollQuestion.getPollId() + ":"
+//                        + alPollQuestion.getQeuestionCreatorId() + ":"
+//                        + alPollQuestion.getQuestionId() + ":"
+//                        + alPollQuestion.getQuestionFormat()
+//                );
+//
+//                //add to poll or create poll
+//                poll = getPoll(alPollQuestion.getPollId());
+//
+//                if(poll == null){
+//                    poll = new PollItem(
+//                            alPollQuestion.getPollId(), getSessionId(), "Poll "+ alPollQuestion.getPollId(), null,
+//                            new Date(),
+//                            PollItem.POLL_STATE.PLAY,
+//                            new UserItem(alPollQuestion.getQeuestionCreatorId())
+//                    );
+//
+//                    polls.add(poll);
+//                }
+//
+//                QuestionItem question = null;
+//                switch(QuestionItem.getFormatFromByte(alPollQuestion.getQuestionFormat())){
+//                    case MCQ_SINGLE:
+//                        question = QuestionItem.getMCQSingleQuestion(
+//                                alPollQuestion.getQuestionId(),
+//                                alPollQuestion.getPollId(),
+//                                alPollQuestion.getQuestionDataAsString(),
+//                                alPollQuestion.getOptionsAsArray(),
+//                                Constants.MIN_QUESTION_MARKS);
+//                        break;
+//                    case MCQ_MULTIPLE:
+//                        question = QuestionItem.getMCQMultipleQuestion(
+//                                alPollQuestion.getQuestionId(),
+//                                alPollQuestion.getPollId(),
+//                                alPollQuestion.getQuestionDataAsString(),
+//                                alPollQuestion.getOptionsAsArray(),
+//                                Constants.MIN_QUESTION_MARKS
+//                        );
+//                        break;
+//                    case ONE_WORD:
+//                        question = QuestionItem.getOneWordQuestion(alPollQuestion.getQuestionId(),
+//                                alPollQuestion.getPollId(),
+//                                alPollQuestion.getQuestionDataAsString(),
+//                                Constants.MIN_QUESTION_MARKS);
+//                        break;
+//                    case SHORT:
+//                        question = QuestionItem.getShortQuestion(alPollQuestion.getQuestionId(),
+//                                alPollQuestion.getPollId(),
+//                                alPollQuestion.getQuestionDataAsString(),
+//                                Constants.MIN_QUESTION_MARKS);
+//                        break;
+//                }
+//
+//                poll.addQuestionToList(alPollQuestion.getQuestionId(), question);
+//
+//                if(alPollQuestion.isMainQuestion()){
+//                    poll.setName(alPollQuestion.getQuestionDataAsString());
+//                }
+//
+//                if(alPollQuestion.isEndOfPoll()){
+//                    //notify the handler
+//                    notifyPoll();
+//                }
+//
+//
+//                break;
+//            case POLL_ANSWER:
+//
+//                AlPollAnswer alPollAnswer = (AlPollAnswer) alMessage;
+//                Log.i(TAG,"RECEIVED MESSAGE: "
+//                        + alPollAnswer.getPollId() + ":"
+//                        + alPollAnswer.getQuestionCreatorId() + ":"
+//                        + alPollAnswer.getQuestionId() + ":"
+//                        + alPollAnswer.getAnswerCreatorId() + ":"
+//                        + alPollAnswer.getFormat()
+//                );
+//
+//                poll = getPoll(alPollAnswer.getPollId());
+//
+//                if(poll == null){
+//                    return;
+//                }
+//
+//                AnswerItem pollAnswer = null;
+//                switch(QuestionItem.getFormatFromByte(alPollAnswer.getFormat())){
+//                    case MCQ_SINGLE:
+//                        pollAnswer = AnswerItem.getMCQSingleAnswer(
+//                                alPollAnswer.getQuestionId(),
+//                                new UserItem(alPollAnswer.getAnswerCreatorId()),
+//                                alPollAnswer.getQuestionId(),
+//                                new UserItem(alPollAnswer.getQuestionCreatorId()),
+//                                alPollAnswer.getAnswerChoicesAsString()
+//                        );
+//
+//                        break;
+//                    case MCQ_MULTIPLE:
+//                        pollAnswer = AnswerItem.getMCQMultipleAnswer(
+//                                alPollAnswer.getQuestionId(),
+//                                new UserItem(alPollAnswer.getAnswerCreatorId()),
+//                                alPollAnswer.getQuestionId(),
+//                                new UserItem(alPollAnswer.getQuestionCreatorId()),
+//                                alPollAnswer.getAnswerChoicesAsString()
+//                        );
+//
+//                        break;
+//                    case ONE_WORD:
+//                        pollAnswer = AnswerItem.getMCQOneWordAnswer(
+//                                alPollAnswer.getQuestionId(),
+//                                new UserItem(alPollAnswer.getAnswerCreatorId()),
+//                                alPollAnswer.getQuestionId(),
+//                                new UserItem(alPollAnswer.getQuestionCreatorId()),
+//                                alPollAnswer.getAnswerDataAsString()
+//                        );
+//                        break;
+//                    case SHORT:
+//                        pollAnswer = AnswerItem.getShortAnswer(
+//                                alPollAnswer.getQuestionId(),
+//                                new UserItem(alPollAnswer.getAnswerCreatorId()),
+//                                alPollAnswer.getQuestionId(),
+//                                new UserItem(alPollAnswer.getQuestionCreatorId()),
+//                                alPollAnswer.getAnswerDataAsString()
+//                        );
+//                        break;
+//                }
+//
+//                poll.addAnswerToQuestion(alPollAnswer.getQuestionId(), pollAnswer);
+//
+//                break;
+//        }
+//
+//        notifyPoll();
+//    }
+
+    public static void handleThread(ApplicationLayerPdu.TYPE type, AlMessage alMessage){
+
+        ConversationThread newThread = null;
+
+        switch(type){
+
             case QUESTION:
 
                 AlQuestion alQuestion = (AlQuestion) alMessage;
@@ -516,7 +666,7 @@ public class SPARQApplication extends MultiDexApplication {
                         + alQuestion.getCreatorId() + ":" +alQuestion.getQuestionId() + ":" + alQuestion.getDataAsString());
 
                 // create a conversation thread
-                ConversationThread newThread = new ConversationThread(
+                newThread = new ConversationThread(
                         alQuestion.getQuestionId(),
                         getSessionId(),
                         new Date(),
@@ -525,8 +675,6 @@ public class SPARQApplication extends MultiDexApplication {
                 );
 
                 conversationThreads.add(newThread);
-
-                notifyConversationThread();
 
                 break;
             case ANSWER:
@@ -546,8 +694,6 @@ public class SPARQApplication extends MultiDexApplication {
                         alAnswer.getQuestionId(), alAnswer.getCreatorId()
                 ).addAnswerToList(newAnswer);
 
-                notifyConversationThread();
-
                 break;
             case QUESTION_VOTE:
 
@@ -558,20 +704,18 @@ public class SPARQApplication extends MultiDexApplication {
                         + alQuestionVote.getVoteValue()
                 );
 
-                ConversationThread thread = getConversationThread(alQuestionVote.getQuestionId(), alQuestionVote.getCreatorId());
+                newThread = getConversationThread(alQuestionVote.getQuestionId(), alQuestionVote.getCreatorId());
 
-                if(thread != null){
+                if(newThread != null){
                     switch(alQuestionVote.getVoteValue()){
                         case UPVOTE:
-                            thread.getQuestionItem().addUpVote();
+                            newThread.getQuestionItem().addUpVote();
                             break;
                         case DOWNVOTE:
-                            thread.getQuestionItem().addDownVote();
+                            newThread.getQuestionItem().addDownVote();
                             break;
                     }
                 }
-
-                notifyConversationThread();
 
                 break;
             case ANSWER_VOTE:
@@ -600,8 +744,28 @@ public class SPARQApplication extends MultiDexApplication {
                     }
                 }
 
-                notifyConversationThread();
+                break;
+        }
 
+        notifyConversationThread();
+    }
+
+    public static void handlePackets(ApplicationLayerPdu.TYPE type, AlMessage alMessage){
+
+        switch(type) {
+            case QUIZ_QUESTION:
+            case QUIZ_ANSWER:
+                handleQuiz(type, alMessage);
+                break;
+            case POLL_QUESTION:
+            case POLL_ANSWER:
+                handlePoll(type, alMessage);
+                break;
+            case QUESTION:
+            case ANSWER:
+            case QUESTION_VOTE:
+            case ANSWER_VOTE:
+                handleThread(type, alMessage);
                 break;
             default:
                 throw new IllegalArgumentException("Illegal message type.");
@@ -612,7 +776,6 @@ public class SPARQApplication extends MultiDexApplication {
                                        int quizId, int creatorId, QuestionItem.FORMAT questionFormat, int numberOfQuestions,
                                        HashMap<Integer, ArrayList<String>> options, int answerCreatorId){
         boolean isSent;
-        Log.i("HERE", "spqrq application send quiz Message");
         switch(type){
             case QUIZ_QUESTION:
 
@@ -628,8 +791,6 @@ public class SPARQApplication extends MultiDexApplication {
                             null
                     );
                 }
-
-                Log.i("HERE", "sparq application " + isSent);
 
                 if(isSent){
 
@@ -729,11 +890,9 @@ public class SPARQApplication extends MultiDexApplication {
         }
     }
 
-    public static void sendPollMessage(ApplicationLayerPdu.TYPE type, byte toAddr, String msg,
-                                       int pollId, int creatorId, int questionId, QuestionItem.FORMAT questionFormat,
-                                       ArrayList<String> options, int answerCreatorId,
-                                       boolean hasMore, boolean endOfPoll, boolean isMainQuestion){
-
+    public static void sendPollMessage(ApplicationLayerPdu.TYPE type, byte toAddr, HashMap<Integer, String> msg,
+                                       int pollId, int creatorId, QuestionItem.FORMAT questionFormat, int numberOfQuestions,
+                                       HashMap<Integer, ArrayList<String>> options, int answerCreatorId){
         boolean isSent;
 
         switch(type){
@@ -742,14 +901,13 @@ public class SPARQApplication extends MultiDexApplication {
                 if(QuestionItem.getFormatAsByte(questionFormat) == (byte) 0){
                     isSent = false;
                 }else{
-                    isSent = mManager.sendData(
+                    isSent = mManager.sendBundledData(
                             ApplicationLayerPdu.TYPE.POLL_QUESTION,
                             msg,
-                            options,
                             toAddr,
-                            asList((byte) pollId, (byte) creatorId, (byte) questionId,
-                                    QuestionItem.getFormatAsByte(questionFormat),(byte) 0),
-                            asList(hasMore, endOfPoll, isMainQuestion)
+                            asList((byte) pollId, QuestionItem.getFormatAsByte(questionFormat),
+                                    (byte) numberOfQuestions,(byte) 0),
+                            null
                     );
                 }
 
@@ -758,11 +916,12 @@ public class SPARQApplication extends MultiDexApplication {
                     PollItem poll = getPoll(pollId);
 
                     if(poll == null){
+
                         poll = new PollItem(
-                                pollId, getSessionId(), null, null,
+                                pollId, getSessionId(), "Poll "+ pollId, null,
                                 new Date(),
                                 PollItem.POLL_STATE.PLAY,
-                                new UserItem(creatorId)
+                                new UserItem((byte) 1)
                         );
 
                         poll.setName("Poll " + pollId);
@@ -770,40 +929,37 @@ public class SPARQApplication extends MultiDexApplication {
                         polls.add(poll);
                     }
 
-                    QuestionItem question = null;
-                    switch(questionFormat){
-                        case MCQ_SINGLE:
-                            question = QuestionItem.getMCQSingleQuestion(questionId, pollId, msg, options, Constants.MIN_QUESTION_MARKS);
-                            break;
-                        case MCQ_MULTIPLE:
-                            question = QuestionItem.getMCQMultipleQuestion(questionId, pollId, msg, options, Constants.MIN_QUESTION_MARKS);
-                            break;
-                        case ONE_WORD:
-                            question = QuestionItem.getOneWordQuestion(questionId, pollId, msg, Constants.MIN_QUESTION_MARKS);
-                            break;
-                        case SHORT:
-                            question = QuestionItem.getShortQuestion(questionId, pollId, msg, Constants.MIN_QUESTION_MARKS);
-                            break;
-                    }
+                    for(int questionNumber = 1; questionNumber <= numberOfQuestions; questionNumber++){
+                        QuestionItem question = null;
+                        switch(questionFormat){
+                            case MCQ_SINGLE:
+                                question = QuestionItem.getMCQSingleQuestion(questionNumber, pollId, "Question " + questionNumber, options.get(questionNumber), Constants.MIN_QUESTION_MARKS);
+                                break;
+                            case MCQ_MULTIPLE:
+                                question = QuestionItem.getMCQMultipleQuestion(questionNumber, pollId, "Question " + questionNumber, options.get(questionNumber), Constants.MIN_QUESTION_MARKS);
+                                break;
+                            case ONE_WORD:
+                                question = QuestionItem.getOneWordQuestion(questionNumber, pollId, "Question " + questionNumber, Constants.MIN_QUESTION_MARKS);
+                                break;
+                            case SHORT:
+                                question = QuestionItem.getShortQuestion(questionNumber, pollId, "Question " + questionNumber, Constants.MIN_QUESTION_MARKS);
+                                break;
+                        }
 
-                    poll.addQuestionToList(questionId, question);
-
-                    if(isMainQuestion){
-                        poll.setName(msg);
+                        poll.addQuestionToList(questionNumber, question);
                     }
-                    notifyPoll();
                 }
+
                 break;
             case POLL_ANSWER:
 
-                isSent = mManager.sendData(
+                isSent = mManager.sendBundledData(
                         ApplicationLayerPdu.TYPE.POLL_ANSWER,
                         msg,
-                        null,
                         toAddr,
-                        asList((byte) pollId, (byte) creatorId, (byte) questionId,
-                                QuestionItem.getFormatAsByte(questionFormat),(byte) answerCreatorId),
-                        asList(false, false, false)
+                        asList((byte) pollId, QuestionItem.getFormatAsByte(questionFormat),
+                                (byte) numberOfQuestions,(byte) answerCreatorId),
+                        null
                 );
 
                 if(isSent){
@@ -813,42 +969,166 @@ public class SPARQApplication extends MultiDexApplication {
                         return;
                     }
 
-                    AnswerItem answer = null;
-                    switch(questionFormat){
-                        case MCQ_SINGLE:
-                            answer = AnswerItem.getMCQSingleAnswer(
-                                    questionId, new UserItem(answerCreatorId),
-                                    questionId, new UserItem(creatorId),
-                                    msg);
-                            break;
-                        case MCQ_MULTIPLE:
-                            answer = AnswerItem.getMCQMultipleAnswer(
-                                    questionId, new UserItem(answerCreatorId),
-                                    questionId, new UserItem(creatorId),
-                                    msg);
-                            break;
-                        case ONE_WORD:
-                            answer = AnswerItem.getMCQOneWordAnswer(
-                                    questionId, new UserItem(answerCreatorId),
-                                    questionId, new UserItem(creatorId),
-                                    msg);
-                            break;
-                        case SHORT:
-                            answer = AnswerItem.getShortAnswer(
-                                    questionId, new UserItem(answerCreatorId),
-                                    questionId, new UserItem(creatorId),
-                                    msg);
-                            break;
-                    }
+                    for(int questionNumber = 0; questionNumber <= numberOfQuestions; questionNumber++){
+                        AnswerItem answer = null;
+                        switch(questionFormat){
+                            case MCQ_SINGLE:
+                                answer = AnswerItem.getMCQSingleAnswer(
+                                        questionNumber, new UserItem(answerCreatorId),
+                                        questionNumber, new UserItem(creatorId),
+                                        msg.get(questionNumber));
+                                break;
+                            case MCQ_MULTIPLE:
+                                answer = AnswerItem.getMCQMultipleAnswer(
+                                        questionNumber, new UserItem(answerCreatorId),
+                                        questionNumber, new UserItem(creatorId),
+                                        msg.get(questionNumber));
+                                break;
+                            case ONE_WORD:
+                                answer = AnswerItem.getMCQOneWordAnswer(
+                                        questionNumber, new UserItem(answerCreatorId),
+                                        questionNumber, new UserItem(creatorId),
+                                        msg.get(questionNumber));
+                                break;
+                            case SHORT:
+                                answer = AnswerItem.getShortAnswer(
+                                        questionNumber, new UserItem(answerCreatorId),
+                                        questionNumber, new UserItem(creatorId),
+                                        msg.get(questionNumber));
+                                break;
+                        }
 
-                    poll.addAnswerToQuestion(questionId, answer);
-                    poll.setHasAnswered(true);
-                    notifyPoll();
+                        poll.addAnswerToQuestion(questionNumber, answer);
+                        poll.setHasAnswered(true);
+                    }
 
                 }
                 break;
         }
+
+        notifyPoll();
     }
+
+//    public static void sendPollMessage(ApplicationLayerPdu.TYPE type, byte toAddr, String msg,
+//                                       int pollId, int creatorId, int questionId, QuestionItem.FORMAT questionFormat,
+//                                       ArrayList<String> options, int answerCreatorId,
+//                                       boolean hasMore, boolean endOfPoll, boolean isMainQuestion){
+//
+//        boolean isSent;
+//
+//        switch(type){
+//            case POLL_QUESTION:
+//
+//                if(QuestionItem.getFormatAsByte(questionFormat) == (byte) 0){
+//                    isSent = false;
+//                }else{
+//                    isSent = mManager.sendData(
+//                            ApplicationLayerPdu.TYPE.POLL_QUESTION,
+//                            msg,
+//                            options,
+//                            toAddr,
+//                            asList((byte) pollId, (byte) creatorId, (byte) questionId,
+//                                    QuestionItem.getFormatAsByte(questionFormat),(byte) 0),
+//                            asList(hasMore, endOfPoll, isMainQuestion)
+//                    );
+//                }
+//
+//                if(isSent){
+//
+//                    PollItem poll = getPoll(pollId);
+//
+//                    if(poll == null){
+//                        poll = new PollItem(
+//                                pollId, getSessionId(), null, null,
+//                                new Date(),
+//                                PollItem.POLL_STATE.PLAY,
+//                                new UserItem(creatorId)
+//                        );
+//
+//                        poll.setName("Poll " + pollId);
+//
+//                        polls.add(poll);
+//                    }
+//
+//                    QuestionItem question = null;
+//                    switch(questionFormat){
+//                        case MCQ_SINGLE:
+//                            question = QuestionItem.getMCQSingleQuestion(questionId, pollId, msg, options, Constants.MIN_QUESTION_MARKS);
+//                            break;
+//                        case MCQ_MULTIPLE:
+//                            question = QuestionItem.getMCQMultipleQuestion(questionId, pollId, msg, options, Constants.MIN_QUESTION_MARKS);
+//                            break;
+//                        case ONE_WORD:
+//                            question = QuestionItem.getOneWordQuestion(questionId, pollId, msg, Constants.MIN_QUESTION_MARKS);
+//                            break;
+//                        case SHORT:
+//                            question = QuestionItem.getShortQuestion(questionId, pollId, msg, Constants.MIN_QUESTION_MARKS);
+//                            break;
+//                    }
+//
+//                    poll.addQuestionToList(questionId, question);
+//
+//                    if(isMainQuestion){
+//                        poll.setName(msg);
+//                    }
+//                    notifyPoll();
+//                }
+//                break;
+//            case POLL_ANSWER:
+//
+//                isSent = mManager.sendData(
+//                        ApplicationLayerPdu.TYPE.POLL_ANSWER,
+//                        msg,
+//                        null,
+//                        toAddr,
+//                        asList((byte) pollId, (byte) creatorId, (byte) questionId,
+//                                QuestionItem.getFormatAsByte(questionFormat),(byte) answerCreatorId),
+//                        asList(false, false, false)
+//                );
+//
+//                if(isSent){
+//                    PollItem poll = getPoll(pollId);
+//
+//                    if(poll == null){
+//                        return;
+//                    }
+//
+//                    AnswerItem answer = null;
+//                    switch(questionFormat){
+//                        case MCQ_SINGLE:
+//                            answer = AnswerItem.getMCQSingleAnswer(
+//                                    questionId, new UserItem(answerCreatorId),
+//                                    questionId, new UserItem(creatorId),
+//                                    msg);
+//                            break;
+//                        case MCQ_MULTIPLE:
+//                            answer = AnswerItem.getMCQMultipleAnswer(
+//                                    questionId, new UserItem(answerCreatorId),
+//                                    questionId, new UserItem(creatorId),
+//                                    msg);
+//                            break;
+//                        case ONE_WORD:
+//                            answer = AnswerItem.getMCQOneWordAnswer(
+//                                    questionId, new UserItem(answerCreatorId),
+//                                    questionId, new UserItem(creatorId),
+//                                    msg);
+//                            break;
+//                        case SHORT:
+//                            answer = AnswerItem.getShortAnswer(
+//                                    questionId, new UserItem(answerCreatorId),
+//                                    questionId, new UserItem(creatorId),
+//                                    msg);
+//                            break;
+//                    }
+//
+//                    poll.addAnswerToQuestion(questionId, answer);
+//                    poll.setHasAnswered(true);
+//                    notifyPoll();
+//
+//                }
+//                break;
+//        }
+//    }
 
     public static void sendThreadMessage(ApplicationLayerPdu.TYPE type, byte toAddr, String msg,
                                          int creatorId, int questionId, int answerCreatotId, int answerId,

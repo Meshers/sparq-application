@@ -1,7 +1,5 @@
 package com.sparq.application.layer.almessage;
 
-import android.widget.ImageView;
-
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.util.Constants;
 
@@ -14,9 +12,9 @@ import static com.sparq.util.Constants.CONSTANT_DELIMITER;
  * Created by sarahcs on 4/9/2017.
  */
 
-public class AlQuizAnswer extends AlMessage {
+public class AlBundledQuestionareAnswer extends AlMessage {
 
-    private byte mQuizId;
+    private byte mQuestionareId;
     private byte mQuestionFormat;
     private byte mNumberOfQuestions;
     private byte mAnswerCreatorId;
@@ -24,11 +22,11 @@ public class AlQuizAnswer extends AlMessage {
 
     private final static Charset CHARSET = Charset.forName("UTF-8");
 
-    public AlQuizAnswer(byte quizId, byte questionFormat, byte numberOfQuestions, byte answerCreatorId,
-                          byte[] data){
+    public AlBundledQuestionareAnswer(byte quizId, byte questionFormat, byte numberOfQuestions, byte answerCreatorId,
+                                      byte[] data){
         super(ApplicationLayerPdu.TYPE.POLL_QUESTION);
 
-        this.mQuizId = quizId;
+        this.mQuestionareId = quizId;
         this.mQuestionFormat = questionFormat;
         this.mNumberOfQuestions = numberOfQuestions;
         this.mAnswerCreatorId = answerCreatorId;
@@ -64,6 +62,7 @@ public class AlQuizAnswer extends AlMessage {
                 choicePerQuestion.add(mData[j]);
                 j++;
             }
+            choicePerQuestion.add(mData[j]);
 
             choices.add(choicePerQuestion);
             i = j+1;
@@ -73,7 +72,7 @@ public class AlQuizAnswer extends AlMessage {
     }
 
     public String getAnswerChoicesAsString(int questionNumber){
-        int questionId = AlQuizQuestion.getQuestionIdFromNumber(questionNumber);
+        int questionId = AlBundledQuestionareQuestion.getQuestionIdFromNumber(questionNumber);
 
         ArrayList<ArrayList<Byte>> choices = getChoices();
         String choiceStr = "";
@@ -97,8 +96,8 @@ public class AlQuizAnswer extends AlMessage {
         return mQuestionFormat;
     }
 
-    public byte getQuizId() {
-        return mQuizId;
+    public byte getQuestionareId() {
+        return mQuestionareId;
     }
 
 }

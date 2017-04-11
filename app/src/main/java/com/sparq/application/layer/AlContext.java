@@ -8,21 +8,16 @@ import com.sparq.application.layer.almessage.AlMessage;
 import com.sparq.application.layer.almessage.AlPollAnswer;
 import com.sparq.application.layer.almessage.AlPollQuestion;
 import com.sparq.application.layer.almessage.AlQuestion;
-import com.sparq.application.layer.almessage.AlQuizAnswer;
-import com.sparq.application.layer.almessage.AlQuizQuestion;
+import com.sparq.application.layer.almessage.AlBundledQuestionareAnswer;
+import com.sparq.application.layer.almessage.AlBundledQuestionareQuestion;
 import com.sparq.application.layer.almessage.AlVote;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.layer.pdu.PollPdu;
 import com.sparq.application.layer.pdu.ThreadPdu;
-import com.sparq.application.layer.pdu.WifiBTQuizPdu;
-import com.sparq.application.userinterface.model.QuestionItem;
+import com.sparq.application.layer.pdu.WifiBTQuestionarePdu;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import static com.sparq.util.Constants.CHARSET;
-import static com.sparq.util.Constants.TEACHER_ADDRESS;
 
 /**
  * Created by sarahcs on 3/19/2017.
@@ -43,8 +38,9 @@ public class AlContext {
 
     // application layer DS
     private HashMap<AlQuestion, ArrayList<AlAnswer>> mSessionThreads;
-    private HashMap<Byte, ArrayList<AlPollQuestion>> mSessionPolls;
-    private HashMap<Byte, AlQuizQuestion> mSessionQuizzes;
+//    private HashMap<Byte, ArrayList<AlPollQuestion>> mSessionPolls;
+    private HashMap<Byte, AlBundledQuestionareQuestion> mSessionPolls;
+    private HashMap<Byte, AlBundledQuestionareQuestion> mSessionQuizzes;
 
     public interface Callback {
         void transmitPdu(ApplicationLayerPdu pdu, byte toAddr);
@@ -59,6 +55,7 @@ public class AlContext {
         this.mCallback = callback;
 
         mSessionThreads = new HashMap<>();
+//        mSessionPolls = new HashMap<>();
         mSessionPolls = new HashMap<>();
         mSessionQuizzes = new HashMap<>();
 
@@ -95,7 +92,6 @@ public class AlContext {
         for(AlPollQuestion question: questions){
 
             byte[] combinedQuestionId = question.getCombinedQuestionId();
-            Log.i("HERE", question.getQeuestionCreatorId() + ":" + question.getQuestionId());
 
             if(combinedQuestionId[0] == questionCreatorId && combinedQuestionId[1] == questionId){
                 return question;
@@ -210,12 +206,74 @@ public class AlContext {
         return true;
     }
 
-    public boolean sendPollPdu(ApplicationLayerPdu.TYPE type, byte pollId,
-                               byte questionCreatorId, byte questionId, byte questionFormat,byte answerCreatorId,
-                               boolean hasMore, boolean endOfPoll, boolean isMainQuestion, byte[] data, byte[][] options, byte toAddr){
+//    public boolean sendPollPdu(ApplicationLayerPdu.TYPE type, byte pollId,
+//                               byte questionCreatorId, byte questionId, byte questionFormat,byte answerCreatorId,
+//                               boolean hasMore, boolean endOfPoll, boolean isMainQuestion, byte[] data, byte[][] options, byte toAddr){
+//
+//        ApplicationLayerPdu pdu = null;
+//        AlPollQuestion retreivedQuestion;
+//
+//        try{
+//            switch(type){
+//                case POLL_QUESTION:
+//
+//                    if(SPARQApplication.getUserType() != SPARQApplication.USER_TYPE.TEACHER){
+//                        return false;
+//                    }
+//
+//                    AlPollQuestion question = new AlPollQuestion(pollId, questionCreatorId, questionId, questionFormat, hasMore, endOfPoll, isMainQuestion, data, options);
+//
+//
+//                    // check if it is the first question of a poll if not add it
+//                    if(!mSessionPolls.keySet().contains(pollId)){
+//                        mSessionPolls.put(
+//                                pollId,
+//                                new ArrayList<AlPollQuestion>(0));
+//                    }
+//
+//                    mSessionPolls.get(pollId).add(question);
+//
+//                    pdu = PollPdu.getQuizQuestionPdu(pollId, questionCreatorId, questionId, questionFormat, hasMore, endOfPoll, isMainQuestion, data, options);
+//
+//                    break;
+//                case POLL_ANSWER:
+//
+//                    // check if corresponding question exists
+//                    if(mSessionPolls.keySet().contains(pollId)){
+//                        retreivedQuestion = getAlPollQuestion(
+//                                mSessionPolls.get(pollId),
+//                                questionCreatorId,
+//                                questionId
+//                        );
+//
+//                        if(retreivedQuestion == null){
+//                            // a question exists for the received answer
+//                            throw new IllegalArgumentException("No such type of Poll packet exists");
+//                        }
+//
+//                        pdu = PollPdu.getQuizAnswerPdu(pollId,questionCreatorId, questionId, questionFormat,answerCreatorId, data);
+//                    }else{
+//                        throw new IllegalArgumentException("No such type of Thread packet exists");
+//                    }
+//
+//                    break;
+//            }
+//        }
+//        catch(IllegalArgumentException e){
+//            Log.e(TAG,e.getMessage());
+//            return false;
+//        }
+//
+//        sendPdu(pdu, toAddr);
+//        return true;
+//
+//
+//    }
+
+    public boolean sendPollPdu(ApplicationLayerPdu.TYPE type, byte pollId, byte questionFormat,byte numberOfQuestions, byte answerCreatorId, byte[] data,  byte toAddr){
 
         ApplicationLayerPdu pdu = null;
-        AlPollQuestion retreivedQuestion;
+        AlBundledQuestionareQuestion retreivedQuestion;
 
         try{
             switch(type){
@@ -225,43 +283,30 @@ public class AlContext {
                         return false;
                     }
 
-                    AlPollQuestion question = new AlPollQuestion(pollId, questionCreatorId, questionId, questionFormat, hasMore, endOfPoll, isMainQuestion, data, options);
+                    AlBundledQuestionareQuestion question = new AlBundledQuestionareQuestion(pollId, questionFormat, numberOfQuestions, data);
 
 
                     // check if it is the first question of a poll if not add it
-                    if(!mSessionPolls.keySet().contains(pollId)){
-                        mSessionPolls.put(
-                                pollId,
-                                new ArrayList<AlPollQuestion>(0));
-                    }
+                    mSessionPolls.put(pollId,question);
 
-                    mSessionPolls.get(pollId).add(question);
-
-                    pdu = PollPdu.getQuestionPdu(pollId, questionCreatorId, questionId, questionFormat, hasMore, endOfPoll, isMainQuestion, data, options);
+                    pdu = WifiBTQuestionarePdu.getPollQuestionPdu(pollId, questionFormat, numberOfQuestions, data);
 
                     break;
                 case POLL_ANSWER:
 
-                    for(AlPollQuestion q: mSessionPolls.get(pollId)){
-                        Log.i("HERE", q.getQeuestionCreatorId() + ":" + q.getQuestionId());
-                    }
-                    Log.i("HERE", questionCreatorId + ":" + questionId);
                     // check if corresponding question exists
                     if(mSessionPolls.keySet().contains(pollId)){
-                        retreivedQuestion = getAlPollQuestion(
-                                mSessionPolls.get(pollId),
-                                questionCreatorId,
-                                questionId
-                        );
+                        retreivedQuestion = mSessionPolls.get(pollId);
 
-                        if(retreivedQuestion == null){
+                        if(retreivedQuestion == null
+                                && retreivedQuestion.getNumberOfQuestions() == numberOfQuestions){
                             // a question exists for the received answer
                             throw new IllegalArgumentException("No such type of Poll packet exists");
                         }
 
-                        pdu = PollPdu.getAnswerPdu(pollId,questionCreatorId, questionId, questionFormat,answerCreatorId, data);
+                        pdu = WifiBTQuestionarePdu.getPollAnswerPdu(pollId, questionFormat, numberOfQuestions, answerCreatorId, data);
                     }else{
-                        throw new IllegalArgumentException("No such type of Thread packet exists");
+                        throw new IllegalArgumentException("No such type of Poll packet exists");
                     }
 
                     break;
@@ -280,9 +325,8 @@ public class AlContext {
 
     public boolean sendQuizPdu(ApplicationLayerPdu.TYPE type, byte quizId, byte questionFormat,byte numberOfQuestions, byte answerCreatorId, byte[] data,  byte toAddr){
 
-        Log.i("HERE", "send data context");
         ApplicationLayerPdu pdu = null;
-        AlQuizQuestion retreivedQuestion;
+        AlBundledQuestionareQuestion retreivedQuestion;
 
         try{
             switch(type){
@@ -292,15 +336,15 @@ public class AlContext {
                         return false;
                     }
 
-                    AlQuizQuestion question = new AlQuizQuestion(quizId, questionFormat, numberOfQuestions, data);
+                    AlBundledQuestionareQuestion question = new AlBundledQuestionareQuestion(quizId, questionFormat, numberOfQuestions, data);
 
 
                     // check if it is the first question of a poll if not add it
                     mSessionQuizzes.put(quizId,question);
+                    Log.i("quizId", String.valueOf(quizId));
 
-                    pdu = WifiBTQuizPdu.getQuestionPdu(quizId, questionFormat, numberOfQuestions, data);
+                    pdu = WifiBTQuestionarePdu.getQuizQuestionPdu(quizId, questionFormat, numberOfQuestions, data);
 
-                    Log.i("HERE", "pdu "+ ((WifiBTQuizPdu)pdu).getData());
                     break;
                 case QUIZ_ANSWER:
 
@@ -314,9 +358,9 @@ public class AlContext {
                             throw new IllegalArgumentException("No such type of Quiz packet exists");
                         }
 
-                        pdu = WifiBTQuizPdu.getAnswerPdu(quizId, questionFormat, numberOfQuestions, answerCreatorId, data);
+                        pdu = WifiBTQuestionarePdu.getQuizAnswerPdu(quizId, questionFormat, numberOfQuestions, answerCreatorId, data);
                     }else{
-                        throw new IllegalArgumentException("No such type of Thread packet exists");
+                        throw new IllegalArgumentException("No such type of Quiz packet exists");
                     }
 
                     break;
@@ -332,7 +376,6 @@ public class AlContext {
 
 
     }
-
 
     public void sendPdu(ApplicationLayerPdu pdu, byte toAddr){
 
@@ -399,23 +442,27 @@ public class AlContext {
 
     }
 
-    public AlMessage convertPduToAlMessage(WifiBTQuizPdu pdu){
+    public AlMessage convertPduToAlMessage(WifiBTQuestionarePdu pdu){
         AlMessage message = null;
 
-        byte quizId = pdu.getQuizId();
+        byte questionareId = pdu.getQuestionareId();
         byte format =  pdu.getQuestionFormat();
         byte numberOfQuestions = pdu.getNumberOfQuestions();
         byte answerCreatorId = pdu.getAnswerCreatorId();
         byte[] data = pdu.getData();
 
-        Log.i("HERE", new String(data, CHARSET));
-
         switch(pdu.getType()){
             case QUIZ_QUESTION:
-                message = new AlQuizQuestion(quizId, format, numberOfQuestions, data);
+                message = new AlBundledQuestionareQuestion(questionareId, format, numberOfQuestions, data);
                 break;
             case QUIZ_ANSWER:
-                message = new AlQuizAnswer(quizId, format, numberOfQuestions, answerCreatorId, data);
+                message = new AlBundledQuestionareAnswer(questionareId, format, numberOfQuestions, answerCreatorId, data);
+                break;
+            case POLL_QUESTION:
+                message = new AlBundledQuestionareQuestion(questionareId, format, numberOfQuestions, data);
+                break;
+            case POLL_ANSWER:
+                message = new AlBundledQuestionareAnswer(questionareId, format, numberOfQuestions, answerCreatorId, data);
                 break;
         }
 
@@ -608,52 +655,126 @@ public class AlContext {
 //        mCallback.sendUpperLayer(pdu.getType(), alMessage);
     }
 
-    public void receivePollPdu(PollPdu pdu){
+//    public void receivePollPdu(PollPdu pdu){
+//
+//        // convert PDU to appropriate Al Message Type
+//        AlMessage alMessage =  convertPduToAlMessage(pdu);
+//
+//        AlPollQuestion retreivedQuestion;
+//
+//        switch(pdu.getType()){
+//            case POLL_QUESTION:
+//
+//                Log.i(TAG, "POLL QUESTION RECEIVED");
+//
+//                AlPollQuestion alPollQuestion = (AlPollQuestion) alMessage;
+//
+//                Log.i(TAG, "POLL QUESTION RECEIVED " +
+//                        alPollQuestion.getPollId() + ":" +
+//                        alPollQuestion.getQeuestionCreatorId()+ ":" +
+//                        alPollQuestion.getQuestionId()+ ":" +
+//                        alPollQuestion.getQuestionFormat()+ ":" +
+//                        alPollQuestion.getOptionsAsArray()+ ":" +
+//                        alPollQuestion.getQuestionDataAsString()
+//                );
+//                // check if question was from teacher
+//                if(alPollQuestion.getQeuestionCreatorId() != TEACHER_ADDRESS){
+//                    return;
+//                }
+//
+//                // check if it is the first question of a poll if not add it
+//                if(!mSessionPolls.keySet().contains(pdu.getPollId())){
+//                    mSessionPolls.put(
+//                            pdu.getPollId(),
+//                            new ArrayList<AlPollQuestion>(0));
+//                }
+//
+//                mSessionPolls.get(pdu.getPollId()).add(alPollQuestion);
+//
+//                for(AlPollQuestion q: mSessionPolls.get(pdu.getPollId())){
+//                    Log.i("HERE on receive", q.getQeuestionCreatorId() + ":" + q.getQuestionId());
+//                }
+//
+//                if(alPollQuestion.isEndOfPoll()){
+//                    //transmit all the poll questions to the upper layer
+//                    for(AlPollQuestion question: mSessionPolls.get(pdu.getPollId())){
+//                        transmitPacketsToUpperLayer(pdu.getType(), question);
+//                    }
+//                }
+//
+//                break;
+//            case POLL_ANSWER:
+//
+//                /**
+//                 * teacher: can receive any number of answers
+//                 * students can send only one answer per question and cannot receive any answers
+//                 */
+//
+//                AlPollAnswer alPollAnswer = (AlPollAnswer) alMessage;
+//
+//                Log.i(TAG, "POLL ANSWER RECEIVED " +
+//                        alPollAnswer.getPollId() + ":" +
+//                        alPollAnswer.getQuestionCreatorId()+ ":" +
+//                        alPollAnswer.getQuestionId()+ ":" +
+//                        alPollAnswer.getFormat()+ ":" +
+//                        alPollAnswer.getAnswerDataAsString()
+//                );
+//
+//                switch(SPARQApplication.getUserType()){
+//                    case STUDENT:
+//                        // check if answer belongs to given user
+//                        if(alPollAnswer.getAnswerCreatorId() != SPARQApplication.getOwnAddress()){
+//                            // revieved someone else's answer
+//                            return;
+//                        }
+//
+//                    case TEACHER:
+//
+//                        if(mSessionPolls.keySet().contains(pdu.getPollId())){
+//                            retreivedQuestion = getAlPollQuestion(
+//                                    mSessionPolls.get(pdu.getPollId()),
+//                                    alPollAnswer.getQuestionCreatorId(),
+//                                    alPollAnswer.getQuestionId()
+//                            );
+//
+//                            if(retreivedQuestion != null){
+//                                // a question exists for the received answer
+//                                transmitPacketsToUpperLayer(pdu.getType(), alPollAnswer);
+//                            }else{
+//                                throw new IllegalArgumentException("No such type of Poll packet exists");
+//                            }
+//                        }else{
+//                            throw new IllegalArgumentException("No such type of Poll packet exists");
+//                        }
+//
+//                        break;
+//                }
+//
+//                break;
+//            default:
+//                throw new IllegalArgumentException("No such type of Poll packet exists");
+//        }
+//    }
 
+    public void receivePollPdu(WifiBTQuestionarePdu pdu){
         // convert PDU to appropriate Al Message Type
         AlMessage alMessage =  convertPduToAlMessage(pdu);
 
-        AlPollQuestion retreivedQuestion;
+        AlBundledQuestionareQuestion retreivedQuestion;
 
         switch(pdu.getType()){
             case POLL_QUESTION:
 
                 Log.i(TAG, "POLL QUESTION RECEIVED");
 
-                AlPollQuestion alPollQuestion = (AlPollQuestion) alMessage;
+                AlBundledQuestionareQuestion alBundledQuestionareQuestion = (AlBundledQuestionareQuestion) alMessage;
 
-                Log.i(TAG, "POLL QUESTION RECEIVED " +
-                        alPollQuestion.getPollId() + ":" +
-                        alPollQuestion.getQeuestionCreatorId()+ ":" +
-                        alPollQuestion.getQuestionId()+ ":" +
-                        alPollQuestion.getQuestionFormat()+ ":" +
-                        alPollQuestion.getOptionsAsArray()+ ":" +
-                        alPollQuestion.getQuestionDataAsString()
-                );
-                // check if question was from teacher
-                if(alPollQuestion.getQeuestionCreatorId() != TEACHER_ADDRESS){
-                    return;
-                }
+                // check if question was from teacher: assumed since only wifi beacons from the teacher reach the app layer
 
                 // check if it is the first question of a poll if not add it
-                if(!mSessionPolls.keySet().contains(pdu.getPollId())){
-                    mSessionPolls.put(
-                            pdu.getPollId(),
-                            new ArrayList<AlPollQuestion>(0));
-                }
+                mSessionPolls.put(pdu.getQuestionareId(), alBundledQuestionareQuestion);
 
-                mSessionPolls.get(pdu.getPollId()).add(alPollQuestion);
-
-                for(AlPollQuestion q: mSessionPolls.get(pdu.getPollId())){
-                    Log.i("HERE on receive", q.getQeuestionCreatorId() + ":" + q.getQuestionId());
-                }
-
-                if(alPollQuestion.isEndOfPoll()){
-                    //transmit all the poll questions to the upper layer
-                    for(AlPollQuestion question: mSessionPolls.get(pdu.getPollId())){
-                        transmitPacketsToUpperLayer(pdu.getType(), question);
-                    }
-                }
+                transmitPacketsToUpperLayer(pdu.getType(), alBundledQuestionareQuestion);
 
                 break;
             case POLL_ANSWER:
@@ -663,36 +784,25 @@ public class AlContext {
                  * students can send only one answer per question and cannot receive any answers
                  */
 
-                AlPollAnswer alPollAnswer = (AlPollAnswer) alMessage;
-
-                Log.i(TAG, "POLL ANSWER RECEIVED " +
-                        alPollAnswer.getPollId() + ":" +
-                        alPollAnswer.getQuestionCreatorId()+ ":" +
-                        alPollAnswer.getQuestionId()+ ":" +
-                        alPollAnswer.getFormat()+ ":" +
-                        alPollAnswer.getAnswerDataAsString()
-                );
+                AlBundledQuestionareAnswer alBundledQuestionareAnswer = (AlBundledQuestionareAnswer) alMessage;
 
                 switch(SPARQApplication.getUserType()){
                     case STUDENT:
                         // check if answer belongs to given user
-                        if(alPollAnswer.getAnswerCreatorId() != SPARQApplication.getOwnAddress()){
+                        if(alBundledQuestionareAnswer.getAnswerCreatorId() != SPARQApplication.getOwnAddress()){
                             // revieved someone else's answer
                             return;
                         }
 
                     case TEACHER:
 
-                        if(mSessionPolls.keySet().contains(pdu.getPollId())){
-                            retreivedQuestion = getAlPollQuestion(
-                                    mSessionPolls.get(pdu.getPollId()),
-                                    alPollAnswer.getQuestionCreatorId(),
-                                    alPollAnswer.getQuestionId()
-                            );
+                        if(mSessionPolls.keySet().contains(pdu.getQuestionareId())){
+                            retreivedQuestion = mSessionPolls.get(pdu.getQuestionareId());
 
-                            if(retreivedQuestion != null){
+                            if(retreivedQuestion != null
+                                    && retreivedQuestion.getNumberOfQuestions() == alBundledQuestionareAnswer.getNumberOfQuestions()){
                                 // a question exists for the received answer
-                                transmitPacketsToUpperLayer(pdu.getType(), alPollAnswer);
+                                transmitPacketsToUpperLayer(pdu.getType(), alBundledQuestionareAnswer);
                             }else{
                                 throw new IllegalArgumentException("No such type of Poll packet exists");
                             }
@@ -709,25 +819,25 @@ public class AlContext {
         }
     }
 
-    public void receiveQuizPdu(WifiBTQuizPdu pdu){
+    public void receiveQuizPdu(WifiBTQuestionarePdu pdu){
         // convert PDU to appropriate Al Message Type
         AlMessage alMessage =  convertPduToAlMessage(pdu);
 
-        AlQuizQuestion retreivedQuestion;
+        AlBundledQuestionareQuestion retreivedQuestion;
 
         switch(pdu.getType()){
             case QUIZ_QUESTION:
 
                 Log.i(TAG, "QUIZ QUESTION RECEIVED");
 
-                AlQuizQuestion alQuizQuestion = (AlQuizQuestion) alMessage;
+                AlBundledQuestionareQuestion alBundledQuestionareQuestion = (AlBundledQuestionareQuestion) alMessage;
 
                 // check if question was from teacher: assumed since only wifi beacons from the teacher reach the app layer
 
                 // check if it is the first question of a poll if not add it
-                mSessionQuizzes.put(pdu.getQuizId(),alQuizQuestion);
+                mSessionQuizzes.put(pdu.getQuestionareId(), alBundledQuestionareQuestion);
 
-                transmitPacketsToUpperLayer(pdu.getType(), alQuizQuestion);
+                transmitPacketsToUpperLayer(pdu.getType(), alBundledQuestionareQuestion);
 
                 break;
             case QUIZ_ANSWER:
@@ -737,25 +847,27 @@ public class AlContext {
                  * students can send only one answer per question and cannot receive any answers
                  */
 
-                AlQuizAnswer alQuizAnswer = (AlQuizAnswer) alMessage;
+                AlBundledQuestionareAnswer alBundledQuestionareAnswer = (AlBundledQuestionareAnswer) alMessage;
 
                 switch(SPARQApplication.getUserType()){
                     case STUDENT:
                         // check if answer belongs to given user
-                        if(alQuizAnswer.getAnswerCreatorId() != SPARQApplication.getOwnAddress()){
+                        if(alBundledQuestionareAnswer.getAnswerCreatorId() != SPARQApplication.getOwnAddress()){
                             // revieved someone else's answer
                             return;
                         }
 
                     case TEACHER:
 
-                        if(mSessionQuizzes.keySet().contains(pdu.getQuizId())){
-                            retreivedQuestion = mSessionQuizzes.get(pdu.getQuizId());
+                        Log.i("quizId", String.valueOf(pdu.getQuestionareId()));
+
+                        if(mSessionQuizzes.keySet().contains(pdu.getQuestionareId())){
+                            retreivedQuestion = mSessionQuizzes.get(pdu.getQuestionareId());
 
                             if(retreivedQuestion != null
-                                    && retreivedQuestion.getNumberOfQuestions() == alQuizAnswer.getNumberOfQuestions()){
+                                    && retreivedQuestion.getNumberOfQuestions() == alBundledQuestionareAnswer.getNumberOfQuestions()){
                                 // a question exists for the received answer
-                                transmitPacketsToUpperLayer(pdu.getType(), alQuizAnswer);
+                                transmitPacketsToUpperLayer(pdu.getType(), alBundledQuestionareAnswer);
                             }else{
                                 throw new IllegalArgumentException("No such type of Quiz packet exists");
                             }
@@ -777,11 +889,12 @@ public class AlContext {
         switch(pdu.getType()){
             case QUIZ_QUESTION:
             case QUIZ_ANSWER:
-                receiveQuizPdu((WifiBTQuizPdu) pdu);
+                receiveQuizPdu((WifiBTQuestionarePdu) pdu);
                 break;
             case POLL_QUESTION:
             case POLL_ANSWER:
-                receivePollPdu((PollPdu) pdu);
+//                receivePollPdu((PollPdu) pdu);
+                receivePollPdu((WifiBTQuestionarePdu) pdu);
                 break;
             case QUESTION:
             case ANSWER:

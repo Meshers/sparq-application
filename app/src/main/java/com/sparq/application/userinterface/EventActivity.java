@@ -51,6 +51,8 @@ public class EventActivity extends AppCompatActivity {
 
     private static final String TAG = "EventActivity";
 
+    public final static String EXTRA_EVENT_CODE = "EVENT_CODE";
+
     TabLayout tabLayout;
     public FloatingActionsMenu newEvent;
     FloatingActionButton newQuiz ,newPoll, newConvThread;

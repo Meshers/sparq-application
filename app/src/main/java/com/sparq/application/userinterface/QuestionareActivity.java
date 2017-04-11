@@ -173,38 +173,60 @@ public class QuestionareActivity extends AppCompatActivity {
 
     }
 
+//    public void sendPollMessage(ArrayList<AnswerItem> answers){
+//
+//        for(AnswerItem answer: answers){
+//
+//            String answerMessage = null;
+//            switch(answer.getFormat()){
+//                case MCQ_SINGLE:
+//                case MCQ_MULTIPLE:
+//                    answerMessage = answer.getAnswerChoicesAsString();
+//                    break;
+//                case ONE_WORD:
+//                case SHORT:
+//                    answerMessage= answer.getAnswer();
+//                    break;
+//            }
+//
+//            SPARQApplication.sendPollMessage(
+//                    ApplicationLayerPdu.TYPE.POLL_ANSWER,
+//                    SPARQApplication.getBdcastAddress(),
+//                    answerMessage,
+//                    questionareId,
+//                    questionCreatorId,
+//                    answer.getQuestionItemId(),
+//                    answer.getFormat(),
+//                    null,
+//                    SPARQApplication.getOwnAddress(),
+//                    false,
+//                    false,
+//                    false
+//            );
+//
+//        }
+//    }
+
     public void sendPollMessage(ArrayList<AnswerItem> answers){
 
         for(AnswerItem answer: answers){
-
-            String answerMessage = null;
-            switch(answer.getFormat()){
-                case MCQ_SINGLE:
-                case MCQ_MULTIPLE:
-                    answerMessage = answer.getAnswerChoicesAsString();
-                    break;
-                case ONE_WORD:
-                case SHORT:
-                    answerMessage= answer.getAnswer();
-                    break;
-            }
-
-            SPARQApplication.sendPollMessage(
-                    ApplicationLayerPdu.TYPE.POLL_ANSWER,
-                    SPARQApplication.getBdcastAddress(),
-                    answerMessage,
-                    questionareId,
-                    questionCreatorId,
-                    answer.getQuestionItemId(),
-                    answer.getFormat(),
-                    null,
-                    SPARQApplication.getOwnAddress(),
-                    false,
-                    false,
-                    false
-            );
-
+            bundleAnswers(answer);
         }
+
+        Log.i("HERE", bundledMessage.toString());
+
+        SPARQApplication.sendPollMessage(
+                ApplicationLayerPdu.TYPE.POLL_ANSWER,
+                SPARQApplication.getBdcastAddress(),
+                bundledMessage,
+                questionare.getQuestionareId(),
+                questionCreatorId,
+                quizFormat,
+                bundledMessage.size(),
+                null,
+                SPARQApplication.getOwnAddress()
+        );
+
     }
 
 }
