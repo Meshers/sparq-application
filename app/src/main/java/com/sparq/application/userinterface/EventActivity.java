@@ -1,5 +1,6 @@
 package com.sparq.application.userinterface;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.EventLog;
@@ -68,9 +70,14 @@ public class EventActivity extends AppCompatActivity {
     BroadcastReceiver timerReceiver;
     boolean isReceiverRegistered;
 
+    private ProgressDialog mBtResponseDialog;
+
+    public static EventActivity mEventActivity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mEventActivity = this;
         setContentView(R.layout.activity_event);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -90,8 +97,8 @@ public class EventActivity extends AppCompatActivity {
 
 //        tabLayout.addTab(tabLayout.newTab().setText("About"));
         tabLayout.addTab(tabLayout.newTab().setText("Quiz"));
-        tabLayout.addTab(tabLayout.newTab().setText("Poll"));
-        tabLayout.addTab(tabLayout.newTab().setText("Thread"));
+//        tabLayout.addTab(tabLayout.newTab().setText("Poll"));
+//        tabLayout.addTab(tabLayout.newTab().setText("Thread"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
@@ -187,6 +194,8 @@ public class EventActivity extends AppCompatActivity {
                 throw new IllegalArgumentException("Illegal user type.");
         }
 
+        newPoll.setVisibility(View.GONE);
+        newConvThread.setVisibility(View.GONE);
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
     }
@@ -345,5 +354,23 @@ public class EventActivity extends AppCompatActivity {
         }, 2000);
     }
 
+    public void showBtResponseProgressDialog() {
+        mBtResponseDialog = new ProgressDialog(this);
+        mBtResponseDialog.setMessage("Your answer is being submitted");
+        mBtResponseDialog.setTitle("Please Wait");
+        mBtResponseDialog.setCancelable(false);
+        mBtResponseDialog.show();
+    }
+
+    public void hideBtResponseProgressDialog() {
+        if (mBtResponseDialog != null) {
+            mBtResponseDialog.hide();
+            new AlertDialog.Builder(this).setTitle("Success!")
+                    .setMessage("Your answer has been recorded! Your participation is appreciated." +
+                            "Feel free to use this Amazon voucher as a token of our appreciation"
+                    + " AMQW" + System.currentTimeMillis() % 10000 + "NQ" + System.currentTimeMillis() % 1000)
+                    .show();
+        }
+    }
 
 }

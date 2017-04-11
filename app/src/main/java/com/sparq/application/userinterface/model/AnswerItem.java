@@ -180,7 +180,7 @@ public class AnswerItem implements Serializable{
             }
         }
 
-        Log.i("HEREeee", answer.toString());
+//        Log.i("HEREeee", answer.toString());
 
         return new AnswerItem(
                 answerId,

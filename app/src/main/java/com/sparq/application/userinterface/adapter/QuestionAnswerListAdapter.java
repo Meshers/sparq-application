@@ -87,11 +87,11 @@ public class QuestionAnswerListAdapter extends RecyclerView.Adapter<QuestionAnsw
                 holder.innerAdapter.setData(question.getOptions(), question.getFormat()); // List of Strings
                 holder.innerAdapter.setRowIndex(position);
 
-                int answerListHeight = OPTION_HEIGHT * question.getOptionsCount();
+                /*int answerListHeight = OPTION_HEIGHT * question.getOptionsCount();
                 ViewGroup.LayoutParams params= holder.recyclerView.getLayoutParams();
                 params.height += answerListHeight;
                 holder.recyclerView.setLayoutParams(params);
-
+*/
                 questionareAnswer = AnswerItem.getMCQSingleAnswer(
                         question.getQuestionId(),
                         new UserItem(SPARQApplication.getOwnAddress()),
@@ -112,10 +112,10 @@ public class QuestionAnswerListAdapter extends RecyclerView.Adapter<QuestionAnsw
                 getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
                 recyclerView.getLayoutParams().height = (int)((displaymetrics.heightPixels*45)/100);*/
 
-                answerListHeight = OPTION_HEIGHT * question.getOptionsCount();
+                /*answerListHeight = OPTION_HEIGHT * question.getOptionsCount();
                 params= holder.recyclerView.getLayoutParams();
                 params.height += answerListHeight;
-                holder.recyclerView.setLayoutParams(params);
+                holder.recyclerView.setLayoutParams(params);*/
 
                 questionareAnswer = AnswerItem.getMCQMultipleAnswer(
                         question.getQuestionId(),

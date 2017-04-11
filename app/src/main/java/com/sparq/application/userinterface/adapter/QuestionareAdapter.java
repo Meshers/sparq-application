@@ -25,6 +25,7 @@ public class QuestionareAdapter extends RecyclerView.Adapter<QuestionareAdapter.
     private ArrayList<String> options;
     private QuestionItem.FORMAT format;
 
+    private int lastPosition;
     private RadioButton lastChecked = null;
 
     private ArrayList<Integer> choices = new ArrayList<>();
@@ -114,12 +115,13 @@ public class QuestionareAdapter extends RecyclerView.Adapter<QuestionareAdapter.
 
                         if(cb.isChecked())
                         {
-                            if(lastChecked != null)
+                            if(lastChecked != null && clickedPos != lastPosition)
                             {
                                 lastChecked.setChecked(false);
                             }
 
                             lastChecked = cb;
+                            lastPosition = clickedPos;
                             choices.clear();
                             choices.add(clickedPos);
                         }

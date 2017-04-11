@@ -2,13 +2,13 @@ package com.sparq.application.layer;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.util.Log;
 
 import com.sparq.application.SPARQApplication;
 import com.sparq.application.layer.almessage.AlMessage;
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.application.layer.pdu.ThreadPdu;
 import com.sparq.application.layer.pdu.WifiBTQuestionarePdu;
+import com.sparq.application.userinterface.EventActivity;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -17,13 +17,10 @@ import java.util.List;
 
 
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
-import test.com.blootoothtester.network.linklayer.bt.DeviceDiscoveryHandler;
 import test.com.blootoothtester.network.linklayer.bt.LinkLayerManager;
-import test.com.blootoothtester.network.linklayer.bt.LlMessage;
 import test.com.blootoothtester.network.linklayer.wifi.BtMessage;
 import test.com.blootoothtester.network.linklayer.wifi.WifiLlManager;
 import test.com.blootoothtester.network.linklayer.wifi.WifiMessage;
-import test.com.blootoothtester.util.Constants;
 
 import static com.sparq.application.layer.pdu.ApplicationLayerPdu.TYPE.POLL_ANSWER;
 import static com.sparq.application.layer.pdu.ApplicationLayerPdu.TYPE.POLL_QUESTION;
@@ -204,7 +201,9 @@ public class ApplicationLayerManager {
 
                     @Override
                     public void onAckedByWifi() {
-                        // do nothing on reception of ack
+                        if (EventActivity.mEventActivity != null) {
+                            EventActivity.mEventActivity.hideBtResponseProgressDialog();
+                        }
                     }
                 },
                 bluetoothAdapter

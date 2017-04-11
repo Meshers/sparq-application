@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sparq.R;
 import com.sparq.application.SPARQApplication;
@@ -18,7 +19,6 @@ import com.sparq.application.userinterface.adapter.QuestionAnswerListAdapter;
 import com.sparq.application.userinterface.model.AnswerItem;
 import com.sparq.application.userinterface.model.QuestionItem;
 import com.sparq.application.userinterface.model.Questionare;
-import com.sparq.application.userinterface.model.UserItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -100,13 +100,19 @@ public class QuestionareActivity extends AppCompatActivity {
 
                 switch(type){
                     case QUIZ:
-                        sendQuizMessage( mAdapter.getAnswerForQuestion());
+                        if(sendQuizMessage( mAdapter.getAnswerForQuestion())){
+                            finish();
+                            EventActivity.mEventActivity.showBtResponseProgressDialog();
+                        }
                         break;
                     case POLL:
-                        sendPollMessage( mAdapter.getAnswerForQuestion());
+                        if(sendPollMessage( mAdapter.getAnswerForQuestion())){
+                            finish();
+                            EventActivity.mEventActivity.showBtResponseProgressDialog();
+                        }
                         break;
                 }
-                finish();
+
             }
         });
 
@@ -151,9 +157,14 @@ public class QuestionareActivity extends AppCompatActivity {
         bundledMessage.put(answer.getAnswerId(), answerMessage);
     }
 
-    public void sendQuizMessage(ArrayList<AnswerItem> answers){
+    public boolean sendQuizMessage(ArrayList<AnswerItem> answers){
 
         for(AnswerItem answer: answers){
+            if(answer.getAnswerChoices().isEmpty()){
+                Toast.makeText(QuestionareActivity.this, "Please Ensure that all questions are answered",
+                        Toast.LENGTH_SHORT).show();
+                return false;
+            }
             bundleAnswers(answer);
         }
 
@@ -170,7 +181,7 @@ public class QuestionareActivity extends AppCompatActivity {
                 null,
                 SPARQApplication.getOwnAddress()
         );
-
+        return true;
     }
 
 //    public void sendPollMessage(ArrayList<AnswerItem> answers){
@@ -207,9 +218,14 @@ public class QuestionareActivity extends AppCompatActivity {
 //        }
 //    }
 
-    public void sendPollMessage(ArrayList<AnswerItem> answers){
+    public boolean sendPollMessage(ArrayList<AnswerItem> answers){
 
         for(AnswerItem answer: answers){
+            if(answer.getAnswerChoices().isEmpty()){
+                Toast.makeText(QuestionareActivity.this, "Please Ensure that all questions are answered",
+                        Toast.LENGTH_SHORT).show();
+                return false;
+            }
             bundleAnswers(answer);
         }
 
@@ -226,7 +242,7 @@ public class QuestionareActivity extends AppCompatActivity {
                 null,
                 SPARQApplication.getOwnAddress()
         );
-
+        return true;
     }
 
 }
