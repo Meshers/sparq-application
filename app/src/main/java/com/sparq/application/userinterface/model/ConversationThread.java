@@ -23,7 +23,7 @@ public class ConversationThread extends Questionare {
     public ConversationThread(int threadId, int eventId, Date date, UserItem creator, String question){
         super(threadId, eventId, QUESTIONARE_TYPE.CONV_THREAD, null, null, date, creator, 1);
 
-        QuestionItem questionItem = QuestionItem.getShortQuestion(QUESTION_KEY, threadId, question, Constants.MIN_QUESTION_MARKS);
+        QuestionItem questionItem = QuestionItem.getShortQuestion(QUESTION_KEY, threadId, question, Constants.MIN_QUESTION_MARKS, null);
         super.addQuestionToList(1, questionItem);
 
         answers = new ArrayList<AnswerItem>(0);

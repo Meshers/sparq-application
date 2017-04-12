@@ -1,15 +1,22 @@
 package com.sparq.application.userinterface.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.sparq.R;
+import com.sparq.application.layer.pdu.ApplicationLayerPdu;
+import com.sparq.application.userinterface.model.QuestionItem;
+import com.sparq.application.userinterface.model.Questionare;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,22 +24,44 @@ import java.util.List;
 
 public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHolder> {
 
+    private Questionare.QUESTIONARE_TYPE type;
     private ArrayList<String> options;
+    private QuestionItem.FORMAT format;
+    private ArrayList<Integer> correctOptions;
+
+    private int lastPosition;
+    private RadioButton lastChecked = null;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView optionName;
         public ImageView deleteOption;
+        public RadioButton radioButton;
+        public CheckBox checkBox;
+        public LinearLayout correctAnswerLayout;
 
         public MyViewHolder(View view) {
             super(view);
             optionName = (TextView) view.findViewById(R.id.option_text);
             deleteOption = (ImageView) view.findViewById(R.id.delete_option);
+            radioButton = (RadioButton) view.findViewById(R.id.correct_answer_radio);
+            checkBox = (CheckBox) view.findViewById(R.id.correct_answer_check);
+            correctAnswerLayout = (LinearLayout) view.findViewById(R.id.correct_answer_layout);
+            correctAnswerLayout.setVisibility(View.GONE);
+
         }
     }
 
 
-    public OptionsAdapter(ArrayList<String> options) {
+    public OptionsAdapter(Questionare.QUESTIONARE_TYPE type, QuestionItem.FORMAT format, ArrayList<String> options) {
+        this.type = type;
+        this.format = format;
         this.options = options;
+
+        if(type == Questionare.QUESTIONARE_TYPE.QUIZ){
+            correctOptions = new ArrayList<>(0);
+        }
+
+        Log.i("HERE", type.toString());
     }
 
     @Override
@@ -57,6 +86,68 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
                 notifyDataSetChanged();
             }
         });
+
+
+        holder.radioButton.setTag(new Integer(position+1));
+
+        holder.radioButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                RadioButton cb = (RadioButton) v;
+                int clickedPos = ((Integer)cb.getTag()).intValue();
+
+                if(cb.isChecked() && clickedPos != lastPosition)
+                {
+                    if(lastChecked != null && clickedPos != lastPosition)
+                    {
+                        lastChecked.setChecked(false);
+                    }
+
+                    lastChecked = cb;
+                    lastPosition = clickedPos;
+                    correctOptions.clear();
+                    correctOptions.add(clickedPos);
+                }
+
+                Log.i("HERE", correctOptions.toString());
+            }
+        });
+
+        holder.checkBox.setTag(new Integer(position+1));
+
+        holder.checkBox.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                CheckBox cb = (CheckBox) v;
+                int clickedPos = ((Integer)cb.getTag()).intValue();
+
+                if(cb.isChecked())
+                    correctOptions.add(clickedPos);
+                else
+                    correctOptions.remove(Integer.valueOf(clickedPos));
+
+                Log.i("HERE", correctOptions.toString());
+            }
+        });
+
+        if(type == Questionare.QUESTIONARE_TYPE.QUIZ){
+            holder.correctAnswerLayout.setVisibility(View.VISIBLE);
+
+            switch(format){
+                case MCQ_SINGLE:
+                    holder.checkBox.setVisibility(View.GONE);
+                    holder.radioButton.setVisibility(View.VISIBLE);
+                    break;
+                case MCQ_MULTIPLE:
+                    holder.radioButton.setVisibility(View.GONE);
+                    holder.checkBox.setVisibility(View.VISIBLE);
+                    break;
+            }
+        }
     }
 
     @Override
@@ -72,6 +163,10 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
 
     public ArrayList<String> getOptions(){
         return this.options;
+    }
+
+    public ArrayList<Integer> getCorrectOptions(){
+        return correctOptions;
     }
 
 }

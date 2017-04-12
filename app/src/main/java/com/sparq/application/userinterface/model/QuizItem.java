@@ -21,6 +21,7 @@ public class QuizItem extends Questionare{
 
     private QUIZ_STATE state;
     private HashMap<Integer, ArrayList<AnswerItem>> answers;
+    private HashMap<Integer, Double> userScores;
 
     public QuizItem(){
         super();
@@ -33,7 +34,9 @@ public class QuizItem extends Questionare{
         this.duration = duration;
         this.totalMarks = totalMarks;
 
-        answers = new HashMap<>(0);
+        this.answers = new HashMap<>(0);
+
+        this.userScores = new HashMap<>(0);
     }
 
     public long getDuration() {
@@ -129,6 +132,22 @@ public class QuizItem extends Questionare{
             return true;
         }
         return false;
+    }
+
+    public HashMap<Integer, Double> getUserScores(){
+        return  this.userScores;
+    }
+
+    public void setUserScores(int userId, int questionNumber, AnswerItem answerItem){
+
+        QuestionItem questionItem = getQuestionWithKey(questionNumber);
+
+        if(userScores.containsKey(userId)){
+            userScores.put(userId, userScores.get(userId) + QuestionItem.evaluateQuestion(questionItem, answerItem));
+        }else{
+            userScores.put(userId, QuestionItem.evaluateQuestion(questionItem, answerItem));
+        }
+
     }
 
 }

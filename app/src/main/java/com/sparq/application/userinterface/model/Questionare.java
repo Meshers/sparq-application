@@ -129,28 +129,6 @@ public abstract class Questionare {
         return questions.get(questionId);
     }
 
-    public boolean editQuestion(int questionId, int questionareId, String question, QuestionItem.FORMAT format, double totalMarks) {
-
-        if(!questions.containsKey(questionId)){
-            return false;
-        }
-        else{
-            QuestionItem questionItem = new QuestionItem(questionId, questionareId, question, format, totalMarks, Constants.INITIAL_VOTE_COUNT);
-            questions.put(questionId, questionItem);
-            return true;
-        }
-    }
-
-    public boolean removeQuestion(int questionId){
-
-        if(questions.remove(questionId) != null){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
     public int getNumberOfQuestions(){
         return questions.size();
     }

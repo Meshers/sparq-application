@@ -35,12 +35,12 @@ public class EventPagerAdapter extends FragmentStatePagerAdapter{
             case 0:
                 fragment = new QuizFragment();
                 break;
-//            case 1:
-//                fragment = new PollFragment();
-//                break;
-//            case 2:
-//                fragment = new ThreadFragment();
-//                break;
+            case 1:
+                fragment = new PollFragment();
+                break;
+            case 2:
+                fragment = new ThreadFragment();
+                break;
         }
 
         return fragment;

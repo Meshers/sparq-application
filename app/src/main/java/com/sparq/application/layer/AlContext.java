@@ -305,6 +305,8 @@ public class AlContext {
                         }
 
                         pdu = WifiBTQuestionarePdu.getPollAnswerPdu(pollId, questionFormat, numberOfQuestions, answerCreatorId, data);
+                        ((WifiBTQuestionarePdu) pdu).setToAddr(retreivedQuestion.getToAddr());
+                        ((WifiBTQuestionarePdu) pdu).setLinkId(retreivedQuestion.getLinkId());
                     }else{
                         throw new IllegalArgumentException("No such type of Poll packet exists");
                     }

@@ -14,7 +14,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.EventLog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,17 +36,10 @@ import com.sparq.application.userinterface.adapter.EventPagerAdapter;
 import com.sparq.application.userinterface.model.Questionare;
 import com.sparq.util.Constants;
 
-import java.util.ArrayList;
-
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
 
-import static com.sparq.application.SPARQApplication.SPARQInstance;
 import static com.sparq.application.SPARQApplication.getInstance;
 import static com.sparq.application.SPARQApplication.getUserType;
-import static com.sparq.application.userinterface.model.QuestionItem.FORMAT.MCQ_MULTIPLE;
-import static com.sparq.application.userinterface.model.QuestionItem.FORMAT.MCQ_SINGLE;
-import static com.sparq.application.userinterface.model.QuestionItem.FORMAT.ONE_WORD;
-import static com.sparq.application.userinterface.model.QuestionItem.FORMAT.SHORT;
 
 //import android.support.design.widget.FloatingActionButton;
 
@@ -91,14 +83,12 @@ public class EventActivity extends AppCompatActivity {
 
         initializeViews();
 
-//        SPARQApplication.initializeObjects(EventActivity.this);
-
         initializeLowerLayer();
 
 //        tabLayout.addTab(tabLayout.newTab().setText("About"));
         tabLayout.addTab(tabLayout.newTab().setText("Quiz"));
-//        tabLayout.addTab(tabLayout.newTab().setText("Poll"));
-//        tabLayout.addTab(tabLayout.newTab().setText("Thread"));
+        tabLayout.addTab(tabLayout.newTab().setText("Poll"));
+        tabLayout.addTab(tabLayout.newTab().setText("Thread"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
@@ -167,8 +157,8 @@ public class EventActivity extends AppCompatActivity {
                 newPoll.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(EventActivity.this, NewQuestionareActicity.class);
-                        intent.putExtra(NewQuestionareActicity.QUESTIONARE_TYPE, Questionare.QUESTIONARE_TYPE.POLL);
+                        Intent intent = new Intent(EventActivity.this, NewQuestionareActivity.class);
+                        intent.putExtra(NewQuestionareActivity.QUESTIONARE_TYPE, Questionare.QUESTIONARE_TYPE.POLL);
                         startActivity(intent);
                         newEvent.collapse();
 
@@ -178,8 +168,8 @@ public class EventActivity extends AppCompatActivity {
                 newQuiz.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(EventActivity.this, NewQuestionareActicity.class);
-                        intent.putExtra(NewQuestionareActicity.QUESTIONARE_TYPE, Questionare.QUESTIONARE_TYPE.QUIZ);
+                        Intent intent = new Intent(EventActivity.this, NewQuestionareActivity.class);
+                        intent.putExtra(NewQuestionareActivity.QUESTIONARE_TYPE, Questionare.QUESTIONARE_TYPE.QUIZ);
                         startActivity(intent);
                         newEvent.collapse();
                     }
@@ -193,9 +183,6 @@ public class EventActivity extends AppCompatActivity {
             default:
                 throw new IllegalArgumentException("Illegal user type.");
         }
-
-        newPoll.setVisibility(View.GONE);
-        newConvThread.setVisibility(View.GONE);
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
     }

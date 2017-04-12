@@ -22,4 +22,21 @@
 
     <include layout="@layout/content_poll_results" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:layout_gravity="bottom|end">
+
+        <Button
+            android:id="@+id/csv_export"
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Export Results to CSV"
+            android:textColor="@color/white"
+            android:theme="@style/AppButton"
+            style="@style/Widget.AppCompat.Button.Colored"/>
+    </LinearLayout>
+
 </android.support.design.widget.CoordinatorLayout>

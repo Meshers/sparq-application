@@ -38,7 +38,11 @@ public class QuestionItem {
     private boolean isMainQuestion;
     private ArrayList<String> options;
 
-    public QuestionItem(int questionId, int questionareId, String question, FORMAT format, double totalMarks, int votes) {
+    //correct answers
+    private String correctAnswer;
+    private ArrayList<Integer> correctOptions;
+
+    public QuestionItem(int questionId, int questionareId, String question, FORMAT format, double totalMarks, int votes, String correctAnswer) {
         this.questionId = questionId;
         this.questionareId = questionareId;
         this.question = question;
@@ -47,16 +51,19 @@ public class QuestionItem {
         this.votes = votes;
         this.hasVoted = false;
 
+        this.correctAnswer = correctAnswer;
+
     }
 
     public QuestionItem(int questionId, int questionareId, String question, FORMAT format, double totalMarks,
-                        ArrayList<String> options, int votes) {
-        this(questionId, questionareId, question, format, totalMarks, votes);
+                        ArrayList<String> options, int votes, ArrayList<Integer> correctOptions) {
+        this(questionId, questionareId, question, format, totalMarks, votes, null);
 
         switch(getFormat()){
             case MCQ_SINGLE:
             case MCQ_MULTIPLE:
                 this.options = options;
+                this.correctOptions = correctOptions;
                 break;
         }
     }
@@ -167,27 +174,66 @@ public class QuestionItem {
         this.options = options;
     }
 
-    public void addOption(String option){
-        options.add(option);
+    public String getCorrectAnswer(){
+        return this.correctAnswer;
     }
 
-    public static QuestionItem getMCQSingleQuestion(int questionId, int questionareId, String question, ArrayList<String> options, float totalMarks){
-
-        return new QuestionItem(questionId, questionareId, question, FORMAT.MCQ_SINGLE, totalMarks, options, Constants.INITIAL_VOTE_COUNT);
+    public void setCorrectAnswer(String correctAnswer){
+        this.correctAnswer = correctAnswer;
     }
 
-    public static QuestionItem getMCQMultipleQuestion(int questionId, int questionareId, String question, ArrayList<String> options, float totalMarks){
-
-        return new QuestionItem(questionId, questionareId, question, FORMAT.MCQ_MULTIPLE, totalMarks, options, Constants.INITIAL_VOTE_COUNT);
+    public ArrayList<Integer> getCorrectOptions(){
+        return this.correctOptions;
     }
 
-    public static QuestionItem getOneWordQuestion(int questionId, int questionareId, String question, float totalMarks){
+    public void setCorrectOptions(ArrayList<Integer> correctOptions){
+        this.correctOptions = correctOptions;
+    }
 
-        return new QuestionItem(questionId, questionareId, question, FORMAT.ONE_WORD, totalMarks, Constants.INITIAL_VOTE_COUNT);
+    public static QuestionItem getMCQSingleQuestion(int questionId, int questionareId, String question,
+                                                    ArrayList<String> options, float totalMarks, ArrayList<Integer> correctOptions){
+
+        return new QuestionItem(questionId, questionareId, question,
+                FORMAT.MCQ_SINGLE, totalMarks, options, Constants.INITIAL_VOTE_COUNT, correctOptions);
+    }
+
+    public static QuestionItem getMCQMultipleQuestion(int questionId, int questionareId, String question,
+                                                      ArrayList<String> options, float totalMarks, ArrayList<Integer> correctOptions){
+
+        return new QuestionItem(questionId, questionareId, question,
+                FORMAT.MCQ_MULTIPLE, totalMarks, options, Constants.INITIAL_VOTE_COUNT, correctOptions);
+    }
+
+    public static QuestionItem getOneWordQuestion(int questionId, int questionareId, String question,
+                                                  float totalMarks, String correctAnswer){
+
+        return new QuestionItem(questionId, questionareId, question,
+                FORMAT.ONE_WORD, totalMarks, Constants.INITIAL_VOTE_COUNT, correctAnswer);
     }
 
 
-    public static QuestionItem getShortQuestion(int questionId, int questionareId, String question, float totalMarks){
-        return new QuestionItem(questionId, questionareId, question, FORMAT.SHORT, totalMarks, null, Constants.INITIAL_VOTE_COUNT);
+    public static QuestionItem getShortQuestion(int questionId, int questionareId, String question, float totalMarks, String correctAnswer){
+        return new QuestionItem(questionId, questionareId, question,
+                FORMAT.SHORT, totalMarks, Constants.INITIAL_VOTE_COUNT, correctAnswer);
+    }
+
+    public static double evaluateQuestion(QuestionItem questionItem, AnswerItem answerItem){
+
+        ArrayList<Integer> correctAns = questionItem.getCorrectOptions();
+        ArrayList<Integer> actualAnswer = answerItem.getAnswerChoices();
+        boolean correct = true;
+
+        for(int answer: actualAnswer){
+            if(!correctAns.contains(answer)){
+                correct = false;
+                break;
+            }
+        }
+
+        if(correct){
+            return questionItem.getTotalMarks();
+        }else{
+            return 0;
+        }
     }
 }

@@ -142,8 +142,10 @@ public class WifiBTQuestionarePdu extends ApplicationLayerPdu{
         nextFieldIndex += NUMBER_OF_QUESTIONS_BYTES;
 
         switch(getType()){
+            case QUIZ_QUESTION:
             case POLL_QUESTION:
                 break;
+            case QUIZ_ANSWER:
             case POLL_ANSWER:
                 encoded[nextFieldIndex] = getAnswerCreatorId();
                 nextFieldIndex += ANSWER_CREATOR_ID_BYTES;
@@ -186,7 +188,9 @@ public class WifiBTQuestionarePdu extends ApplicationLayerPdu{
 
             switch(type){
                 case POLL_QUESTION:
+                case QUIZ_QUESTION:
                     break;
+                case QUIZ_ANSWER:
                 case POLL_ANSWER:
                     answerCreatorId = encoded[nextFieldIndex];
                     nextFieldIndex += ANSWER_CREATOR_ID_BYTES;

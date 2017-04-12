@@ -275,7 +275,8 @@ public class SPARQApplication extends MultiDexApplication {
                                     alBundledQuestionareQuestion.getQuestionareId(),
                                     "Question "+ questionNumber,
                                     alBundledQuestionareQuestion.getOptionsForQuestionAsString(questionNumber),
-                                    Constants.MIN_QUESTION_MARKS
+                                    Constants.MIN_QUESTION_MARKS,
+                                    null
                             );
                             break;
                         case MCQ_MULTIPLE:
@@ -284,7 +285,8 @@ public class SPARQApplication extends MultiDexApplication {
                                     alBundledQuestionareQuestion.getQuestionareId(),
                                     "Question "+ questionNumber,
                                     alBundledQuestionareQuestion.getOptionsForQuestionAsString(questionNumber),
-                                    Constants.MIN_QUESTION_MARKS
+                                    Constants.MIN_QUESTION_MARKS,
+                                    null
                             );
                             break;
                         case ONE_WORD:
@@ -292,14 +294,18 @@ public class SPARQApplication extends MultiDexApplication {
                                     questionNumber,
                                     alBundledQuestionareQuestion.getQuestionareId(),
                                     alBundledQuestionareQuestion.getQuestionDataAsString(),
-                                    Constants.MIN_QUESTION_MARKS);
+                                    Constants.MIN_QUESTION_MARKS,
+                                    null
+                            );
                             break;
                         case SHORT:
                             question = QuestionItem.getShortQuestion(
                                     questionNumber,
                                     alBundledQuestionareQuestion.getQuestionareId(),
                                     alBundledQuestionareQuestion.getQuestionDataAsString(),
-                                    Constants.MIN_QUESTION_MARKS);
+                                    Constants.MIN_QUESTION_MARKS,
+                                    null
+                            );
                             break;
                     }
 
@@ -313,7 +319,8 @@ public class SPARQApplication extends MultiDexApplication {
                 Log.i(TAG,"RECEIVED MESSAGE: "
                         + alQuizAnswer.getQuestionareId() + ":"
                         + alQuizAnswer.getAnswerCreatorId() + ":"
-                        + alQuizAnswer.getQuestionFormat()
+                        + alQuizAnswer.getQuestionFormat() + ":"
+                        + alQuizAnswer.getAnswerDataAsString()
                 );
 
                 quiz = getQuiz(alQuizAnswer.getQuestionareId());
@@ -366,6 +373,7 @@ public class SPARQApplication extends MultiDexApplication {
                     }
 
                     quiz.addAnswerToQuestion(questionNumber, quizAnswer);
+                    quiz.setUserScores(alQuizAnswer.getAnswerCreatorId(), questionNumber, quizAnswer);
                 }
 
                 break;
@@ -411,7 +419,8 @@ public class SPARQApplication extends MultiDexApplication {
                                     alPollQuestion.getQuestionareId(),
                                     "Question "+ questionNumber,
                                     alPollQuestion.getOptionsForQuestionAsString(questionNumber),
-                                    Constants.MIN_QUESTION_MARKS
+                                    Constants.MIN_QUESTION_MARKS,
+                                    null
                             );
                             break;
                         case MCQ_MULTIPLE:
@@ -420,7 +429,8 @@ public class SPARQApplication extends MultiDexApplication {
                                     alPollQuestion.getQuestionareId(),
                                     "Question "+ questionNumber,
                                     alPollQuestion.getOptionsForQuestionAsString(questionNumber),
-                                    Constants.MIN_QUESTION_MARKS
+                                    Constants.MIN_QUESTION_MARKS,
+                                    null
                             );
                             break;
                         case ONE_WORD:
@@ -428,14 +438,18 @@ public class SPARQApplication extends MultiDexApplication {
                                     questionNumber,
                                     alPollQuestion.getQuestionareId(),
                                     alPollQuestion.getQuestionDataAsString(),
-                                    Constants.MIN_QUESTION_MARKS);
+                                    Constants.MIN_QUESTION_MARKS,
+                                    null
+                            );
                             break;
                         case SHORT:
                             question = QuestionItem.getShortQuestion(
                                     questionNumber,
                                     alPollQuestion.getQuestionareId(),
                                     alPollQuestion.getQuestionDataAsString(),
-                                    Constants.MIN_QUESTION_MARKS);
+                                    Constants.MIN_QUESTION_MARKS,
+                                    null
+                            );
                             break;
                     }
 
@@ -774,7 +788,8 @@ public class SPARQApplication extends MultiDexApplication {
 
     public static void sendQuizMessage(ApplicationLayerPdu.TYPE type, byte toAddr, HashMap<Integer, String> msg,
                                        int quizId, int creatorId, QuestionItem.FORMAT questionFormat, int numberOfQuestions,
-                                       HashMap<Integer, ArrayList<String>> options, int answerCreatorId){
+                                       HashMap<Integer, ArrayList<String>> options, int answerCreatorId,
+                                       HashMap<Integer, String> correctAnswers, HashMap<Integer, ArrayList<Integer>> correctOptions){
         boolean isSent;
         switch(type){
             case QUIZ_QUESTION:
@@ -815,16 +830,42 @@ public class SPARQApplication extends MultiDexApplication {
                         QuestionItem question = null;
                         switch(questionFormat){
                             case MCQ_SINGLE:
-                                question = QuestionItem.getMCQSingleQuestion(questionNumber, quizId, "Question " + questionNumber, options.get(questionNumber), Constants.MIN_QUESTION_MARKS);
+                                question = QuestionItem.getMCQSingleQuestion(
+                                        questionNumber,
+                                        quizId,
+                                        "Question " + questionNumber,
+                                        options.get(questionNumber),
+                                        1,
+                                        correctOptions.get(questionNumber)
+                                );
                                 break;
                             case MCQ_MULTIPLE:
-                                question = QuestionItem.getMCQMultipleQuestion(questionNumber, quizId, "Question " + questionNumber, options.get(questionNumber), Constants.MIN_QUESTION_MARKS);
+                                question = QuestionItem.getMCQMultipleQuestion(
+                                        questionNumber,
+                                        quizId,
+                                        "Question " + questionNumber,
+                                        options.get(questionNumber),
+                                        1,
+                                        correctOptions.get(questionNumber)
+                                );
                                 break;
                             case ONE_WORD:
-                                question = QuestionItem.getOneWordQuestion(questionNumber, quizId, "Question " + questionNumber, Constants.MIN_QUESTION_MARKS);
+                                question = QuestionItem.getOneWordQuestion(
+                                        questionNumber,
+                                        quizId,
+                                        "Question " + questionNumber,
+                                        1,
+                                        correctAnswers.get(questionNumber)
+                                );
                                 break;
                             case SHORT:
-                                question = QuestionItem.getShortQuestion(questionNumber, quizId, "Question " + questionNumber, Constants.MIN_QUESTION_MARKS);
+                                question = QuestionItem.getShortQuestion(
+                                        questionNumber,
+                                        quizId,
+                                        "Question " + questionNumber,
+                                        1,
+                                        correctAnswers.get(questionNumber)
+                                );
                                 break;
                         }
 
@@ -933,16 +974,42 @@ public class SPARQApplication extends MultiDexApplication {
                         QuestionItem question = null;
                         switch(questionFormat){
                             case MCQ_SINGLE:
-                                question = QuestionItem.getMCQSingleQuestion(questionNumber, pollId, "Question " + questionNumber, options.get(questionNumber), Constants.MIN_QUESTION_MARKS);
+                                question = QuestionItem.getMCQSingleQuestion(
+                                        questionNumber,
+                                        pollId,
+                                        "Question " + questionNumber,
+                                        options.get(questionNumber),
+                                        Constants.MIN_QUESTION_MARKS,
+                                        null
+                                );
                                 break;
                             case MCQ_MULTIPLE:
-                                question = QuestionItem.getMCQMultipleQuestion(questionNumber, pollId, "Question " + questionNumber, options.get(questionNumber), Constants.MIN_QUESTION_MARKS);
+                                question = QuestionItem.getMCQMultipleQuestion(
+                                        questionNumber,
+                                        pollId,
+                                        "Question " + questionNumber,
+                                        options.get(questionNumber),
+                                        Constants.MIN_QUESTION_MARKS,
+                                        null
+                                );
                                 break;
                             case ONE_WORD:
-                                question = QuestionItem.getOneWordQuestion(questionNumber, pollId, "Question " + questionNumber, Constants.MIN_QUESTION_MARKS);
+                                question = QuestionItem.getOneWordQuestion(
+                                        questionNumber,
+                                        pollId,
+                                        "Question " + questionNumber,
+                                        Constants.MIN_QUESTION_MARKS,
+                                        null
+                                );
                                 break;
                             case SHORT:
-                                question = QuestionItem.getShortQuestion(questionNumber, pollId, "Question " + questionNumber, Constants.MIN_QUESTION_MARKS);
+                                question = QuestionItem.getShortQuestion(
+                                        questionNumber,
+                                        pollId,
+                                        "Question " + questionNumber,
+                                        Constants.MIN_QUESTION_MARKS,
+                                        null
+                                );
                                 break;
                         }
 

@@ -1,5 +1,7 @@
 package com.sparq.application.layer.almessage;
 
+import android.util.Log;
+
 import com.sparq.application.layer.pdu.ApplicationLayerPdu;
 import com.sparq.util.Constants;
 
@@ -79,6 +81,8 @@ public class AlBundledQuestionareAnswer extends AlMessage {
         for(byte choice: choices.get(questionId)){
             choiceStr += new String(new byte[]{choice}, CHARSET);
         }
+
+        Log.i("HERE", choiceStr.toString());
 
         // checks if the number of options for a given bundled answer are more than the specific limit
         if(choiceStr.length() <= Constants.MAX_NUMBER_OF_OPTIONS){

@@ -161,7 +161,7 @@ public class QuestionareActivity extends AppCompatActivity {
 
         for(AnswerItem answer: answers){
             if(answer.getAnswerChoices().isEmpty()){
-                Toast.makeText(QuestionareActivity.this, "Please Ensure that all questions are answered",
+                Toast.makeText(QuestionareActivity.this, "Please ensure that all questions are answered",
                         Toast.LENGTH_SHORT).show();
                 return false;
             }
@@ -179,7 +179,9 @@ public class QuestionareActivity extends AppCompatActivity {
                 quizFormat,
                 bundledMessage.size(),
                 null,
-                SPARQApplication.getOwnAddress()
+                SPARQApplication.getOwnAddress(),
+                null,
+                null
         );
         return true;
     }
@@ -228,8 +230,6 @@ public class QuestionareActivity extends AppCompatActivity {
             }
             bundleAnswers(answer);
         }
-
-        Log.i("HERE", bundledMessage.toString());
 
         SPARQApplication.sendPollMessage(
                 ApplicationLayerPdu.TYPE.POLL_ANSWER,
