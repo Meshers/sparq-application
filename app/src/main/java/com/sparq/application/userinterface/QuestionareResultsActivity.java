@@ -7,6 +7,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -95,15 +96,21 @@ public class QuestionareResultsActivity extends AppCompatActivity {
 
     public void exportResultsToCSV(){
 
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            if(resultsLogger.writeResults(((QuizItem) questionare).getUserScores())){
+            if(((QuizItem) questionare).getUserScores().size() > 0){
+                if(resultsLogger.writeResults(((QuizItem) questionare).getUserScores())){
 
-                Toast.makeText(QuestionareResultsActivity.this, "Successfully written to a CSV file",
-                        Toast.LENGTH_SHORT).show();
-            }else{
+                    Toast.makeText(QuestionareResultsActivity.this, "Successfully written to a CSV file",
+                            Toast.LENGTH_SHORT).show();
+                }else{
 
-                Toast.makeText(QuestionareResultsActivity.this, "Failed to write to CSV file",
+                    Toast.makeText(QuestionareResultsActivity.this, "Failed to write to CSV file",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+            else
+            {
+                Toast.makeText(QuestionareResultsActivity.this, "Nothing to write",
                         Toast.LENGTH_SHORT).show();
             }
         }

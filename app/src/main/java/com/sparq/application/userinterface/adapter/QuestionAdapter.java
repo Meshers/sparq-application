@@ -64,6 +64,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.MyView
             public void onClick(View v) {
                 questions.remove(position + 1);
                 notifyItemRemoved(position);
+                notifyDataSetChanged();
             }
         });
 

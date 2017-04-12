@@ -30,7 +30,7 @@ public class ResultsLogger {
         }
         try {
             PrintWriter pw = new PrintWriter(mResultsFile);
-            pw.println("User Name,Score");
+            pw.println("User ID, Score");
             pw.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();

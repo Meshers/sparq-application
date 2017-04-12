@@ -9,20 +9,22 @@
         android:orientation="vertical"
         android:layout_height="wrap_content">
 
-        <LinearLayout
+        <com.jaredrummler.materialspinner.MaterialSpinner
+            android:id="@+id/option_spinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:dropDownSelector="@color/colorAccent"
+            android:hint="Number of options?"
+            android:spinnerMode="dropdown"
+            android:textColor="@color/secondaryText"
+            android:textColorHint="@color/secondaryText" />
 
-            <com.jaredrummler.materialspinner.MaterialSpinner
-                android:layout_marginTop="5dp"
-                android:id="@+id/option_spinner"
+        <!--    <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Choose a"
-                android:textColor="@color/secondaryText"
-                android:textColorHint="@color/colorAccent" />
+                android:layout_height="match_parent">
 
-        </LinearLayout>
+            </LinearLayout>-->
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/options_recycler_view"

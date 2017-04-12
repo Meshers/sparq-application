@@ -163,19 +163,6 @@ public class NewQuestionareActivity extends AppCompatActivity {
                 // add all the questions to the questionare object
                 questionare.setQuestions(questionsArray);
 
-                //Log.i("onClick: ", questionare.getName());
-                //Setting first question as the main question for naming purpose
-//                if(questionare.getName() == null){
-//                    QuestionItem firstQuestion = questionsArray.get(new Integer(1));
-//                    firstQuestion.setMainQuestion(true);
-//                    questionare.setName(firstQuestion.getQuestion());
-//                    Log.i("onClick: ", questionare.getName());
-//                }
-//                else{
-//                    Log.i("onClick: ", questionare.getName());
-//                }
-
-
                 switch(type){
                     case QUIZ:
                         sendQuizMessage(
@@ -198,7 +185,7 @@ public class NewQuestionareActivity extends AppCompatActivity {
         });
 
         mQuestionAdapter = new QuestionAdapter(NewQuestionareActivity.this,questionsArray);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(NewQuestionareActivity.this);
+        final RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(NewQuestionareActivity.this);
         questionsRecyclerView.setLayoutManager(mLayoutManager);
         questionsRecyclerView.setItemAnimator(new DefaultItemAnimator());
         questionsRecyclerView.setAdapter(mQuestionAdapter);
@@ -207,12 +194,20 @@ public class NewQuestionareActivity extends AppCompatActivity {
             @Override
             public void onChanged() {
                 super.onChanged();
-                if(mQuestionAdapter.getItemCount() == Constants.MAX_NUMBER_OF_QUESIONS){
+                if(mQuestionAdapter.getItemCount() == Constants.MAX_NUMBER_OF_QUESIONS ){
                     newQuestion.setEnabled(false);
                 }
                 else{
                     newQuestion.setEnabled(true);
                 }
+
+                if(mQuestionAdapter.getItemCount() == 0){
+                    addQuestionare.setEnabled(false);
+                }
+                else{
+                    addQuestionare.setEnabled(true);
+                }
+
             }
         });
     }
@@ -221,15 +216,15 @@ public class NewQuestionareActivity extends AppCompatActivity {
     public void openNewQuestionDialog(){
 
         final String[] SPINNEROPTIONLIST = {
-                "Empty", "2", "3", "4", "5"
+                "Options", "2", "3", "4", "5"
         };
 
         final ArrayList<String> options = new ArrayList<>();
 
-        final OptionsAdapter mAdapter = new OptionsAdapter(type, questionareFormat ,options);
+        final OptionsAdapter mAdapter = new OptionsAdapter(type, questionareFormat , options);
 
         final MaterialDialog dialog = new MaterialDialog.Builder(NewQuestionareActivity.this)
-                .title("Add a New Question")
+                .title("Mark the right answers")
                 .customView(R.layout.dialog_new_question_dup, true)
                 .positiveText("ADD")
                 .negativeText("CANCEL")
@@ -253,7 +248,6 @@ public class NewQuestionareActivity extends AppCompatActivity {
                         mQuestionAdapter.notifyDataSetChanged();
                         addQuestionare.setEnabled(true);
 
-
                         dialog.dismiss();
                     }
                 })
@@ -263,6 +257,8 @@ public class NewQuestionareActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 }).build();
+
+        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
 
         View view = dialog.getCustomView();
 
@@ -281,8 +277,9 @@ public class NewQuestionareActivity extends AppCompatActivity {
             public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
 
                 options.clear();
-                if(item.equalsIgnoreCase("Empty")){
+                if(item.equalsIgnoreCase("Options")){
                     mAdapter.notifyDataSetChanged();
+                    dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
                     return;
                 }
 
@@ -290,14 +287,29 @@ public class NewQuestionareActivity extends AppCompatActivity {
                 for(int i = 1; i <= choice; i++){
                     options.add(String.valueOf(i));
                 }
+
                 mAdapter.notifyDataSetChanged();
-                dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
+//                dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
             }
 
         });
 
 
         dialog.show();
+
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                Log.i("onChanged: ", String.valueOf(mAdapter.getItemCount()) + ";" + String.valueOf(mAdapter.getChosenAnswerCount()));
+                if(mAdapter.getItemCount() >= 2 && mAdapter.getChosenAnswerCount() != 0){
+                    dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                }
+                else{
+                    dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
+                }
+            }
+        });
 
     }
 

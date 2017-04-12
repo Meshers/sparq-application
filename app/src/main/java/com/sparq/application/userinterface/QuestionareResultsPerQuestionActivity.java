@@ -23,10 +23,13 @@ import com.sparq.application.userinterface.adapter.AnswerListAdapter;
 import com.sparq.application.userinterface.model.AnswerItem;
 import com.sparq.application.userinterface.model.QuestionItem;
 import com.sparq.application.userinterface.model.Questionare;
+import com.sparq.util.Constants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
+
+import static test.com.blootoothtester.util.Constants.MAX_USERS;
 
 public class QuestionareResultsPerQuestionActivity extends AppCompatActivity {
 
@@ -42,6 +45,7 @@ public class QuestionareResultsPerQuestionActivity extends AppCompatActivity {
     private String questionareName = "Questions";
 
     private TextView questionText;
+    private TextView answerText;
     private RecyclerView answerRecyclerView;
     private CardView graphCard, recyclerCard;
     private GraphView graph;
@@ -90,6 +94,8 @@ public class QuestionareResultsPerQuestionActivity extends AppCompatActivity {
 
         questionText = (TextView) findViewById(R.id.question_text);
         questionText.setText(question.getQuestion());
+        answerText = (TextView) findViewById(R.id.answer_text);
+//        answerText.setText(question.getCorrectAnswer());
 
         answerRecyclerView = (RecyclerView) findViewById(R.id.answer_recycler_view);
         graphCard = (CardView) findViewById(R.id.card_view1);
@@ -134,11 +140,13 @@ public class QuestionareResultsPerQuestionActivity extends AppCompatActivity {
                 }
             }
 
+            //Handling options which weren't answered but are part of the system
+
         }
 
         Log.i("HERE", data.toString());
 
-        DataPoint[] dataPoints = new DataPoint[data.size()+1];
+        DataPoint[] dataPoints = new DataPoint[data.size()+2];
         dataPoints[0] = new DataPoint(0,0);
 
         int i = 1;
@@ -146,6 +154,10 @@ public class QuestionareResultsPerQuestionActivity extends AppCompatActivity {
             dataPoints[i] = new DataPoint(key, data.get(key));
             i++;
         }
+
+        //Adding extreme points
+        dataPoints[i] = new DataPoint(Constants.MAX_NUMBER_OF_OPTIONS, 0);
+//        dataPoints[i] = new DataPoint(0, MAX_USERS);
 
         BarGraphSeries<DataPoint> series = new BarGraphSeries<>(dataPoints);
         graph.addSeries(series);
@@ -157,10 +169,9 @@ public class QuestionareResultsPerQuestionActivity extends AppCompatActivity {
             }
         });
 
-        series.setSpacing(1);
-
+        series.setSpacing(50);
         series.setDrawValuesOnTop(true);
-        series.setValuesOnTopColor(Color.GRAY);
+        series.setValuesOnTopColor(Color.RED);
     }
 
 }

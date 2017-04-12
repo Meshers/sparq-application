@@ -109,6 +109,7 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
                     lastPosition = clickedPos;
                     correctOptions.clear();
                     correctOptions.add(clickedPos);
+                    notifyDataSetChanged();
                 }
 
                 Log.i("HERE", correctOptions.toString());
@@ -125,10 +126,14 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
                 CheckBox cb = (CheckBox) v;
                 int clickedPos = ((Integer)cb.getTag()).intValue();
 
-                if(cb.isChecked())
+                if(cb.isChecked()){
                     correctOptions.add(clickedPos);
-                else
+                    notifyDataSetChanged();
+                }
+                else {
                     correctOptions.remove(Integer.valueOf(clickedPos));
+                    notifyDataSetChanged();
+                }
 
                 Log.i("HERE", correctOptions.toString());
             }
@@ -159,6 +164,15 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
             return 0;
         }
 
+    }
+
+    public int getChosenAnswerCount(){
+        if(correctOptions != null){
+            return correctOptions.size();
+        }
+        else{
+            return 0;
+        }
     }
 
     public ArrayList<String> getOptions(){

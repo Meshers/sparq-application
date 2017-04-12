@@ -85,10 +85,9 @@ public class EventActivity extends AppCompatActivity {
 
         initializeLowerLayer();
 
-//        tabLayout.addTab(tabLayout.newTab().setText("About"));
         tabLayout.addTab(tabLayout.newTab().setText("Quiz"));
         tabLayout.addTab(tabLayout.newTab().setText("Poll"));
-        tabLayout.addTab(tabLayout.newTab().setText("Thread"));
+        tabLayout.addTab(tabLayout.newTab().setText("Forums"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);

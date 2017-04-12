@@ -29,11 +29,17 @@
         <com.jaredrummler.materialspinner.MaterialSpinner
             android:layout_marginTop="5dp"
             android:id="@+id/format_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:hint="Choose a Question Format"
             android:textColor="@color/secondaryText"
-            android:textColorHint="@color/colorAccent" />
+            android:textColorHint="@color/secondaryText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:dropDownSelector="@color/colorAccent"
+            android:spinnerMode="dropdown"
+            app:ms_hide_arrow="false"
+            app:ms_arrow_tint="@color/secondaryText"
+            app:ms_dropdown_height="wrap_content"
+            />
 
     </LinearLayout>
 
