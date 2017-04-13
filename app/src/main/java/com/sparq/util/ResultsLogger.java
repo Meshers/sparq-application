@@ -1,5 +1,9 @@
 package com.sparq.util;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
@@ -53,5 +57,13 @@ public class ResultsLogger {
             Log.e("ResultLogger", "Failed writing results", e);
             return false;
         }
+    }
+
+    public void openFile(Context activity){
+        Intent i = new Intent();
+        i.setAction(android.content.Intent.ACTION_VIEW);
+        i.setDataAndType(Uri.fromFile(mResultsFile), "text/csv");
+        activity.startActivity(i);
+
     }
 }

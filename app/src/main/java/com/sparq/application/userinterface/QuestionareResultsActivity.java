@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.sparq.R;
@@ -18,6 +19,7 @@ import com.sparq.application.userinterface.adapter.ArrivedQuestionsAdapter;
 import com.sparq.application.userinterface.model.PollItem;
 import com.sparq.application.userinterface.model.Questionare;
 import com.sparq.application.userinterface.model.QuizItem;
+import com.sparq.util.Constants;
 import com.sparq.util.ResultsLogger;
 
 import java.util.HashMap;
@@ -34,6 +36,7 @@ public class QuestionareResultsActivity extends AppCompatActivity {
 
     private RecyclerView questionListView;
     private Button csvButton;
+    private LinearLayout csvLayout;
 
     private ResultsLogger resultsLogger;
     @Override
@@ -66,13 +69,18 @@ public class QuestionareResultsActivity extends AppCompatActivity {
 
         questionListView = (RecyclerView) findViewById(R.id.question_recycler_view);
         csvButton = (Button) findViewById(R.id.csv_export);
-
+        csvLayout = (LinearLayout) findViewById(R.id.csv_layout);
         csvButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 exportResultsToCSV();
             }
         });
+
+        initializeAdapter(type);
+    }
+
+    public void initializeAdapter(Questionare.QUESTIONARE_TYPE type){
 
         switch(type){
             case QUIZ:
@@ -82,6 +90,7 @@ public class QuestionareResultsActivity extends AppCompatActivity {
                 break;
             case POLL:
                 setTitle("Poll Questions");
+                csvLayout.setVisibility(View.GONE);
                 mAdapter = new ArrivedQuestionsAdapter(QuestionareResultsActivity.this, Questionare.QUESTIONARE_TYPE.POLL, questionare);
 
                 break;
@@ -91,17 +100,19 @@ public class QuestionareResultsActivity extends AppCompatActivity {
         questionListView.setLayoutManager(mLayoutManager);
         questionListView.setItemAnimator(new DefaultItemAnimator());
         questionListView.setAdapter(mAdapter);
-
     }
 
     public void exportResultsToCSV(){
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            if(((QuizItem) questionare).getUserScores().size() > 0){
+            if(((QuizItem) questionare).getUserScores() != null &&
+                    ((QuizItem) questionare).getUserScores().size() > 0){
                 if(resultsLogger.writeResults(((QuizItem) questionare).getUserScores())){
 
-                    Toast.makeText(QuestionareResultsActivity.this, "Successfully written to a CSV file",
-                            Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(QuestionareResultsActivity.this, "Successfully written to a CSV file",
+//                            Toast.LENGTH_SHORT).show();
+                    resultsLogger.openFile(QuestionareResultsActivity.this);
+
                 }else{
 
                     Toast.makeText(QuestionareResultsActivity.this, "Failed to write to CSV file",
@@ -114,6 +125,48 @@ public class QuestionareResultsActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             }
         }
+
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        switch(type){
+            case QUIZ:
+
+                NotifyQuizHandler notifyQuizHandler = new NotifyQuizHandler() {
+                    @Override
+                    public void handleQuizQuestions() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void handleQuizAnswers() {
+                        initializeAdapter(type);
+                    }
+                };
+
+                SPARQApplication.setQuizNotifier(notifyQuizHandler);
+                break;
+            case POLL:
+
+                NotifyPollHandler notifyPollHandler = new NotifyPollHandler() {
+                    @Override
+                    public void handlePollQuestions() {
+
+                    }
+
+                    @Override
+                    public void handlePollAnswers() {
+                        initializeAdapter(type);
+                    }
+                };
+
+                SPARQApplication.setPollNotifier(notifyPollHandler);
+                break;
+        }
+
 
     }
 

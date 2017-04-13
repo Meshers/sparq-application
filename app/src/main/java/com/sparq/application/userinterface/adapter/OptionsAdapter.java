@@ -135,12 +135,12 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
 
                 if(cb.isChecked()){
                     correctOptions.add(clickedPos);
-                    notifyDataSetChanged();
                 }
                 else {
                     correctOptions.remove(Integer.valueOf(clickedPos));
-                    notifyDataSetChanged();
                 }
+
+                notifyDataSetChanged();
 
                 Log.i("HERE", correctOptions.toString());
             }

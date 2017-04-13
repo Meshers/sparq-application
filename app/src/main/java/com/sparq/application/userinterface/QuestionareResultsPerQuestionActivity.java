@@ -95,7 +95,25 @@ public class QuestionareResultsPerQuestionActivity extends AppCompatActivity {
         questionText = (TextView) findViewById(R.id.question_text);
         questionText.setText(question.getQuestion());
         answerText = (TextView) findViewById(R.id.answer_text);
-//        answerText.setText(question.getCorrectAnswer());
+
+        switch(format){
+            case MCQ_SINGLE:
+            case MCQ_MULTIPLE:
+
+                String answerChoice = "";
+                for(int option: question.getCorrectOptions()){
+                    answerChoice += + option + ", ";
+                }
+                answerChoice = answerChoice.substring(0, answerChoice.length()-2);
+                answerText.setText(answerChoice);
+
+                break;
+            case ONE_WORD:
+            case SHORT:
+                answerText.setText(question.getCorrectAnswer());
+
+                break;
+        }
 
         answerRecyclerView = (RecyclerView) findViewById(R.id.answer_recycler_view);
         graphCard = (CardView) findViewById(R.id.card_view1);

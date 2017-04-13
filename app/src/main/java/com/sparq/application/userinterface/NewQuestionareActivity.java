@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import static com.sparq.application.userinterface.model.Questionare.QUESTIONARE_TYPE.POLL;
+import static com.sparq.application.userinterface.model.Questionare.QUESTIONARE_TYPE.QUIZ;
 import static com.sparq.application.userinterface.model.QuizItem.QUIZ_STATE.INACTIVE;
 
 public class NewQuestionareActivity extends AppCompatActivity {
@@ -137,10 +139,13 @@ public class NewQuestionareActivity extends AppCompatActivity {
                 if(item.equalsIgnoreCase(SPINNERLIST[0])){
                     questionareFormat = QuestionItem.getFormatFromByte((byte) 1);
 
+
                 } else if(item.equalsIgnoreCase(SPINNERLIST[1])){
                     questionareFormat = QuestionItem.getFormatFromByte((byte) 2);
 
                 }
+
+                initializeQuestionAdapter();
             }
 
         });
@@ -188,6 +193,13 @@ public class NewQuestionareActivity extends AppCompatActivity {
             }
         });
 
+        initializeQuestionAdapter();
+    }
+
+    public void initializeQuestionAdapter(){
+
+        questionsArray.clear();
+
         mQuestionAdapter = new QuestionAdapter(NewQuestionareActivity.this,questionsArray);
         final RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(NewQuestionareActivity.this);
         questionsRecyclerView.setLayoutManager(mLayoutManager);
@@ -198,7 +210,7 @@ public class NewQuestionareActivity extends AppCompatActivity {
             @Override
             public void onChanged() {
                 super.onChanged();
-                if(mQuestionAdapter.getItemCount() == Constants.MAX_NUMBER_OF_QUESIONS ){
+                if(mQuestionAdapter.getItemCount() == Constants.MAX_NUMBER_OF_QUESTIONS ){
                     newQuestion.setEnabled(false);
                 }
                 else{
@@ -266,7 +278,7 @@ public class NewQuestionareActivity extends AppCompatActivity {
         View view = dialog.getCustomView();
 
         optionsListView = (RecyclerView) view.findViewById(R.id.options_recycler_view);
-        initializeOptionsAdapter();
+//        initializeOptionsAdapter();
 
         // set up the options spinner
         final MaterialSpinner optionsSpinner = (MaterialSpinner) view.findViewById(R.id.option_spinner);
@@ -276,8 +288,9 @@ public class NewQuestionareActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
 
-                initializeOptionsAdapter();
+                initializeOptionsAdapter(dialog);
                 if(item.equalsIgnoreCase("Options")){
+                    mOptionsAdapter.notifyDataSetChanged();
                     dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
 
                     return;
@@ -289,11 +302,9 @@ public class NewQuestionareActivity extends AppCompatActivity {
                 }
 
                 mOptionsAdapter.notifyDataSetChanged();
-                dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
             }
 
         });
-
 
         dialog.show();
 
@@ -302,8 +313,17 @@ public class NewQuestionareActivity extends AppCompatActivity {
             public void onChanged() {
                 super.onChanged();
                 Log.i("onChanged: ", String.valueOf(mOptionsAdapter.getItemCount()) + ";" + String.valueOf(mOptionsAdapter.getChosenAnswerCount()));
-                if(mOptionsAdapter.getItemCount() >= 2 && mOptionsAdapter.getChosenAnswerCount() != 0){
-                    dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                if(mOptionsAdapter.getItemCount() >= 2){
+
+                    if( type == QUIZ && mOptionsAdapter.getChosenAnswerCount() != 0){
+                        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                    }
+                    else if(type == POLL){
+                        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                    }
+                    else{
+                        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
+                    }
                 }
                 else{
                     dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
@@ -313,13 +333,36 @@ public class NewQuestionareActivity extends AppCompatActivity {
 
     }
 
-    public  void  initializeOptionsAdapter(){
+    public  void  initializeOptionsAdapter(final MaterialDialog dialog){
         options.clear();
         mOptionsAdapter = new OptionsAdapter(type, questionareFormat , options);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(NewQuestionareActivity.this);
         optionsListView.setLayoutManager(mLayoutManager);
         optionsListView.setItemAnimator(new DefaultItemAnimator());
         optionsListView.setAdapter(mOptionsAdapter);
+
+        mOptionsAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                Log.i("onChanged: ", String.valueOf(mOptionsAdapter.getItemCount()) + ";" + String.valueOf(mOptionsAdapter.getChosenAnswerCount()));
+                if(mOptionsAdapter.getItemCount() >= 2){
+
+                    if( type == QUIZ && mOptionsAdapter.getChosenAnswerCount() != 0){
+                        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                    }
+                    else if(type == POLL){
+                        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                    }
+                    else{
+                        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
+                    }
+                }
+                else{
+                    dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
+                }
+            }
+        });
     }
 
 

@@ -23,6 +23,7 @@
     <include layout="@layout/content_poll_results" />
 
     <LinearLayout
+        android:id="@+id/csv_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
