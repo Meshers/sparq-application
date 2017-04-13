@@ -54,7 +54,9 @@ public class LoginActivity extends AppCompatActivity {
 
     public void makePermissionsRequest() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            String[] permissions = {"android.permission.ACCESS_FINE_LOCATION"};
+            String[] permissions = {"android.permission.ACCESS_FINE_LOCATION",
+                    "android.permission.ACCESS_COARSE_LOCATION",
+                    "android.permission.WRITE_EXTERNAL_STORAGE"};
             requestPermissions(
                     permissions, 1
             );
@@ -65,6 +67,11 @@ public class LoginActivity extends AppCompatActivity {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
+
+            Intent gpsIntent = new Intent("android.location.GPS_ENABLED_CHANGE");
+            gpsIntent.putExtra("enabled", true);
+            sendBroadcast(gpsIntent);
+
         }
 
     }
