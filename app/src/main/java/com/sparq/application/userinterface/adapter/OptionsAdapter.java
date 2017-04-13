@@ -64,6 +64,13 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
         Log.i("HERE", type.toString());
     }
 
+    public void resetData(){
+        lastPosition = -1;
+        lastChecked = null;
+        correctOptions.clear();
+        notifyDataSetChanged();
+    }
+
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())

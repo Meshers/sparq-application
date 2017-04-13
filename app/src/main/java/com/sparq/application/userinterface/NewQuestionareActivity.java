@@ -47,6 +47,10 @@ public class NewQuestionareActivity extends AppCompatActivity {
             "Multiple Choice MCQ",
     };
 
+    RecyclerView optionsListView;
+    OptionsAdapter mOptionsAdapter;
+    ArrayList<String> options;
+
     private TextView questionareNameText;
     private EditText durationText;
     private FloatingActionButton addQuestionare;
@@ -58,7 +62,7 @@ public class NewQuestionareActivity extends AppCompatActivity {
     private Questionare.QUESTIONARE_TYPE type;
     private QuestionItem.FORMAT questionareFormat = QuestionItem.FORMAT.MCQ_SINGLE;
     Questionare questionare;
-    private HashMap<Integer, QuestionItem> questionsArray = new HashMap<>(0);
+    private ArrayList<QuestionItem> questionsArray = new ArrayList<>(0);
 
     public static final String QUESTIONARE_TYPE = "questionare_type";
 
@@ -161,7 +165,7 @@ public class NewQuestionareActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 // add all the questions to the questionare object
-                questionare.setQuestions(questionsArray);
+                questionare.setQuestions(mQuestionAdapter.getQuestionHash());
 
                 switch(type){
                     case QUIZ:
@@ -219,9 +223,8 @@ public class NewQuestionareActivity extends AppCompatActivity {
                 "Options", "2", "3", "4", "5"
         };
 
-        final ArrayList<String> options = new ArrayList<>();
-
-        final OptionsAdapter mAdapter = new OptionsAdapter(type, questionareFormat , options);
+        options = new ArrayList<>();
+        mOptionsAdapter = new OptionsAdapter(type, questionareFormat , options);
 
         final MaterialDialog dialog = new MaterialDialog.Builder(NewQuestionareActivity.this)
                 .title("Mark the right answers")
@@ -233,16 +236,16 @@ public class NewQuestionareActivity extends AppCompatActivity {
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
                         QuestionItem newQuestion = new QuestionItem(
-                                questionsArray.size()+1,
+                                0,
                                 questionare.getQuestionareId(),
-                                "Question " + (questionsArray.size()+1),
+                                "New Question",
                                 questionareFormat,
                                 Constants.MIN_QUESTION_MARKS,
-                                mAdapter.getOptions(),
+                                mOptionsAdapter.getOptions(),
                                 Constants.INITIAL_VOTE_COUNT,
-                                mAdapter.getCorrectOptions()
+                                mOptionsAdapter.getCorrectOptions()
                         );
-                        questionsArray.put(questionsArray.size()+1, newQuestion);
+                        questionsArray.add(newQuestion);
 
                         //notify dataset changed
                         mQuestionAdapter.notifyDataSetChanged();
@@ -262,24 +265,21 @@ public class NewQuestionareActivity extends AppCompatActivity {
 
         View view = dialog.getCustomView();
 
-        final RecyclerView optionsListView = (RecyclerView) view.findViewById(R.id.options_recycler_view);
-
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(NewQuestionareActivity.this);
-        optionsListView.setLayoutManager(mLayoutManager);
-        optionsListView.setItemAnimator(new DefaultItemAnimator());
-        optionsListView.setAdapter(mAdapter);
+        optionsListView = (RecyclerView) view.findViewById(R.id.options_recycler_view);
+        initializeOptionsAdapter();
 
         // set up the options spinner
         final MaterialSpinner optionsSpinner = (MaterialSpinner) view.findViewById(R.id.option_spinner);
         optionsSpinner.setItems(SPINNEROPTIONLIST);
         optionsSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
 
-                options.clear();
+                initializeOptionsAdapter();
                 if(item.equalsIgnoreCase("Options")){
-                    mAdapter.notifyDataSetChanged();
                     dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
+
                     return;
                 }
 
@@ -288,8 +288,8 @@ public class NewQuestionareActivity extends AppCompatActivity {
                     options.add(String.valueOf(i));
                 }
 
-                mAdapter.notifyDataSetChanged();
-//                dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                mOptionsAdapter.notifyDataSetChanged();
+                dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
             }
 
         });
@@ -297,12 +297,12 @@ public class NewQuestionareActivity extends AppCompatActivity {
 
         dialog.show();
 
-        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+        mOptionsAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
                 super.onChanged();
-                Log.i("onChanged: ", String.valueOf(mAdapter.getItemCount()) + ";" + String.valueOf(mAdapter.getChosenAnswerCount()));
-                if(mAdapter.getItemCount() >= 2 && mAdapter.getChosenAnswerCount() != 0){
+                Log.i("onChanged: ", String.valueOf(mOptionsAdapter.getItemCount()) + ";" + String.valueOf(mOptionsAdapter.getChosenAnswerCount()));
+                if(mOptionsAdapter.getItemCount() >= 2 && mOptionsAdapter.getChosenAnswerCount() != 0){
                     dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
                 }
                 else{
@@ -311,6 +311,15 @@ public class NewQuestionareActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public  void  initializeOptionsAdapter(){
+        options.clear();
+        mOptionsAdapter = new OptionsAdapter(type, questionareFormat , options);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(NewQuestionareActivity.this);
+        optionsListView.setLayoutManager(mLayoutManager);
+        optionsListView.setItemAnimator(new DefaultItemAnimator());
+        optionsListView.setAdapter(mOptionsAdapter);
     }
 
 

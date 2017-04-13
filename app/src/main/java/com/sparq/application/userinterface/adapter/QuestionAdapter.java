@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.sparq.R;
 import com.sparq.application.userinterface.model.QuestionItem;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.MyView
             R.color.warningDark,
     };
 
-    private HashMap<Integer, QuestionItem> questions;
+    private ArrayList<QuestionItem> questions;
     private Context mContext;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -40,7 +41,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.MyView
     }
 
 
-    public QuestionAdapter(Context context, HashMap<Integer, QuestionItem> questions) {
+    public QuestionAdapter(Context context, ArrayList<QuestionItem> questions) {
         mContext = context;
         this.questions = questions;
     }
@@ -56,14 +57,13 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.MyView
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int position) {
 
-        holder.questionName.setText(questions.get(position + 1).getQuestion());
-        holder.questionFormat.setText(QuestionItem.getFormatAsString(questions.get(position + 1).getFormat()));
+        holder.questionName.setText(questions.get(position).getQuestion());
+        holder.questionFormat.setText(QuestionItem.getFormatAsString(questions.get(position).getFormat()));
 
         holder.deleteOption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                questions.remove(position + 1);
-                notifyItemRemoved(position);
+                questions.remove(position);
                 notifyDataSetChanged();
             }
         });
@@ -79,6 +79,18 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.MyView
     @Override
     public int getItemCount() {
         return questions.size();
+    }
+
+    public HashMap<Integer, QuestionItem> getQuestionHash(){
+
+        HashMap<Integer, QuestionItem> questionHash = new HashMap<>();
+
+        for(QuestionItem questionItem: questions){
+            questionItem.setQuestionId(questions.indexOf(questionItem) + 1);
+            questionHash.put(questionItem.getQuestionId(), questionItem);
+        }
+
+        return questionHash;
     }
 
 }
