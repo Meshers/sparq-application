@@ -68,9 +68,8 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
             }
 
-            Intent gpsIntent = new Intent("android.location.GPS_ENABLED_CHANGE");
-            gpsIntent.putExtra("enabled", true);
-            sendBroadcast(gpsIntent);
+//
+            
 
         }
 
