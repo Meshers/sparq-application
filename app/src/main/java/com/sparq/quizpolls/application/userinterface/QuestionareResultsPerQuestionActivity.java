@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
@@ -45,6 +46,7 @@ public class QuestionareResultsPerQuestionActivity extends AppCompatActivity {
     private RecyclerView answerRecyclerView;
     private CardView graphCard, recyclerCard;
     private GraphView graph;
+    private LinearLayout correctAnswerLayout;
 
     private QuestionItem question;
     private ArrayList<AnswerItem> answers;
@@ -91,24 +93,30 @@ public class QuestionareResultsPerQuestionActivity extends AppCompatActivity {
         questionText = (TextView) findViewById(R.id.question_text);
         questionText.setText(question.getQuestion());
         answerText = (TextView) findViewById(R.id.answer_text);
+        correctAnswerLayout = (LinearLayout) findViewById(R.id.correct_answer_layout);
 
-        switch(format){
-            case MCQ_SINGLE:
-            case MCQ_MULTIPLE:
+        if(type == Questionare.QUESTIONARE_TYPE.QUIZ){
+            switch(format){
+                case MCQ_SINGLE:
+                case MCQ_MULTIPLE:
 
-                String answerChoice = "";
-                for(int option: question.getCorrectOptions()){
-                    answerChoice += + option + ", ";
-                }
-                answerChoice = answerChoice.substring(0, answerChoice.length()-2);
-                answerText.setText(answerChoice);
+                    String answerChoice = "";
+                    for(int option: question.getCorrectOptions()){
+                        answerChoice += + option + ", ";
+                    }
+                    answerChoice = answerChoice.substring(0, answerChoice.length()-2);
+                    answerText.setText(answerChoice);
 
-                break;
-            case ONE_WORD:
-            case SHORT:
-                answerText.setText(question.getCorrectAnswer());
+                    break;
+                case ONE_WORD:
+                case SHORT:
+                    answerText.setText(question.getCorrectAnswer());
 
-                break;
+                    break;
+            }
+        }
+        else if (type == Questionare.QUESTIONARE_TYPE.POLL){
+            correctAnswerLayout.setVisibility(View.GONE);
         }
 
         answerRecyclerView = (RecyclerView) findViewById(R.id.answer_recycler_view);

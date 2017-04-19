@@ -81,13 +81,15 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
 
         holder.optionName.setText(options.get(position));
 
-        holder.deleteOption.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                options.remove(option);
-                notifyDataSetChanged();
-            }
-        });
+//        holder.deleteOption.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                options.remove(option);
+//                notifyDataSetChanged();
+//            }
+//        });
+
+        holder.deleteOption.setVisibility(View.GONE);
 
 
         holder.radioButton.setTag(new Integer(position+1));

@@ -183,6 +183,8 @@ public class EventActivity extends AppCompatActivity {
                 throw new IllegalArgumentException("Illegal user type.");
         }
 
+        newConvThread.setVisibility(View.GONE);
+
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
     }
 
