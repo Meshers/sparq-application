@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".application.userinterface.fragment.EventFragment">
+    tools:context=".quizpolls.application.userinterface.fragment.EventFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/event_list"

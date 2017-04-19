@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sparq">
+    package="com.sparq.quizpolls">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -80,13 +80,13 @@
             android:screenOrientation="portrait"/>
 
         <!-- <provider android:name="application.userinterface.database.ApplicationContentProvider" -->
-        <!-- android:authorities="com.sparq.application.userinterface.database.ApplicationContentProvider"/> -->
+        <!-- android:authorities="com.sparq.quizpolls.application.userinterface.database.ApplicationContentProvider"/> -->
 
 
         <!-- <receiver android:name=".application.userinterface.EventActivity$UIReceiver" android:enabled="true"> -->
         <!-- <intent-filter> -->
-        <!-- <action android:name="com.sparq.application.UI_ENABLE_INTENT"></action> -->
-        <!-- <action android:name="com.sparq.application.UI_DISABLE_INTENT"></action> -->
+        <!-- <action android:name="com.sparq.quizpolls.application.UI_ENABLE_INTENT"></action> -->
+        <!-- <action android:name="com.sparq.quizpolls.application.UI_DISABLE_INTENT"></action> -->
         <!-- <category android:name="android.intent.category.DEFAULT" /> -->
         <!-- </intent-filter> -->
         <!-- </receiver> -->

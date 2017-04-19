@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.sparq.application.userinterface.fragment.QuizFragment">
+    tools:context=".quizpolls.application.userinterface.fragment.QuizFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/thread_recycler_view"

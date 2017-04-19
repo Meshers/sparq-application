@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.sparq.application.userinterface.NewPollActivity">
+    tools:context=".quizpolls.application.userinterface.NewPollActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

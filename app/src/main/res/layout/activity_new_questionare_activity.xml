@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.sparq.application.userinterface.NewQuestionareActivity">
+    tools:context=".quizpolls.application.userinterface.NewQuestionareActivity">
     <!--image used is downloaded from : https://pixabay.com/en/amsterdam-night-canals-evening-1150319/-->
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
