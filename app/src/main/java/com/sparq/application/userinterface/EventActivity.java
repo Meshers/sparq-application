@@ -352,9 +352,7 @@ public class EventActivity extends AppCompatActivity {
         if (mBtResponseDialog != null) {
             mBtResponseDialog.hide();
             new AlertDialog.Builder(this).setTitle("Success!")
-                    .setMessage("Your answer has been recorded! Your participation is appreciated." +
-                            "Feel free to use this Amazon voucher as a token of our appreciation"
-                    + " AMQW" + System.currentTimeMillis() % 10000 + "NQ" + System.currentTimeMillis() % 1000)
+                    .setMessage("Your answer has been submitted and acknowledged")
                     .show();
         }
     }

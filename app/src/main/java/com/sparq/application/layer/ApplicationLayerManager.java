@@ -69,7 +69,7 @@ public class ApplicationLayerManager {
                     case POLL_ANSWER:
                         mWifiLlManager.sendBtMessage(
                                 ((WifiBTQuestionarePdu) pdu).getToAddr(),
-                                ((WifiBTQuestionarePdu) pdu).getToAddr(),
+                                ((WifiBTQuestionarePdu) pdu).getLinkId(),
                                 pdu.encode()
                         );
                         break;

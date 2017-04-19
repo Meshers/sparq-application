@@ -21,6 +21,8 @@ import com.sparq.application.userinterface.model.QuizItem;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import test.com.blootoothtester.network.hotspot.WifiUtils;
+
 import static com.sparq.application.SPARQApplication.USER_TYPE.TEACHER;
 import static com.sparq.application.userinterface.model.Questionare.QUESTIONARE_TYPE.POLL;
 import static com.sparq.application.userinterface.model.Questionare.QUESTIONARE_TYPE.QUIZ;
@@ -105,6 +107,16 @@ public class QuizListAdapter extends RecyclerView.Adapter<QuizListAdapter.MyView
                 }
             }
         });
+
+//        holder.quizStatusImage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                WifiUtils.disableWifi(mContext);
+//
+//                quiz.setState(QuizItem.QUIZ_STATE.INACTIVE);
+//                notifyDataSetChanged();
+//            }
+//        });
 
         switch(quiz.getState()){
             case ACTIVE:
