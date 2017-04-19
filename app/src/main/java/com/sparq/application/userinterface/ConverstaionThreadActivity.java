@@ -225,11 +225,27 @@ public class ConverstaionThreadActivity extends AppCompatActivity {
             @Override
             public void handleConversationThreadQuestions() {
                 // do nothing
+                if(mThread.getAnswers().size() == 0){
+                    recyclerView.setVisibility(View.GONE);
+                    emptyView.setVisibility(View.VISIBLE);
+                }
+                else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    emptyView.setVisibility(View.GONE);
+                }
                 mAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void handleConversationThreadAnswers(){
+                if(mThread.getAnswers().size() == 0){
+                    recyclerView.setVisibility(View.GONE);
+                    emptyView.setVisibility(View.VISIBLE);
+                }
+                else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    emptyView.setVisibility(View.GONE);
+                }
                 mAdapter.notifyDataSetChanged();
                 answerCount.setText(String.valueOf(mThread.getAnswers().size()));
             }

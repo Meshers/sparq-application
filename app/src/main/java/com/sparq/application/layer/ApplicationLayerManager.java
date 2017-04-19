@@ -2,6 +2,7 @@ package com.sparq.application.layer;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.util.Log;
 
 import com.sparq.application.SPARQApplication;
 import com.sparq.application.layer.almessage.AlMessage;
@@ -17,7 +18,9 @@ import java.util.List;
 
 
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
+import test.com.blootoothtester.network.linklayer.bt.DeviceDiscoveryHandler;
 import test.com.blootoothtester.network.linklayer.bt.LinkLayerManager;
+import test.com.blootoothtester.network.linklayer.bt.LlMessage;
 import test.com.blootoothtester.network.linklayer.wifi.BtMessage;
 import test.com.blootoothtester.network.linklayer.wifi.WifiLlManager;
 import test.com.blootoothtester.network.linklayer.wifi.WifiMessage;
@@ -54,7 +57,7 @@ public class ApplicationLayerManager {
         this.mSessionId = sessionId;
 
         initializeArchitectureOne(bluetoothAdapter);
-        initializeArchitectureTwo(bluetoothAdapter);
+//        initializeArchitectureTwo(bluetoothAdapter);
 
         AlContext.Callback callback = new AlContext.Callback() {
             @Override
@@ -93,48 +96,46 @@ public class ApplicationLayerManager {
         };
 
         this.mAlContext = new AlContext(mSessionId, callback);
-//        mLinkLayerManager.startReceiving();
+        mLinkLayerManager.startReceiving();
 
-        mWifiLlManager.startReceivingWifiMessages();
+//        mWifiLlManager.startReceivingWifiMessages();
 
     }
 
     public void initializeArchitectureOne(MyBluetoothAdapter bluetoothAdapter){
 
-        return;
-//
-//        DeviceDiscoveryHandler discoveryHandler = new DeviceDiscoveryHandler() {
-//
-//            @Override
-//            public void handleDiscovery(LlMessage llMessage) {
-//                Log.i("LLMSSG","Message Received from linklayer: "+ llMessage.getDataAsString());
-//
-//                ApplicationLayerPdu pdu = null;
-//
-//                if(llMessage.getDataAsString().equalsIgnoreCase("init")){
-//                    return;
-//                }
-//
-//                switch(ApplicationLayerPdu.getTypeDecoded(llMessage.getData()[0])){
-//                    // this callback is used only for application layer thread PDUs
-//                    case QUESTION:
-//                    case ANSWER:
-//                    case QUESTION_VOTE:
-//                    case ANSWER_VOTE:
-//                        pdu = ThreadPdu.from(llMessage);
-//                        break;
-//                }
-//                if(pdu != null){
-//                    mAlContext.receivePdu(pdu);
-//                }
-//            }
-//        };
-//        this.mLinkLayerManager = new LinkLayerManager(
-//                mOwnAddr,
-//                SPARQApplication.getSessionId(),
-//                bluetoothAdapter,
-//                discoveryHandler
-//        );
+        DeviceDiscoveryHandler discoveryHandler = new DeviceDiscoveryHandler() {
+
+            @Override
+            public void handleDiscovery(LlMessage llMessage) {
+                Log.i("LLMSSG","Message Received from linklayer: "+ llMessage.getDataAsString());
+
+                ApplicationLayerPdu pdu = null;
+
+                if(llMessage.getDataAsString().equalsIgnoreCase("init")){
+                    return;
+                }
+
+                switch(ApplicationLayerPdu.getTypeDecoded(llMessage.getData()[0])){
+                    // this callback is used only for application layer thread PDUs
+                    case QUESTION:
+                    case ANSWER:
+                    case QUESTION_VOTE:
+                    case ANSWER_VOTE:
+                        pdu = ThreadPdu.from(llMessage);
+                        break;
+                }
+                if(pdu != null){
+                    mAlContext.receivePdu(pdu);
+                }
+            }
+        };
+        this.mLinkLayerManager = new LinkLayerManager(
+                mOwnAddr,
+                SPARQApplication.getSessionId(),
+                bluetoothAdapter,
+                discoveryHandler
+        );
     }
 
     public void initializeArchitectureTwo(MyBluetoothAdapter bluetoothAdapter){

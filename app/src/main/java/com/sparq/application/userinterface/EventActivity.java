@@ -85,8 +85,8 @@ public class EventActivity extends AppCompatActivity {
 
         initializeLowerLayer();
 
-        tabLayout.addTab(tabLayout.newTab().setText("Quiz"));
-        tabLayout.addTab(tabLayout.newTab().setText("Poll"));
+//        tabLayout.addTab(tabLayout.newTab().setText("Quiz"));
+//        tabLayout.addTab(tabLayout.newTab().setText("Poll"));
         tabLayout.addTab(tabLayout.newTab().setText("Forums"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
@@ -182,6 +182,9 @@ public class EventActivity extends AppCompatActivity {
             default:
                 throw new IllegalArgumentException("Illegal user type.");
         }
+
+        newPoll.setVisibility(View.GONE);
+        newQuiz.setVisibility(View.GONE);
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
     }
