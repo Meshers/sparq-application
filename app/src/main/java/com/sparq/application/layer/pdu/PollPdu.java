@@ -6,7 +6,7 @@ import android.annotation.SuppressLint;
 
 import java.util.BitSet;
 
-import test.com.blootoothtester.network.linklayer.bt.LlMessage;
+import test.com.blootoothtester.network.linklayer.LlMessage;
 
 import static com.sparq.util.Constants.CONSTANT_DELIMITER;
 

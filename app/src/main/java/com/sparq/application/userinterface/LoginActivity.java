@@ -151,7 +151,7 @@ public class LoginActivity extends AppCompatActivity {
     public void onNextClick() {
 
         Intent intent = new Intent(this, EventActivity.class);
-        String eventCode = mEventCode.getText().toString();
+        final String eventCode = mEventCode.getText().toString();
         String ownAddress = mOwnAddr.getText().toString();
         Log.i("Login Activity:"," onNextClick: ");
 

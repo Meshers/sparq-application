@@ -3,11 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app-arch-2.2/app-arch-2.2.iml" filepath="$PROJECT_DIR$/app-arch-2.2/app-arch-2.2.iml" />
       <module fileurl="file://$PROJECT_DIR$/graphview-4.2.1/graphview-4.2.1.iml" filepath="$PROJECT_DIR$/graphview-4.2.1/graphview-4.2.1.iml" />
       <module fileurl="file://$PROJECT_DIR$/material-spinner-1.1.0/material-spinner-1.1.0.iml" filepath="$PROJECT_DIR$/material-spinner-1.1.0/material-spinner-1.1.0.iml" />
       <module fileurl="file://$PROJECT_DIR$/material-spinner-1.1.1/material-spinner-1.1.1.iml" filepath="$PROJECT_DIR$/material-spinner-1.1.1/material-spinner-1.1.1.iml" />
       <module fileurl="file://$PROJECT_DIR$/sparq-application.iml" filepath="$PROJECT_DIR$/sparq-application.iml" />
+      <module fileurl="file://$PROJECT_DIR$/threads-lib/threads-lib.iml" filepath="$PROJECT_DIR$/threads-lib/threads-lib.iml" />
     </modules>
   </component>
 </project>

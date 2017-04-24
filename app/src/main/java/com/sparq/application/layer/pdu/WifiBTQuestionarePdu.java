@@ -1,9 +1,6 @@
 package com.sparq.application.layer.pdu;
 
-import test.com.blootoothtester.network.linklayer.bt.LlMessage;
-import test.com.blootoothtester.network.linklayer.wifi.BtMessage;
-import test.com.blootoothtester.network.linklayer.wifi.WifiLlManager;
-import test.com.blootoothtester.network.linklayer.wifi.WifiMessage;
+import test.com.blootoothtester.network.linklayer.LlMessage;
 
 /**
  * Created by sarahcs on 4/9/2017.
@@ -231,19 +228,19 @@ public class WifiBTQuestionarePdu extends ApplicationLayerPdu{
     }
 
 
-    public static ApplicationLayerPdu from(BtMessage btMessage) {
-        return decode(btMessage.getBody());
-
-    }
-
-    public static ApplicationLayerPdu from(WifiMessage wifiMessage) {
-
-        WifiBTQuestionarePdu pdu = decode(wifiMessage.getBody());
-        pdu.setToAddr(wifiMessage.getFromAddress());
-        pdu.setLinkId(wifiMessage.getMsgId());
-        return pdu;
-
-    }
+//    public static ApplicationLayerPdu from(BtMessage btMessage) {
+//        return decode(btMessage.getBody());
+//
+//    }
+//
+//    public static ApplicationLayerPdu from(WifiMessage wifiMessage) {
+//
+//        WifiBTQuestionarePdu pdu = decode(wifiMessage.getBody());
+//        pdu.setToAddr(wifiMessage.getFromAddress());
+//        pdu.setLinkId(wifiMessage.getMsgId());
+//        return pdu;
+//
+//    }
 
 
 }

@@ -18,12 +18,9 @@ import java.util.List;
 
 
 import test.com.blootoothtester.bluetooth.MyBluetoothAdapter;
-import test.com.blootoothtester.network.linklayer.bt.DeviceDiscoveryHandler;
-import test.com.blootoothtester.network.linklayer.bt.LinkLayerManager;
-import test.com.blootoothtester.network.linklayer.bt.LlMessage;
-import test.com.blootoothtester.network.linklayer.wifi.BtMessage;
-import test.com.blootoothtester.network.linklayer.wifi.WifiLlManager;
-import test.com.blootoothtester.network.linklayer.wifi.WifiMessage;
+import test.com.blootoothtester.network.linklayer.DeviceDiscoveryHandler;
+import test.com.blootoothtester.network.linklayer.LinkLayerManager;
+import test.com.blootoothtester.network.linklayer.LlMessage;
 
 import static com.sparq.application.layer.pdu.ApplicationLayerPdu.TYPE.POLL_ANSWER;
 import static com.sparq.application.layer.pdu.ApplicationLayerPdu.TYPE.POLL_QUESTION;
@@ -45,7 +42,7 @@ public class ApplicationLayerManager {
     private AlContext mAlContext;
     private byte mOwnAddr;
     private LinkLayerManager mLinkLayerManager;
-    private WifiLlManager mWifiLlManager;
+//    private WifiLlManager mWifiLlManager;
 
     public ApplicationLayerManager(Context context, byte ownAddr, MyBluetoothAdapter bluetoothAdapter,
                                    final ApplicationPacketDiscoveryHandler applicationPacketDiscoveryHandler, byte sessionId){
@@ -64,18 +61,18 @@ public class ApplicationLayerManager {
             public void transmitPdu(ApplicationLayerPdu pdu, byte toAddr) {
 
                 switch(pdu.getType()){
-                    case QUIZ_QUESTION:
-                    case POLL_QUESTION:
-                        mWifiLlManager.sendWifiMessage(pdu.encode());
-                        break;
-                    case QUIZ_ANSWER:
-                    case POLL_ANSWER:
-                        mWifiLlManager.sendBtMessage(
-                                ((WifiBTQuestionarePdu) pdu).getToAddr(),
-                                ((WifiBTQuestionarePdu) pdu).getLinkId(),
-                                pdu.encode()
-                        );
-                        break;
+//                    case QUIZ_QUESTION:
+//                    case POLL_QUESTION:
+//                        mWifiLlManager.sendWifiMessage(pdu.encode());
+//                        break;
+//                    case QUIZ_ANSWER:
+//                    case POLL_ANSWER:
+//                        mWifiLlManager.sendBtMessage(
+//                                ((WifiBTQuestionarePdu) pdu).getToAddr(),
+//                                ((WifiBTQuestionarePdu) pdu).getLinkId(),
+//                                pdu.encode()
+//                        );
+//                        break;
                     case QUESTION:
                     case ANSWER:
                     case ANSWER_VOTE:
@@ -138,78 +135,78 @@ public class ApplicationLayerManager {
         );
     }
 
-    public void initializeArchitectureTwo(MyBluetoothAdapter bluetoothAdapter){
-
-        mWifiLlManager = new WifiLlManager(
-                mContext,
-                SPARQApplication.getOwnAddress(),
-                mSessionId,
-                new WifiLlManager.MessageCallback() {
-
-                    ApplicationLayerPdu pdu = null;
-
-                    @Override
-                    public void onReceiveWifiMessage(WifiMessage wifiMessage) {
-                        // teacher -> student
-                        // poll questions and quiz questions
-                        switch(ApplicationLayerPdu.getTypeDecoded(wifiMessage.getBody()[0])) {
-                            case QUIZ_QUESTION:
-                                pdu = WifiBTQuestionarePdu.from(wifiMessage);
-                                break;
-                            case POLL_QUESTION:
-//                              pdu = PollPdu.from(llMessage);
-                                pdu = WifiBTQuestionarePdu.from(wifiMessage);
-                                break;
-                            default:
-                                throw new IllegalArgumentException(
-                                        "Invalid Packet type. Found " +
-                                        ApplicationLayerPdu.getTypeDecoded(wifiMessage.getBody()[0]) +
-                                        " but expected " + QUIZ_QUESTION +
-                                        " or " + POLL_QUESTION
-                                );
-                        }
-
-                        if(pdu != null){
-                            mAlContext.receivePdu(pdu);
-                        }
-                    }
-
-                    @Override
-                    public void onReceiveBtMessage(BtMessage btMessage) {
-                        // student -> teacher
-                        // poll answers and quiz answers
-                        switch(ApplicationLayerPdu.getTypeDecoded(btMessage.getBody()[0])) {
-                            case QUIZ_ANSWER:
-                                pdu = WifiBTQuestionarePdu.from(btMessage);
-                                break;
-                            case POLL_ANSWER:
-//                              pdu = PollPdu.from(llMessage);
-                                pdu = WifiBTQuestionarePdu.from(btMessage);
-                                break;
-                            default:
-                                throw new IllegalArgumentException(
-                                        "Invalid Packet type. Found " +
-                                                ApplicationLayerPdu.getTypeDecoded(btMessage.getBody()[0]) +
-                                                " but expected " + QUIZ_ANSWER +
-                                                " or " + POLL_ANSWER
-                                );
-                        }
-
-                        if(pdu != null){
-                            mAlContext.receivePdu(pdu);
-                        }
-                    }
-
-                    @Override
-                    public void onAckedByWifi() {
-                        if (EventActivity.mEventActivity != null) {
-                            EventActivity.mEventActivity.hideBtResponseProgressDialog();
-                        }
-                    }
-                },
-                bluetoothAdapter
-        );
-    }
+//    public void initializeArchitectureTwo(MyBluetoothAdapter bluetoothAdapter){
+//
+//        mWifiLlManager = new WifiLlManager(
+//                mContext,
+//                SPARQApplication.getOwnAddress(),
+//                mSessionId,
+//                new WifiLlManager.MessageCallback() {
+//
+//                    ApplicationLayerPdu pdu = null;
+//
+//                    @Override
+//                    public void onReceiveWifiMessage(WifiMessage wifiMessage) {
+//                        // teacher -> student
+//                        // poll questions and quiz questions
+//                        switch(ApplicationLayerPdu.getTypeDecoded(wifiMessage.getBody()[0])) {
+//                            case QUIZ_QUESTION:
+//                                pdu = WifiBTQuestionarePdu.from(wifiMessage);
+//                                break;
+//                            case POLL_QUESTION:
+////                              pdu = PollPdu.from(llMessage);
+//                                pdu = WifiBTQuestionarePdu.from(wifiMessage);
+//                                break;
+//                            default:
+//                                throw new IllegalArgumentException(
+//                                        "Invalid Packet type. Found " +
+//                                        ApplicationLayerPdu.getTypeDecoded(wifiMessage.getBody()[0]) +
+//                                        " but expected " + QUIZ_QUESTION +
+//                                        " or " + POLL_QUESTION
+//                                );
+//                        }
+//
+//                        if(pdu != null){
+//                            mAlContext.receivePdu(pdu);
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onReceiveBtMessage(BtMessage btMessage) {
+//                        // student -> teacher
+//                        // poll answers and quiz answers
+//                        switch(ApplicationLayerPdu.getTypeDecoded(btMessage.getBody()[0])) {
+//                            case QUIZ_ANSWER:
+//                                pdu = WifiBTQuestionarePdu.from(btMessage);
+//                                break;
+//                            case POLL_ANSWER:
+////                              pdu = PollPdu.from(llMessage);
+//                                pdu = WifiBTQuestionarePdu.from(btMessage);
+//                                break;
+//                            default:
+//                                throw new IllegalArgumentException(
+//                                        "Invalid Packet type. Found " +
+//                                                ApplicationLayerPdu.getTypeDecoded(btMessage.getBody()[0]) +
+//                                                " but expected " + QUIZ_ANSWER +
+//                                                " or " + POLL_ANSWER
+//                                );
+//                        }
+//
+//                        if(pdu != null){
+//                            mAlContext.receivePdu(pdu);
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onAckedByWifi() {
+//                        if (EventActivity.mEventActivity != null) {
+//                            EventActivity.mEventActivity.hideBtResponseProgressDialog();
+//                        }
+//                    }
+//                },
+//                bluetoothAdapter
+//        );
+//    }
 
     public boolean sendData(ApplicationLayerPdu.TYPE type, byte[] data, byte[][] options,byte toAddr , List<Byte> headers, List<Boolean> flags) {
 
